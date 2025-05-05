@@ -1,78 +1,119 @@
-Notes:
-Deep Generative Models
-  1. Variational Autoender
-  2. GANs
-  3. LLM
-  4. Multimodal LLMS
-  5. Diffusion Models
-    a. Advanced topics under diffusion models
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Variational Autoencoder</title>
+  <title>Likelihood Estimation in VAE</title>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
 </head>
 <body>
 
-  <h2>Variational Autoencoder</h2>
-  <p>
-    Variational Autoencoder (VAE) is a kind of autoencoder that was originally used to generate images, 
-    but by changing the decoder, we can make it generate text too.
-  </p>
+<h2>Likelihood Estimator</h2>
 
-  <h3>Main Motivation</h3>
-  <p>
-    Given a set of training data of faces, the neural network can be trained to understand the distribution 
-    of the semantic/hidden features of the images provided, and the same set of hidden features can be sampled 
-    to generate similar images.
-  </p>
-  <p>
-    For the training data <code>X</code>, our goal while training is to maximize the likelihood of the data <code>p(X)</code>.
-    From Bayes Theorem, <code>p(X)</code> can be written as the summation of the joint probability distribution 
-    of the given data and the hidden semantic features:
-  </p>
-  <pre>
-max(p(X)) = ∑<sub>z ∈ Z</sub> p(x, z)
-           = |Z| * (1 / |Z|) * ∑ p(x, z)
-           = E<sub>z ∈ Z</sub>[p(x, z)]
-  </pre>
+<p>
+  The likelihood of data \( X \) parameterized by \( \theta \) is:
+</p>
+<p>
+  \[
+  p(X; \theta) = \sum_{z} p(x, z)
+  \]
+</p>
 
-  <p>
-    It is intractable to sum over all values of <code>z</code>. If <code>z</code> is continuous, 
-    then <code>p(x)</code> becomes an integration, which is computationally intractable. 
-    Thus, we need a sampling technique to consider only the values of <code>z</code> 
-    that significantly contribute to <code>p(x, z)</code>.
-  </p>
+<p>
+  For i.i.d. data:
+</p>
+<p>
+  \[
+  p(X) = p(x^{(1)}) \cdot p(x^{(2)}) \cdots p(x^{(m)})
+  \]
+</p>
+<p>
+  Taking log-likelihood:
+</p>
+<p>
+  \[
+  \log p(X; \theta) = \log \left( \prod_{i=1}^{m} p(x^{(i)}) \right) = \sum_{i=1}^{m} \log p(x^{(i)})
+  \]
+</p>
 
-  <h3>Sampling Technique</h3>
+<p>
+  Now consider:
+</p>
+<p>
+  \[
+  \log p(x; \theta) = \log \left( \sum_{z} q(z) \cdot \frac{p(x, z)}{q(z)} \right)
+  \]
+</p>
 
-  <h4>1. Monte Carlo Sampling</h4>
-  <p>
-    For most values of <code>z</code>, <code>p(x, z)</code> is low and not useful for training. Instead:
-  </p>
-  <pre>
-p(x) ≈ |Z| * (1 / k) * ∑<sub>i=1</sub><sup>k</sup> p(x, z<sup>(i)</sup>)
-  </pre>
+<h3>Using Jensen's Inequality</h3>
+<p>
+  For a concave function \( f \), Jensen's inequality states:
+</p>
+<p>
+  \[
+  f(\mathbb{E}[x]) \geq \mathbb{E}[f(x)]
+  \]
+</p>
+<p>
+  Applying to the log-likelihood:
+</p>
+<p>
+  \[
+  \log \left( \mathbb{E}_{z \sim q(z)} \left[ \frac{p(x, z)}{q(z)} \right] \right) \geq \mathbb{E}_{z \sim q(z)} \left[ \log \left( \frac{p(x, z)}{q(z)} \right) \right]
+  \]
+</p>
+<p>
+  The right-hand side is the **Evidence Lower Bound (ELBO)**.
+</p>
 
-  <h4>2. Importance Sampling</h4>
-  <p>
-    Involves sampling from another distribution <code>q(z)</code>:
-  </p>
-  <pre>
-p(x) = ∑<sub>z ∈ Z</sub> (q(z) / q(z)) * p(x, z)
-     = E<sub>z ∼ q(z)</sub>[p(x, z) / q(z)]
-  </pre>
-  <p>
-    Sample <code>z<sup>(1)</sup>, z<sup>(2)</sup>, ..., z<sup>(k)</sup></code> from <code>q(z)</code>,
-  </p>
-  <pre>
-p(x) ≈ (1 / k) * ∑<sub>i=1</sub><sup>k</sup> (p(x, z<sup>(i)</sup>) / q(z<sup>(i)</sup>))
-  </pre>
+<h3>Condition for Equality</h3>
+<p>
+  Equality in Jensen’s inequality holds when \( q(z) = p(z|x) \). Then:
+</p>
+<p>
+  \[
+  \sum_z q(z) \log \left( \frac{p(x, z)}{q(z)} \right) 
+  = \sum_z q(z) \log \left( \frac{p(z|x)p(x)}{q(z)} \right)
+  \]
+  \[
+  = \sum_z q(z) \log \left( \frac{q(z)p(x)}{q(z)} \right) 
+  = \sum_z q(z) \log p(x) = \log p(x)
+  \]
+</p>
+
+<h3>Approximating the Posterior</h3>
+<p>
+  For a tight bound, we assume \( q(z) = p(z|x) \). But in practice, we approximate the posterior using a neural network:
+</p>
+<p>
+  \[
+  q_{\phi}(z|x)
+  \]
+</p>
+<p>
+  If we assume a standard normal prior:
+  \[
+  p(z) = \mathcal{N}(0, I)
+  \]
+  then we aim to learn the distribution \( p(z|x) \) using a neural network that outputs the mean and standard deviation.
+</p>
+
+<h3>Generation Process</h3>
+<p>
+  To generate data, we:
+  <ol>
+    <li>Sample \( z \sim q_{\phi}(z|x) \)</li>
+    <li>Use the decoder to get \( x \sim p_{\theta}(x|z) \)</li>
+  </ol>
+  The joint distribution is:
+</p>
+<p>
+  \[
+  p(x, z) = p(x|z) \cdot p(z)
+  \]
+</p>
 
 </body>
 </html>
