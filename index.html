@@ -1,18 +1,66 @@
-<head>
-  <meta charset="utf-8">
-  <title>Portfolio - Margi Pandya</title>
-  <meta property="og:locale" content="en-US">
-  <meta property="og:site_name" content="Margi Pandya">
-  <meta property="og:title" content="Publications">
-  <link rel="canonical" href="https://bowenc0221.github.io/publications/">
-  <meta property="og:url" content="https://bowenc0221.github.io/publications/">
-  <link rel="stylesheet" href="https://bowenc0221.github.io/assets/css/main.css">
-  <link rel="icon" type="image/png" href="https://bowenc0221.github.io/images/favicon-32x32.png">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131396962-1"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'UA-131396962-1');
-  </script>
-</head>
+<body>
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <div class="masthead__menu">
+        <nav id="site-nav" class="greedy-nav">
+          <button><div class="navicon"></div></button>
+          <ul class="visible-links">
+            <li class="masthead__menu-item masthead__menu-item--lg">
+              <a href="https://margipandya27.github.io/MargiPandya/">Margi Pandya</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://github.com/MargiPandya27/MargiPandya/blob/main/project.html">Ongoing Projects</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://github.com/MargiPandya27/MargiPandya/blob/main/publications.html">Publications</a>
+            </li>
+          </ul>
+          <ul class="hidden-links hidden"></ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <div id="main" role="main">
+    <div class="sidebar sticky">
+      <div itemscope itemtype="http://schema.org/Person">
+        <div class="author__avatar">
+          <img src="https://raw.githubusercontent.com/MargiPandya27/MargiPandya/main/photo_final1.jpeg"
+               class="author__avatar" alt="Margi Pandya" width="150" height="280">
+        </div>
+        <div class="author__content">
+          <h3 class="author__name">Margi Pandya</h3>
+          <p class="author__bio">BTech at National Institute of Technology, Tiruchirappalli (NITT)</p>
+        </div>
+        <div class="author__urls-wrapper">
+          <button class="btn btn--inverse">Follow</button>
+          <ul class="author__urls social-icons">
+            <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> Tiruchirappalli, Tamil Nadu</li>
+            <li><a href="mailto:pandyamk27@gmail.com"><i class="fa fa-fw fa-envelope-square" aria-hidden="true"></i> Email</a></li>
+            <li><a href="https://github.com/MargiPandya27/"><i class="fa fa-fw fa-github" aria-hidden="true"></i> Github</a></li>
+            <li><a href="https://drive.google.com/drive/u/0/folders/1REPTAcCSlPhdo8LxhpK_7GSFKqZB5QfF"><i class="fa fa-fw fa-file" aria-hidden="true"></i> Updated CV (April 2024)</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="archive">
+      <h1 class="page__title">Ongoing Projects</h1>
+      <h2 id="research-projects">Research Projects</h2>
+      <ol>
+        <li>
+          <p><strong>Multiple Foreground Co-segmentation</strong><br>
+          Advisor: <span style="color:blue"><a href="https://www.nitt.edu/home/academics/departments/ece/faculty/avikhati/">Dr. Avik Hati</a></span><br>
+          Multiple foreground common object co-segmentation is a task in computer vision with applications ranging from image understanding to object recognition. The goal is to segment common objects shared among multiple images within a given group. Till now, research in this area has primarily focused on single foreground co-segmentation, where only a single common object is segmented across multiple images. In this project, we work on key approaches such as deep learning-based methods, graph-based algorithms, and optimization techniques to develop an algorithm advised for multiple foreground co-segmentation.
+          </p>
+        </li>
+        <li>
+          <p><strong>Contrastive Fusion of Transformer and CNN based Deep Features for Semantic Segmentation</strong><br>
+          Advisor: <span style="color:blue"><a href="https://www.iitk.ac.in/new/tushar-sandhan">Dr. Tushar Sandhan</a></span><br>
+          Image segmentation is crucial in various computer vision applications for accurately identifying and extracting objects or regions of interest within an image. Despite significant advancements in state-of-the-art (SOTA) models for semantic segmentation, many still rely on additional datasets for improved performance. We introduce ContraFusionNet, a novel segmentation architecture combining...
+          </p>
+        </li>
+      </ol>
+    </div>
+  </div>
+</body>
