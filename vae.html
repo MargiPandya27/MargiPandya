@@ -10,6 +10,66 @@
 </head>
 <body>
 
+<h2>Variational Autoencoder</h2>
+  <p>
+    Variational Autoencoder (VAE) is a kind of autoencoder that was originally used to generate images, 
+    but by changing the decoder, we can make it generate text too.
+  </p>
+
+  <h3>Main Motivation</h3>
+  <p>
+    Given a set of training data of faces, the neural network can be trained to understand the distribution 
+    of the semantic/hidden features of the images provided, and the same set of hidden features can be sampled 
+    to generate similar images.
+  </p>
+  <p>
+    For the training data \( X \), our goal while training is to maximize the likelihood of the data \( p(X) \).
+    From Bayes Theorem, \( p(X) \) can be written as the summation of the joint probability distribution 
+    of the given data and the hidden semantic features:
+  </p>
+  <p>
+    \[
+    \max p(X) = \sum_{z \in Z} p(x, z) = |Z| \cdot \frac{1}{|Z|} \sum p(x, z) = \mathbb{E}_{z \in Z}[p(x, z)]
+    \]
+  </p>
+
+  <p>
+    It is intractable to sum over all values of \( z \). If \( z \) is continuous, 
+    then \( p(x) \) becomes an integration, which is computationally intractable. 
+    Thus, we need a sampling technique to consider only the values of \( z \) 
+    that significantly contribute to \( p(x, z) \).
+  </p>
+
+  <h3>Sampling Technique</h3>
+
+  <h4>1. Monte Carlo Sampling</h4>
+  <p>
+    For most values of \( z \), \( p(x, z) \) is low and not useful for training. Instead:
+  </p>
+  <p>
+    \[
+    p(x) \approx |Z| \cdot \frac{1}{k} \sum_{i=1}^{k} p(x, z^{(i)})
+    \]
+  </p>
+
+  <h4>2. Importance Sampling</h4>
+  <p>
+    Involves sampling from another distribution \( q(z) \):
+  </p>
+  <p>
+    \[
+    p(x) = \sum_{z \in Z} \frac{q(z)}{q(z)} p(x, z) = \mathbb{E}_{z \sim q(z)}\left[\frac{p(x, z)}{q(z)}\right]
+    \]
+  </p>
+  <p>
+    Sample \( z^{(1)}, z^{(2)}, ..., z^{(k)} \sim q(z) \):
+  </p>
+  <p>
+    \[
+    p(x) \approx \frac{1}{k} \sum_{i=1}^{k} \frac{p(x, z^{(i)})}{q(z^{(i)})}
+    \]
+  </p>
+  
 <h2>Likelihood Estimator</h2>
 
 <p>
