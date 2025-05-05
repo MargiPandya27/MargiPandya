@@ -3,77 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Margi Pandya - Variational Autoencoders</title>
-  <link rel="stylesheet" href="style.css">
-  <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <title>Margi Pandya - Portfolio</title>
+  <link rel="stylesheet" href="https://bowenc0221.github.io/assets/css/main.css">
+  <style>
+    .container {
+      display: flex;
+      align-items: flex-start;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      gap: 2rem;
+    }
+    .sidebar {
+      flex: 0 0 280px;
+      min-width: 220px;
+      max-width: 320px;
+      position: sticky;
+      top: 2rem;
+      height: fit-content;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      z-index: 10;
+    }
+    .content {
+      flex: 1 1 0;
+      min-width: 0;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      z-index: 1;
+    }
+    @media (max-width: 800px) {
+      .container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .sidebar, .content {
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="container">
-      <h1>Margi Pandya</h1>
-      <ul class="nav-links">
-        <li><a href="#vae">VAE</a></li>
-        <li><a href="#elbo">ELBO</a></li>
-        <li><a href="#sampling">Sampling</a></li>
-        <li><a href="#reparameterization">Reparameterization</a></li>
-        <li><a href="#kl-divergence">KL Divergence</a></li>
-      </ul>
-    </div>
-  </nav>
+  <!-- Top Navigation Bar -->
+  <div class="masthead">
+    <!-- ... navigation ... -->
+  </div>
 
   <div class="container">
-    <aside class="sidebar">
-      <img src="photo.jpg" alt="Margi Pandya" class="profile-photo">
-      <h2>Margi Pandya</h2>
-      <p>Graduate Student, ECE</p>
-      <ul>
-        <li>Email: margipandya@ucsd.edu</li>
-        <li><a href="cv.pdf">CV</a></li>
-        <li><a href="https://github.com/margipandya">GitHub</a></li>
-      </ul>
+    <!-- Sidebar -->
+    <aside class="sidebar sticky">
+      <!-- ... sidebar content ... -->
     </aside>
 
+    <!-- Main Content -->
     <main class="content">
-      <section id="vae">
-        <h2>Variational Autoencoder (VAE)</h2>
-        <p>Instead of maximizing the probability of a point x directly, we maximize its log-likelihood:</p>
-        <p>\[ \log p(x) = \log \int p(x|z) p(z) \; dz \]</p>
-        <p>In VAEs, we introduce an approximate posterior \( q(z|x) \) to turn this into a lower bound (ELBO):</p>
-        <p>\[ \log p(x) \geq \mathbb{E}_{q(z|x)} [\log p(x|z)] - \mathrm{KL}(q(z|x) || p(z)) \]</p>
-      </section>
-
-      <section id="sampling">
-        <h2>Sampling from a Multivariate Gaussian</h2>
-        <p>To sample \( z \sim \mathcal{N}(\mu, \Sigma) \), we use:</p>
-        <p>\[ z = \mu + A \epsilon, \quad \epsilon \sim \mathcal{N}(0, I) \]</p>
-        <p>Here, \( A \) is a matrix such that \( AA^T = \Sigma \), typically found via Cholesky decomposition.</p>
-      </section>
-
-      <section id="elbo">
-        <h2>ELBO Derivation</h2>
-        <p>We start from:</p>
-        <p>\[ \log p(x) = \log \int p(x, z) \; dz = \log \int q(z|x) \frac{p(x,z)}{q(z|x)} \; dz \]</p>
-        <p>Then use Jensen’s Inequality:</p>
-        <p>\[ \log p(x) \geq \mathbb{E}_{q(z|x)} \left[ \log \frac{p(x,z)}{q(z|x)} \right] = \text{ELBO} \]</p>
-      </section>
-
-      <section id="reparameterization">
-        <h2>Reparameterization Trick</h2>
-        <p>We reparameterize \( z \sim q(z|x) \) as:</p>
-        <p>\[ z = \mu(x) + \sigma(x) \cdot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I) \]</p>
-        <p>This allows gradient flow through \( \mu \) and \( \sigma \) during backpropagation.</p>
-      </section>
-
-      <section id="kl-divergence">
-        <h2>KL Divergence Between Two Gaussians</h2>
-        <p>Given \( q(z|x) = \mathcal{N}(\mu, \sigma^2) \) and \( p(z) = \mathcal{N}(0,1) \), the KL divergence is:</p>
-        <p>\[ \mathrm{KL}(q || p) = -\frac{1}{2} \sum_{i=1}^{d} \left(1 + \log \sigma_i^2 - \mu_i^2 - \sigma_i^2\right) \]</p>
-      </section>
+      <!-- ... your VAE content ... -->
+      <!-- Place all your <h2>, <p>, <ol>, <div class="math">, etc. here -->
     </main>
   </div>
 
-  <footer class="footer">
-    <p>&copy; 2025 Margi Pandya. All rights reserved.</p>
-  </footer>
+  <div class="page__footer">
+    <footer>
+      <p>@2025 Margi Pandya</p>
+    </footer>
+  </div>
 </body>
 </html>
