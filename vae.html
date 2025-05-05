@@ -10,164 +10,158 @@
 </head>
 <body>
 
-<h2>Variational Autoencoder</h2>
-  <p>
-    Variational Autoencoder (VAE) is a kind of autoencoder that was originally used to generate images, 
-    but by changing the decoder, we can make it generate text too.
-  </p>
+<h2>Variational Autoencoder (VAE)</h2>
+<p>
+  A Variational Autoencoder is a type of generative model that learns a latent representation of data and can be used to generate similar data samples. While VAEs were originally used for images, changing the decoder enables them to generate text or other data types.
+</p>
 
-  <h3>Main Motivation</h3>
-  <p>
-    Given a set of training data of faces, the neural network can be trained to understand the distribution 
-    of the semantic/hidden features of the images provided, and the same set of hidden features can be sampled 
-    to generate similar images.
-  </p>
-  <p>
-    For the training data \( X \), our goal while training is to maximize the likelihood of the data \( p(X) \).
-    From Bayes Theorem, \( p(X) \) can be written as the summation of the joint probability distribution 
-    of the given data and the hidden semantic features:
-  </p>
-  <p>
-    \[
-    \max p(X) = \sum_{z \in Z} p(x, z) = |Z| \cdot \frac{1}{|Z|} \sum p(x, z) = \mathbb{E}_{z \in Z}[p(x, z)]
-    \]
-  </p>
+<h3>Main Motivation</h3>
+<p>
+  Given a training dataset of faces, a neural network can be trained to model the distribution of the latent (hidden) semantic features that describe those faces. Once trained, we can sample new latent features and decode them to generate similar, realistic faces.
+</p>
+<p>
+  For the dataset \( X \), the goal is to maximize the likelihood of the data under the model: \( p(X) \). By marginalizing over latent variables \( z \), we write:
+</p>
+<p>
+  \[
+  \max p(X) = \sum_{z \in Z} p(x, z) = |Z| \cdot \frac{1}{|Z|} \sum p(x, z) = \mathbb{E}_{z \in Z}[p(x, z)]
+  \]
+</p>
+<p>
+  When \( z \) is continuous, this summation becomes an integral:
+</p>
+<p>
+  \[
+  p(x) = \int p(x, z) \, dz
+  \]
+</p>
+<p>
+  Computing this integral exactly is intractable. Thus, we use sampling-based techniques that focus on the regions of \( z \) that significantly contribute to the probability mass of \( p(x, z) \).
+</p>
 
-  <p>
-    It is intractable to sum over all values of \( z \). If \( z \) is continuous, 
-    then \( p(x) \) becomes an integration, which is computationally intractable. 
-    Thus, we need a sampling technique to consider only the values of \( z \) 
-    that significantly contribute to \( p(x, z) \).
-  </p>
+<h3>Sampling Techniques</h3>
 
-  <h3>Sampling Technique</h3>
+<h4>1. Monte Carlo Sampling</h4>
+<p>
+  Most values of \( z \) contribute negligibly to \( p(x, z) \), so instead of averaging over all possible \( z \), we approximate the integral using samples:
+</p>
+<p>
+  \[
+  p(x) \approx \frac{1}{k} \sum_{i=1}^{k} p(x, z^{(i)})
+  \quad \text{where } z^{(i)} \sim \text{Uniform sampling}
+  \]
+</p>
 
-  <h4>1. Monte Carlo Sampling</h4>
-  <p>
-    For most values of \( z \), \( p(x, z) \) is low and not useful for training. Instead:
-  </p>
-  <p>
-    \[
-    p(x) \approx |Z| \cdot \frac{1}{k} \sum_{i=1}^{k} p(x, z^{(i)})
-    \]
-  </p>
+<h4>2. Importance Sampling</h4>
+<p>
+  Rather than sampling \( z \) uniformly, we sample from a distribution \( q(z) \) that is closer to the posterior. This improves the efficiency of the estimate:
+</p>
+<p>
+  \[
+  p(x) = \int \frac{p(x, z)}{q(z)} q(z) \, dz = \mathbb{E}_{z \sim q(z)}\left[\frac{p(x, z)}{q(z)}\right]
+  \]
+</p>
+<p>
+  Approximating this expectation with \( k \) samples:
+</p>
+<p>
+  \[
+  p(x) \approx \frac{1}{k} \sum_{i=1}^{k} \frac{p(x, z^{(i)})}{q(z^{(i)})}
+  \quad \text{where } z^{(i)} \sim q(z)
+  \]
+</p>
 
-  <h4>2. Importance Sampling</h4>
-  <p>
-    Involves sampling from another distribution \( q(z) \):
-  </p>
-  <p>
-    \[
-    p(x) = \sum_{z \in Z} \frac{q(z)}{q(z)} p(x, z) = \mathbb{E}_{z \sim q(z)}\left[\frac{p(x, z)}{q(z)}\right]
-    \]
-  </p>
-  <p>
-    Sample \( z^{(1)}, z^{(2)}, ..., z^{(k)} \sim q(z) \):
-  </p>
-  <p>
-    \[
-    p(x) \approx \frac{1}{k} \sum_{i=1}^{k} \frac{p(x, z^{(i)})}{q(z^{(i)})}
-    \]
-  </p>
-  
 <h2>Likelihood Estimator</h2>
 
 <p>
-  The likelihood of data \( X \) parameterized by \( \theta \) is:
+  The marginal likelihood of a single data point \( x \) (parameterized by \( \theta \)) is:
 </p>
 <p>
   \[
-  p(X; \theta) = \sum_{z} p(x, z)
-  \]
-</p>
-
-<p>
-  For i.i.d. data:
-</p>
-<p>
-  \[
-  p(X) = p(x^{(1)}) \cdot p(x^{(2)}) \cdots p(x^{(m)})
+  p(x; \theta) = \int p(x, z; \theta) \, dz
   \]
 </p>
 <p>
-  Taking log-likelihood:
+  For i.i.d. data \( X = \{x^{(1)}, \dots, x^{(m)}\} \), the total data likelihood is:
 </p>
 <p>
   \[
-  \log p(X; \theta) = \log \left( \prod_{i=1}^{m} p(x^{(i)}) \right) = \sum_{i=1}^{m} \log p(x^{(i)})
-  \]
-</p>
-
-<p>
-  Now consider:
-</p>
-<p>
-  \[
-  \log p(x; \theta) = \log \left( \sum_{z} q(z) \cdot \frac{p(x, z)}{q(z)} \right)
+  p(X; \theta) = \prod_{i=1}^{m} p(x^{(i)}; \theta)
+  \quad \Rightarrow \quad
+  \log p(X; \theta) = \sum_{i=1}^{m} \log p(x^{(i)}; \theta)
   \]
 </p>
 
 <h3>Using Jensen's Inequality</h3>
 <p>
-  For a concave function \( f \), Jensen's inequality states:
+  We rewrite the log-likelihood of a single data point using importance sampling:
 </p>
 <p>
   \[
-  f(\mathbb{E}[x]) \geq \mathbb{E}[f(x)]
+  \log p(x; \theta) = \log \left( \int q(z) \cdot \frac{p(x, z)}{q(z)} \, dz \right)
+  = \log \mathbb{E}_{z \sim q(z)} \left[ \frac{p(x, z)}{q(z)} \right]
   \]
 </p>
 <p>
-  Applying to the log-likelihood:
+  Applying Jensen’s inequality (since log is concave):
 </p>
 <p>
   \[
-  \log \left( \mathbb{E}_{z \sim q(z)} \left[ \frac{p(x, z)}{q(z)} \right] \right) \geq \mathbb{E}_{z \sim q(z)} \left[ \log \left( \frac{p(x, z)}{q(z)} \right) \right]
+  \log \mathbb{E}_{z \sim q(z)} \left[ \frac{p(x, z)}{q(z)} \right]
+  \geq \mathbb{E}_{z \sim q(z)} \left[ \log \left( \frac{p(x, z)}{q(z)} \right) \right]
   \]
 </p>
 <p>
-  The right-hand side is the **Evidence Lower Bound (ELBO)**.
+  The right-hand side is known as the <strong>Evidence Lower Bound (ELBO)</strong>:
+</p>
+<p>
+  \[
+  \mathcal{L}(x; \theta, \phi) = \mathbb{E}_{z \sim q_\phi(z|x)} \left[ \log p_\theta(x|z) \right] - D_{KL}(q_\phi(z|x) \| p(z))
+  \]
 </p>
 
 <h3>Condition for Equality</h3>
 <p>
-  Equality in Jensen’s inequality holds when \( q(z) = p(z|x) \). Then:
+  The inequality becomes equality when \( q(z) = p(z|x) \), the true posterior:
 </p>
 <p>
   \[
-  \sum_z q(z) \log \left( \frac{p(x, z)}{q(z)} \right) 
-  = \sum_z q(z) \log \left( \frac{p(z|x)p(x)}{q(z)} \right)
-  \]
-  \[
-  = \sum_z q(z) \log \left( \frac{q(z)p(x)}{q(z)} \right) 
-  = \sum_z q(z) \log p(x) = \log p(x)
+  \log p(x) = \mathbb{E}_{z \sim p(z|x)} \left[ \log \left( \frac{p(x, z)}{p(z|x)} \right) \right]
+  = \log p(x)
   \]
 </p>
-
-<h3>Approximating the Posterior</h3>
 <p>
-  For a tight bound, we assume \( q(z) = p(z|x) \). But in practice, we approximate the posterior using a neural network:
+  However, since computing the true posterior is intractable, we approximate it using a neural network:
 </p>
 <p>
   \[
   q_{\phi}(z|x)
   \]
 </p>
+
+<h3>Approximate Posterior via Neural Network</h3>
 <p>
-  If we assume a standard normal prior:
+  To approximate \( p(z|x) \), we define \( q_{\phi}(z|x) \) as a neural network that outputs a Gaussian distribution with mean and variance conditioned on \( x \). We typically assume a standard normal prior:
+</p>
+<p>
   \[
   p(z) = \mathcal{N}(0, I)
   \]
-  then we aim to learn the distribution \( p(z|x) \) using a neural network that outputs the mean and standard deviation.
+</p>
+<p>
+  The encoder (inference network) learns \( q_{\phi}(z|x) = \mathcal{N}(\mu(x), \sigma^2(x)) \), while the decoder models \( p_{\theta}(x|z) \).
 </p>
 
 <h3>Generation Process</h3>
 <p>
-  To generate data, we:
+  Once trained, we can generate new samples as follows:
   <ol>
-    <li>Sample \( z \sim q_{\phi}(z|x) \)</li>
-    <li>Use the decoder to get \( x \sim p_{\theta}(x|z) \)</li>
+    <li>Sample \( z \sim p(z) = \mathcal{N}(0, I) \)</li>
+    <li>Generate \( x \sim p_{\theta}(x|z) \) using the decoder</li>
   </ol>
-  The joint distribution is:
+</p>
+<p>
+  The joint distribution used during training is:
 </p>
 <p>
   \[
