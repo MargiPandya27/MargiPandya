@@ -70,38 +70,80 @@
         \approx \frac{1}{k} \sum_{i=1}^{k} \frac{p(x, z^{(i)})}{q(z^{(i)})}, \quad z^{(i)} \sim q(z)
       \]
     </div>
+    <div class="highlight">
+      <strong>Note:</strong> In VAEs, the proposal distribution \( q(z) \) is replaced by the encoder \( q_\phi(z|x) \).
+    </div>
   </div>
 
   <div class="section">
-    <h3>Evidence Lower Bound (ELBO)</h3>
+    <h3>Likelihood Estimator and ELBO Derivation</h3>
     <p>
-      The log-likelihood can be lower-bounded using Jensen's inequality:
+      For a single data point \( x \) and parameters \( \theta \), the marginal likelihood is:
     </p>
     <div class="math">
       \[
-        \log p(x) = \log \mathbb{E}_{z \sim q(z)} \left[ \frac{p(x, z)}{q(z)} \right]
-        \geq \mathbb{E}_{z \sim q(z)} \left[ \log \frac{p(x, z)}{q(z)} \right]
+        p(x; \theta) = \int p(x, z; \theta) \, dz
       \]
     </div>
     <p>
-      This lower bound is called the <strong>ELBO</strong>:
+      For a dataset \( X = \{x^{(1)}, \dots, x^{(m)}\} \), the total likelihood is:
     </p>
     <div class="math">
       \[
-        \mathcal{L}(x; \theta, \phi) = \mathbb{E}_{z \sim q_\phi(z|x)} \left[ \log p_\theta(x|z) \right] - D_{KL}(q_\phi(z|x) \| p(z))
+        p(X; \theta) = \prod_{i=1}^{m} p(x^{(i)}; \theta)
+        \quad \Rightarrow \quad
+        \log p(X; \theta) = \sum_{i=1}^{m} \log p(x^{(i)}; \theta)
       \]
     </div>
-    <p>
-      <strong>Equality holds</strong> when \( q(z) = p(z|x) \), i.e., the approximate posterior matches the true posterior.
-    </p>
+    <h4>Step-by-Step Derivation:</h4>
+    <ol>
+      <li>
+        <strong>Rewrite using importance sampling:</strong>
+        <div class="math">
+          \[
+            \log p(x; \theta) = \log \left( \int q_\phi(z|x) \cdot \frac{p(x, z)}{q_\phi(z|x)} \, dz \right)
+            = \log \mathbb{E}_{z \sim q_\phi(z|x)} \left[ \frac{p(x, z)}{q_\phi(z|x)} \right]
+          \]
+        </div>
+      </li>
+      <li>
+        <strong>Apply Jensen’s inequality (log is concave):</strong>
+        <div class="math">
+          \[
+            \log \mathbb{E}_{z \sim q_\phi(z|x)} \left[ \frac{p(x, z)}{q_\phi(z|x)} \right]
+            \geq \mathbb{E}_{z \sim q_\phi(z|x)} \left[ \log \left( \frac{p(x, z)}{q_\phi(z|x)} \right) \right]
+          \]
+        </div>
+      </li>
+      <li>
+        <strong>Define the Evidence Lower Bound (ELBO):</strong>
+        <div class="math">
+          \[
+            \mathcal{L}(x; \theta, \phi) = \mathbb{E}_{z \sim q_\phi(z|x)} \left[ \log p_\theta(x|z) \right] - D_{KL}(q_\phi(z|x) \| p(z))
+          \]
+        </div>
+      </li>
+      <li>
+        <strong>Condition for equality:</strong> The inequality becomes equality when \( q_\phi(z|x) = p(z|x) \), the true posterior.
+      </li>
+    </ol>
   </div>
 
   <div class="section">
     <h3>VAE Architecture</h3>
     <ul>
-      <li><strong>Encoder</strong>: Learns \( q_\phi(z|x) = \mathcal{N}(\mu(x), \sigma^2(x)I) \) via a neural network.</li>
-      <li><strong>Decoder</strong>: Models \( p_\theta(x|z) \), typically as a Gaussian or Bernoulli distribution.</li>
-      <li><strong>Prior</strong>: Usually \( p(z) = \mathcal{N}(0, I) \).</li>
+      <li>
+        <strong>Encoder</strong>:
+        Learns \( q_\phi(z|x) = \mathcal{N}(\mu_\phi(x), \sigma_\phi^2(x)I) \) via a neural network.
+      </li>
+      <li>
+        <strong>Decoder</strong>:
+        Models \( p_\theta(x|z) \), typically as a Gaussian or Bernoulli distribution.
+      </li>
+      <li>
+        <strong>Prior</strong>:
+        Usually \( p(z) = \mathcal{N}(0, I) \).
+      </li>
     </ul>
     <p>
       For images: Encoders use convolutional layers; decoders use transposed convolutions.
@@ -110,10 +152,12 @@
 
   <div class="section">
     <h3>KL Divergence (Gaussian Case)</h3>
+    <p>
+      For \( q_\phi(z|x) = \mathcal{N}(\mu_\phi(x), \sigma_\phi^2(x)I) \) and prior \( p(z) = \mathcal{N}(0, I) \), the KL divergence has a closed form:
+    </p>
     <div class="math">
-      For \( q(z) = \mathcal{N}(\mu, \sigma^2 I) \), \( p(z) = \mathcal{N}(0, I) \):<br>
       \[
-        D_{\text{KL}}(q \| p) = \frac{1}{2} \sum_{j=1}^d \left( -\log \sigma_j^2 + \mu_j^2 + \sigma_j^2 - 1 \right)
+        D_{\text{KL}}(q_\phi(z|x) \| p(z)) = \frac{1}{2} \sum_{j=1}^d \left( -\log \sigma_{\phi,j}^2(x) + \mu_{\phi,j}^2(x) + \sigma_{\phi,j}^2(x) - 1 \right)
       \]
     </div>
   </div>
@@ -125,7 +169,29 @@
     </p>
     <div class="math">
       \[
-        z = \mu + \sigma \cdot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)
+        z = \mu_\phi(x) + \sigma_\phi(x) \cdot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)
+      \]
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Reconstruction Loss Gradient Derivation</h3>
+    <div class="math">
+      \[
+        \nabla_\phi \mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z)] = \nabla_\phi \int q_\phi(z|x) \log p_\theta(x|z) dz
+      \]
+      Assuming interchange of gradient and integral:
+      \[
+        = \int \log p_\theta(x|z) \nabla_\phi q_\phi(z|x) dz
+      \]
+      Using the identity:
+      \[
+        \nabla_\phi q_\phi(z|x) = q_\phi(z|x) \nabla_\phi \log q_\phi(z|x)
+      \]
+      So,
+      \[
+        = \int \log p_\theta(x|z) q_\phi(z|x) \nabla_\phi \log q_\phi(z|x) dz
+        = \mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z) \nabla_\phi \log q_\phi(z|x)]
       \]
     </div>
   </div>
@@ -133,8 +199,8 @@
   <div class="section">
     <h3>Training & Generation</h3>
     <ol>
-      <li>Encode \( x \) to get \( \mu, \sigma \).</li>
-      <li>Sample \( z \) via reparameterization.</li>
+      <li>Encode \( x \) to get \( \mu_\phi(x), \sigma_\phi(x) \).</li>
+      <li>Sample \( z \) via the reparameterization trick.</li>
       <li>Decode \( z \) to reconstruct \( x \).</li>
       <li>Optimize ELBO: maximize reconstruction, minimize KL divergence.</li>
     </ol>
