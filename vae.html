@@ -1,23 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Likelihood Estimation in VAE</title>
+  <meta charset="UTF-8" />
+  <title>VAE with Sidebar Navigation</title>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <style>
-    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 2em; background: #fafbfc; color: #222; }
-    h2, h3, h4 { color: #2c3e50; }
-    code { background: #f4f4f4; padding: 2px 4px; border-radius: 4px; }
-    ol, ul { margin-top: 0; }
-    p { line-height: 1.6; }
-    .math { margin: 1em 0; }
-    .section { margin-bottom: 2em; }
-    .highlight { background: #e8f6ff; padding: 0.5em; border-radius: 6px; }
+    /* Sidebar container */
+    .sidebar {
+      height: 100%; /* Full height */
+      width: 200px; /* Sidebar width */
+      position: fixed; /* Fixed position */
+      top: 0;
+      left: 0;
+      background-color: #111; /* Dark background */
+      padding-top: 20px;
+      overflow-x: hidden; /* Disable horizontal scroll */
+    }
+
+    /* Sidebar links */
+    .sidebar a {
+      padding: 12px 16px;
+      text-decoration: none;
+      font-size: 18px;
+      color: #ccc;
+      display: block;
+      transition: 0.3s;
+    }
+
+    /* Active/current link */
+    .sidebar a.active {
+      background-color: #04AA6D;
+      color: white;
+    }
+
+    /* Links on hover */
+    .sidebar a:hover:not(.active) {
+      background-color: #575757;
+      color: white;
+    }
+
+    /* Page content */
+    .content {
+      margin-left: 210px; /* Same as sidebar width + some margin */
+      padding: 20px;
+    }
+
+    /* Responsive: collapse sidebar on small screens */
+    @media screen and (max-width: 700px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      .sidebar a {float: left; padding: 10px;}
+      .content {margin-left: 0;}
+    }
+
+    @media screen and (max-width: 400px) {
+      .sidebar a {
+        text-align: center;
+        float: none;
+      }
+    }
   </style>
 </head>
 <body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="deep-generative-models.html" class="active">Deep Generative Models</a>
+    <a href="agents.html">Agents</a>
+    <a href="rag.html">RAG</a>
+  </div>
 
 <h2>Variational Autoencoder (VAE)</h2>
 <p>
