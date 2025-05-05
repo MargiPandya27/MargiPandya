@@ -2,162 +2,156 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Likelihood Estimation in VAE</title>
+  <title>Variational Autoencoder (VAE) – Likelihood Estimation</title>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-  </script>
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 2em; background: #fafbfc; color: #222; }
+    h2, h3, h4 { color: #2c3e50; }
+    code { background: #f4f4f4; padding: 2px 4px; border-radius: 4px; }
+    ol, ul { margin-top: 0; }
+    p { line-height: 1.6; }
+    .math { margin: 1em 0; }
+    .section { margin-bottom: 2em; }
+    .highlight { background: #e8f6ff; padding: 0.5em; border-radius: 6px; }
+  </style>
 </head>
 <body>
 
-<h1>Variational Autoencoder (VAE) - Likelihood Estimation</h1>
+  <h2>Variational Autoencoder (VAE): Likelihood Estimation</h2>
 
-<p>
-  A <strong>Variational Autoencoder (VAE)</strong> is a type of deep generative model that learns to encode data into a latent space and then decode it to generate similar data samples. While originally designed for image data, VAEs can be adapted to work with text, audio, or other modalities.
-</p>
+  <div class="section">
+    <h3>Overview</h3>
+    <p>
+      A <strong>Variational Autoencoder (VAE)</strong> is a generative model that learns a probabilistic mapping between observed data and a latent space. VAEs are widely used for generating complex data such as images, text, and audio.
+    </p>
+  </div>
 
-<h2>🔍 Goal</h2>
-<p>
-  Given a dataset \( X \), we want to learn the parameters \( \theta \) of a generative model such that the likelihood \( p(X; \theta) \) is maximized.
-</p>
+  <div class="section">
+    <h3>Motivation</h3>
+    <p>
+      Given a dataset (e.g., faces), a VAE learns to encode each data point into a latent representation. By sampling from this latent space and decoding, the model can generate new, realistic samples.
+    </p>
+    <div class="math">
+      For data \( X \), the goal is to maximize the marginal likelihood:<br>
+      \[
+        p(x) = \int p(x, z) \, dz
+      \]
+      where \( z \) is the latent variable.
+    </div>
+    <p>
+      This integral is generally intractable, so we approximate it using sampling techniques.
+    </p>
+  </div>
 
-<h3>Marginal Likelihood and Latent Variables</h3>
-<p>
-  To handle complex distributions, VAEs introduce latent variables \( z \) and define a joint distribution \( p(x, z) \). The marginal likelihood of a sample \( x \) is obtained by integrating over all latent variables:
-</p>
-<p>
-  \[
-  p(x) = \int p(x, z) \, dz
-  \]
-</p>
-<p>
-  This integral is often intractable, especially when \( z \) is high-dimensional. So we estimate it using <em>sampling techniques</em>.
-</p>
+  <div class="section">
+    <h3>Sampling Techniques</h3>
 
-<h2>🎲 Sampling Methods</h2>
+    <h4>1. Monte Carlo Sampling</h4>
+    <p>
+      Approximate the integral by averaging over samples from the latent space:
+    </p>
+    <div class="math">
+      \[
+        p(x) \approx \frac{1}{k} \sum_{i=1}^{k} p(x, z^{(i)}), \quad z^{(i)} \sim \text{Uniform}
+      \]
+    </div>
 
-<h3>1. Monte Carlo Estimation</h3>
-<p>
-  We approximate the integral using randomly sampled latent vectors:
-</p>
-<p>
-  \[
-  p(x) \approx \frac{1}{k} \sum_{i=1}^{k} p(x, z^{(i)}), \quad z^{(i)} \sim \text{Uniform}
-  \]
-</p>
-<p>
-  However, since most sampled \( z \) contribute little to \( p(x, z) \), this method is inefficient.
-</p>
+    <h4>2. Importance Sampling</h4>
+    <p>
+      Sample \( z \) from a proposal distribution \( q(z) \) that is closer to the true posterior:
+    </p>
+    <div class="math">
+      \[
+        p(x) = \int \frac{p(x, z)}{q(z)} q(z) \, dz = \mathbb{E}_{z \sim q(z)}\left[\frac{p(x, z)}{q(z)}\right]
+      \]
+      \[
+        \approx \frac{1}{k} \sum_{i=1}^{k} \frac{p(x, z^{(i)})}{q(z^{(i)})}, \quad z^{(i)} \sim q(z)
+      \]
+    </div>
+  </div>
 
-<h3>2. Importance Sampling</h3>
-<p>
-  We instead sample from a distribution \( q(z) \) that is closer to the posterior:
-</p>
-<p>
-  \[
-  p(x) = \int \frac{p(x, z)}{q(z)} q(z) \, dz = \mathbb{E}_{z \sim q(z)}\left[\frac{p(x, z)}{q(z)}\right]
-  \]
-</p>
-<p>
-  Approximating with \( k \) samples:
-</p>
-<p>
-  \[
-  p(x) \approx \frac{1}{k} \sum_{i=1}^{k} \frac{p(x, z^{(i)})}{q(z^{(i)})}, \quad z^{(i)} \sim q(z)
-  \]
-</p>
+  <div class="section">
+    <h3>Evidence Lower Bound (ELBO)</h3>
+    <p>
+      The log-likelihood can be lower-bounded using Jensen's inequality:
+    </p>
+    <div class="math">
+      \[
+        \log p(x) = \log \mathbb{E}_{z \sim q(z)} \left[ \frac{p(x, z)}{q(z)} \right]
+        \geq \mathbb{E}_{z \sim q(z)} \left[ \log \frac{p(x, z)}{q(z)} \right]
+      \]
+    </div>
+    <p>
+      This lower bound is called the <strong>ELBO</strong>:
+    </p>
+    <div class="math">
+      \[
+        \mathcal{L}(x; \theta, \phi) = \mathbb{E}_{z \sim q_\phi(z|x)} \left[ \log p_\theta(x|z) \right] - D_{KL}(q_\phi(z|x) \| p(z))
+      \]
+    </div>
+    <p>
+      <strong>Equality holds</strong> when \( q(z) = p(z|x) \), i.e., the approximate posterior matches the true posterior.
+    </p>
+  </div>
 
-<h2>📈 Log-Likelihood and ELBO</h2>
-<p>
-  For i.i.d. dataset \( X = \{x^{(1)}, \dots, x^{(m)}\} \), the log-likelihood is:
-</p>
-<p>
-  \[
-  \log p(X; \theta) = \sum_{i=1}^{m} \log p(x^{(i)}; \theta)
-  \]
-</p>
+  <div class="section">
+    <h3>VAE Architecture</h3>
+    <ul>
+      <li><strong>Encoder</strong>: Learns \( q_\phi(z|x) = \mathcal{N}(\mu(x), \sigma^2(x)I) \) via a neural network.</li>
+      <li><strong>Decoder</strong>: Models \( p_\theta(x|z) \), typically as a Gaussian or Bernoulli distribution.</li>
+      <li><strong>Prior</strong>: Usually \( p(z) = \mathcal{N}(0, I) \).</li>
+    </ul>
+    <p>
+      For images: Encoders use convolutional layers; decoders use transposed convolutions.
+    </p>
+  </div>
 
-<h3>Using Jensen’s Inequality</h3>
-<p>
-  The log-likelihood for a single point \( x \) can be written using importance sampling:
-</p>
-<p>
-  \[
-  \log p(x) = \log \mathbb{E}_{z \sim q(z)} \left[ \frac{p(x, z)}{q(z)} \right]
-  \geq \mathbb{E}_{z \sim q(z)} \left[ \log \left( \frac{p(x, z)}{q(z)} \right) \right]
-  \]
-</p>
-<p>
-  This lower bound is called the <strong>Evidence Lower Bound (ELBO)</strong>:
-</p>
-<p>
-  \[
-  \mathcal{L}(x; \theta, \phi) = \mathbb{E}_{z \sim q_\phi(z|x)} \left[ \log p_\theta(x|z) \right] - D_{KL}(q_\phi(z|x) \| p(z))
-  \]
-</p>
+  <div class="section">
+    <h3>KL Divergence (Gaussian Case)</h3>
+    <div class="math">
+      For \( q(z) = \mathcal{N}(\mu, \sigma^2 I) \), \( p(z) = \mathcal{N}(0, I) \):<br>
+      \[
+        D_{\text{KL}}(q \| p) = \frac{1}{2} \sum_{j=1}^d \left( -\log \sigma_j^2 + \mu_j^2 + \sigma_j^2 - 1 \right)
+      \]
+    </div>
+  </div>
 
-<h3>Equality Condition</h3>
-<p>
-  The inequality becomes equality when \( q(z) = p(z|x) \), the true posterior:
-</p>
-<p>
-  \[
-  \log p(x) = \mathbb{E}_{z \sim p(z|x)} \left[ \log \left( \frac{p(x, z)}{p(z|x)} \right) \right] = \log p(x)
-  \]
-</p>
+  <div class="section">
+    <h3>Reparameterization Trick</h3>
+    <p>
+      To enable backpropagation through stochastic sampling, we use:
+    </p>
+    <div class="math">
+      \[
+        z = \mu + \sigma \cdot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)
+      \]
+    </div>
+  </div>
 
-<h2>🧠 Approximating the Posterior with Neural Networks</h2>
-<p>
-  Since the true posterior is intractable, we approximate it with a neural network:
-</p>
-<p>
-  \[
-  q_\phi(z|x) = \mathcal{N}(z; \mu(x), \sigma^2(x))
-  \]
-</p>
-<p>
-  This is known as the <strong>encoder</strong> or inference network. It outputs the mean and variance of a Gaussian for each input \( x \).
-</p>
+  <div class="section">
+    <h3>Training & Generation</h3>
+    <ol>
+      <li>Encode \( x \) to get \( \mu, \sigma \).</li>
+      <li>Sample \( z \) via reparameterization.</li>
+      <li>Decode \( z \) to reconstruct \( x \).</li>
+      <li>Optimize ELBO: maximize reconstruction, minimize KL divergence.</li>
+    </ol>
+    <div class="highlight">
+      <strong>Generation:</strong> Sample \( z \sim \mathcal{N}(0, I) \), decode to get a new sample \( x_{\text{new}} \).
+    </div>
+  </div>
 
-<h2>🧬 Generation Process</h2>
-<ol>
-  <li>Sample \( z \sim p(z) = \mathcal{N}(0, I) \)</li>
-  <li>Use decoder to generate \( x \sim p_\theta(x|z) \)</li>
-</ol>
-<p>
-  The generative model is defined as:
-</p>
-<p>
-  \[
-  p(x, z) = p(x|z) \cdot p(z)
-  \]
-</p>
-
-<h2>🔧 Final Loss Function</h2>
-<p>
-  The final VAE loss function (to maximize ELBO) is:
-</p>
-<p>
-  \[
-  \log p(x) \geq \mathbb{E}_{z \sim q(z|x)} \left[ \log p_\theta(x|z) \right] - D_{KL}(q_\phi(z|x) \| p(z))
-  \]
-</p>
-
-<h2>📉 KL Divergence Term</h2>
-<p>
-  Given:
-  \[
-  q(z|x) = \mathcal{N}(z; \mu, \sigma^2 I), \quad p(z) = \mathcal{N}(z; 0, I)
-  \]
-</p>
-<p>
-  The KL divergence has a closed form:
-</p>
-<p>
-  \[
-  D_{KL}(q(z|x) \| p(z)) = \frac{1}{2} \sum_{j=1}^{d} \left( \sigma_j^2 + \mu_j^2 - 1 - \log \sigma_j^2 \right)
-  \]
-</p>
+  <div class="section">
+    <h3>Summary</h3>
+    <ul>
+      <li>VAEs maximize a lower bound (ELBO) on data likelihood.</li>
+      <li>They use neural networks to approximate the intractable posterior.</li>
+      <li>The reparameterization trick enables efficient training.</li>
+      <li>KL divergence regularizes the latent space.</li>
+    </ul>
+  </div>
 
 </body>
 </html>
