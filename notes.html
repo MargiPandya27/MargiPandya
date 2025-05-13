@@ -1,4 +1,4 @@
-r<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -35,7 +35,7 @@ r<!DOCTYPE html>
   
   <div style="display: flex; justify-content: space-between; max-width: 1300px; margin: 0 auto; padding: 20px;">
   <!-- Sidebar -->
-  <div class="sidebar sticky">
+  <div class="sidebar sticky" style="width: 300px;"> <!-- Adjust sidebar width -->
     <div itemscope itemtype="http://schema.org/Person">
       <div class="author__avatar">
         <img src="https://raw.githubusercontent.com/MargiPandya27/MargiPandya/main/photo_final1.jpeg" class="author__avatar" alt="Margi Pandya" width="150" height="280">
@@ -57,42 +57,38 @@ r<!DOCTYPE html>
   </div>
     
   <!-- Main Content -->
-<main style="flex: 1; padding: 10px; max-width: 1000px;">
-  <h2>Notes</h2>
-  <p>
-    This page includes all the important bits and pieces of information that I found has to be stored.
-  </p>
-  <div>
-    <div class="toggle-header" onclick="toggleSection('deepGenList')">📂 Deep Generative Models</div>
-    <ul class="nested-list" id="deepGenList">
-      <li><a href="https://margipandya27.github.io/MargiPandya/vae.html">Variational Autoencoder</a></li>
-      <li>Generative Adversarial Networks</li>
-      <li>LLMs</li>
-      <li>VLMs</li>
-    </ul>
-  </div>
-
-  <div>
-    <div class="toggle-header" onclick="toggleSection('deepGenList')">📂 Retrieval Augmented Generation</div>
-    <ul class="nested-list" id="deepGenList">
-      <li><a href="https://margipandya27.github.io/MargiPandya/naive_rag.html">Naive RAG</a></li>
-    </ul>
-  </div>
-
-</main>
+  <main style="flex: 1; padding: 10px; max-width: 1000px;">
+    <h2>Notes</h2>
+    <p>
+      This page includes all the important bits and pieces of information that I found have to be stored.
+    </p>
+    <div>
+      <div class="toggle-header" onclick="toggleSection('deepGenList')">📂 Deep Generative Models</div>
+      <ul class="nested-list" id="deepGenList">
+        <li><a href="https://margipandya27.github.io/MargiPandya/vae.html">Variational Autoencoder</a></li>
+        <li>Generative Adversarial Networks</li>
+        <li>LLMs</li>
+        <li>VLMs</li>
+      </ul>
     </div>
+
+    <div>
+      <div class="toggle-header" onclick="toggleSection('deepGenList')">📂 Retrieval Augmented Generation</div>
+      <ul class="nested-list" id="deepGenList">
+        <li><a href="https://margipandya27.github.io/MargiPandya/naive_rag.html">Naive RAG</a></li>
+      </ul>
+    </div>
+  </main>
+  </div>
+
   <footer class="page__meta">
-                    <!-- Any additional metadata or footer information goes here -->
-                </footer>
-            </div>
-        </article>
-    </div>
+    <!-- Any additional metadata or footer information goes here -->
+  </footer>
 
-    <div class="page__footer">
-        <footer>
-            <!-- Your footer content goes here -->
-            <p>@2025 Margi Pandya</p>
-        </footer>
-    </div>
+  <div class="page__footer">
+    <footer>
+      <p>@2025 Margi Pandya</p>
+    </footer>
+  </div>
 </body>
 </html>
