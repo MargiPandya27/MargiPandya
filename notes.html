@@ -33,7 +33,7 @@ r<!DOCTYPE html>
     </div>
   </div>
   
-  <div style="display: flex; justify-content: space-between; max-width: 1000px; margin: 0 auto; padding: 10px;">
+  <div style="display: flex; justify-content: space-between; max-width: 800px; margin: 0 auto; padding: 10px;">
   <!-- Sidebar -->
   <div class="sidebar sticky">
     <div itemscope itemtype="http://schema.org/Person">
@@ -57,7 +57,7 @@ r<!DOCTYPE html>
   </div>
     
   <!-- Main Content -->
-<main style="flex: 1; padding: 20px; max-width: 1000px;">
+<main style="flex: 1; padding: 20px; max-width: 800px;">
   <h2>Notes</h2>
   <p>
     This page includes all the important bits and pieces of information that I found has to be stored.
@@ -71,10 +71,13 @@ r<!DOCTYPE html>
       <li>VLMs</li>
     </ul>
   </div>
-  <ul>
-    <li><a href="https://margipandya27.github.io/MargiPandya/vae.html">Deep Generative Models</a></li>
-    <li><a href="https://margipandya27.github.io/MargiPandya/naive_rag.html">Retrieval Augmented Generation</a></li>
-  </ul>
+
+  <div>
+    <div class="toggle-header" onclick="toggleSection('deepGenList')">📂 Retrieval Augmented Generation</div>
+    <ul class="nested-list" id="deepGenList">
+      <li><a href="https://margipandya27.github.io/MargiPandya/naive_rag.html">Naive RAG</a></li>
+    </ul>
+  </div>
 
 </main>
     </div>
