@@ -51,8 +51,10 @@ _<!DOCTYPE html>
 
 
   <!-- Main Content -->
+<!-- Main Content -->
 <main style="flex: 1; padding: 20px; max-width: 1000px;">
-<script>
+
+  <script>
     function copyToClipboard(codeId) {
       const text = document.getElementById(codeId).innerText;
       navigator.clipboard.writeText(text).then(() => {
@@ -60,8 +62,135 @@ _<!DOCTYPE html>
       });
     }
   </script>
-</head>
-<body>
+
+  <h2>Introduction to RAGs</h2>
+  <p>
+    Large Language Models (LLMs), or any type of foundational models, are typically trained on static datasets. Retraining these models every time new data is added to the internet is not feasible. While fine-tuning a model for a specific domain may be effective in certain use cases, it is not a scalable solution for keeping up with daily information updates.
+  </p>
+  <p>
+    For example, if you ask ChatGPT to provide papers on "Multi-Agent Systems for Autonomous Driving," it may respond with a curated list of papers up to 2023 or 2024. This is useful—but what if you want to retrieve papers published just yesterday? In fields like Machine Learning and Deep Learning, hundreds (if not thousands) of papers are published every day. Constantly retraining the model is simply not practical.
+  </p>
+  <p>
+    This is where <strong>Retrieval-Augmented Generation (RAG)</strong>, <strong>Prompt Engineering</strong>, and <strong>Fine-Tuning</strong> come into play. These techniques help ground the responses of foundational models based on the specific query being asked. Each approach has its pros and cons, and the best choice depends on the application.
+  </p>
+
+  <h3>What is RAG?</h3>
+  <p>
+    RAG can be thought of as a data pre-processing layer for LLMs. Instead of feeding the model a massive corpus of documents (webpages, PDFs, etc.), only the <em>most relevant document chunks</em> are provided as <strong>context</strong> along with the user's query. The LLM then generates a response based on this grounded context.
+  </p>
+  <p>
+    At a high level, RAG involves three key components:
+  </p>
+  <ul>
+    <li><strong>Indexing</strong></li>
+    <li><strong>Retrieval</strong></li>
+    <li><strong>Generation</strong></li>
+  </ul>
+
+  <h4>1. Indexing</h4>
+  <p>
+    Indexing involves breaking documents into smaller chunks that fit within the context window of an embedding model. These chunks are then passed through an embedding model to convert them into vector representations. These vectors capture the semantic meaning of the text and place similar concepts close together in vector space. The resulting vectors are stored in a <strong>vector database</strong>.
+  </p>
+
+  <h4>2. Retrieval</h4>
+  <p>
+    When a user submits a query, it is also converted into a vector using the <em>same embedding model</em>. The system then searches for the most semantically similar chunks in the vector database.
+  </p>
+  <p>
+    A simple method for retrieval is <strong>k-Nearest Neighbors (k-NN)</strong>, which calculates cosine similarity between the query vector and vectors in the database. However, this method has a time complexity of <code>O(N)</code>, which becomes inefficient as the dataset grows.
+  </p>
+  <p>
+    To optimize this process, <strong>Approximate Nearest Neighbor (ANN)</strong> search algorithms are used. One popular method is <strong>Hierarchical Navigable Small World (HNSW)</strong> graphs, which use skip-linked lists and graph structures to significantly reduce the search time to <code>O(log(N))</code>.
+  </p>
+
+  <h4>3. Generation</h4>
+  <p>
+    This stage involves two main components:
+  </p>
+  <ul>
+    <li><strong>Prompt Engineering</strong>: Techniques like zero-shot learning, few-shot learning, and chain-of-thought reasoning are used to guide the model output effectively.</li>
+    <li><strong>Choice of LLM</strong>: Based on token limits, speed, accuracy, cost, and integration feasibility.</li>
+  </ul>
+
+  <h4>Comparison of LLMs</h4>
+  <table border="1" cellpadding="6">
+    <thead>
+      <tr>
+        <th>LLM</th>
+        <th>Type</th>
+        <th>Strengths</th>
+        <th>Weaknesses</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>LLaMA 2</td>
+        <td>Open-source</td>
+        <td>Local control, no API cost, customizable</td>
+        <td>Requires setup/GPU, resource-heavy</td>
+      </tr>
+      <tr>
+        <td>Mistral</td>
+        <td>Open-source</td>
+        <td>Lightweight, fast, good for edge deployments</td>
+        <td>Limited long-context handling</td>
+      </tr>
+      <tr>
+        <td>Falcon</td>
+        <td>Open-source</td>
+        <td>Scalable, permissive license</td>
+        <td>Inconsistent output formatting</td>
+      </tr>
+      <tr>
+        <td>Claude</td>
+        <td>Commercial</td>
+        <td>Excellent reasoning, safe outputs</td>
+        <td>Slower, weaker formatting adherence</td>
+      </tr>
+      <tr>
+        <td>GPT-4</td>
+        <td>Commercial</td>
+        <td>High-quality output, great reasoning</td>
+        <td>Limited API access, costly</td>
+      </tr>
+      <tr>
+        <td>Gemini 1.5 Flash</td>
+        <td>Commercial</td>
+        <td>Fast, reliable formatting, large context window</td>
+        <td>Requires API key</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>Context Window Sizes</h4>
+  <table border="1" cellpadding="6">
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Context Window Size</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>GPT-3</td>
+        <td>2,049 tokens</td>
+      </tr>
+      <tr>
+        <td>GPT-4o</td>
+        <td>128K tokens</td>
+      </tr>
+      <tr>
+        <td>LLaMA 3</td>
+        <td>32K tokens</td>
+      </tr>
+      <tr>
+        <td>Gemini</td>
+        <td>128K tokens</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr>
 
   <h2>Simplest RAG Pipeline using LangChain & HuggingFace</h2>
   <p>This example walks through how to build a simple Retrieval-Augmented Generation pipeline using LangChain.</p>
@@ -120,11 +249,15 @@ Please summarize the related work section of the paper, highlighting prior appro
 
 response = model.generate_content(prompt)</code></pre>
 
-<p> References:  https://medium.com/@dinabavli/rag-basics-basic-implementation-of-retrieval-augmented-generation-rag-e80e0791159d
-  https://www.youtube.com/playlist?list=PLfaIDFEXuae2LXbO1_PKyVJiQ23ZztA0x
-  https://github.com/langchain-ai/rag-from-scratch
-  
-</p>
+  <p>
+    References:  
+    <a href="https://medium.com/@dinabavli/rag-basics-basic-implementation-of-retrieval-augmented-generation-rag-e80e0791159d" target="_blank">Medium article on RAG basics</a><br>
+    <a href="https://www.youtube.com/playlist?list=PLfaIDFEXuae2LXbO1_PKyVJiQ23ZztA0x" target="_blank">RAG YouTube playlist</a><br>
+    <a href="https://github.com/langchain-ai/rag-from-scratch" target="_blank">LangChain RAG from scratch GitHub</a>
+  </p>
+
+</main>
+
 
 </body>
    <footer class="page__meta">
