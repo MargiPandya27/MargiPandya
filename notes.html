@@ -1,10 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Margi Pandya - Portfolio</title>
-  <link rel="stylesheet" href="https://bowenc0221.github.io/assets/css/main.css">
+  <link rel="stylesheet" href="https://bowenc0221.github.io/assets/css/main.css" />
+  
+  <!-- ✅ Add toggle list styles -->
+  <style>
+    .toggle-header {
+      font-weight: bold;
+      cursor: pointer;
+      padding: 10px;
+      background-color: #f2f2f2;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+
+    .toggle-header:hover {
+      background-color: #e6e6e6;
+    }
+
+    .nested-list {
+      list-style-type: none;
+      padding-left: 20px;
+      margin-top: 5px;
+      display: none; /* Hidden by default */
+    }
+
+    .nested-list li {
+      padding: 5px 0;
+    }
+
+    .nested-list li a {
+      text-decoration: none;
+      color: #007bff;
+    }
+
+    .nested-list li a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
   <!-- Top Navigation Bar -->
@@ -32,54 +69,82 @@
       </div>
     </div>
   </div>
-  
+
   <div style="display: flex; justify-content: space-between; max-width: 1300px; margin: 0 auto; padding: 20px;">
-  <!-- Sidebar -->
-  <div class="sidebar sticky" style="width: 300px;"> <!-- Adjust sidebar width -->
-    <div itemscope itemtype="http://schema.org/Person">
-      <div class="author__avatar">
-        <img src="https://raw.githubusercontent.com/MargiPandya27/MargiPandya/main/photo_final1.jpeg" class="author__avatar" alt="Margi Pandya" width="150" height="280">
+    <!-- Sidebar -->
+    <div class="sidebar sticky" style="width: 300px;">
+      <div itemscope itemtype="http://schema.org/Person">
+        <div class="author__avatar">
+          <img src="https://raw.githubusercontent.com/MargiPandya27/MargiPandya/main/photo_final1.jpeg" class="author__avatar" alt="Margi Pandya" width="150" height="280">
+        </div>
+        <div class="author__content">
+          <h3 class="author__name">Margi Pandya</h3>
+          <p class="author__bio">BTech at National Institute of Technology, Tiruchirappalli (NITT)</p>
+        </div>
+        <div class="author__urls-wrapper">
+          <button class="btn btn--inverse">Follow</button>
+          <ul class="author__urls social-icons">
+            <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> Tiruchirappalli, Tamil Nadu</li>
+            <li><a href="mailto:pandyamk27@gmail.com"><i class="fa fa-fw fa-envelope-square" aria-hidden="true"></i> Email</a></li>
+            <li><a href="https://github.com/MargiPandya27/"><i class="fa fa-fw fa-github" aria-hidden="true"></i> Github</a></li>
+            <li><a href="https://drive.google.com/drive/u/0/folders/1REPTAcCSlPhdo8LxhpK_7GSFKqZB5QfF"><i class="fa fa-fw fa-file" aria-hidden="true"></i> Updated CV (April 2024)</a></li>
+          </ul>
+        </div>
       </div>
-      <div class="author__content">
-        <h3 class="author__name">Margi Pandya</h3>
-        <p class="author__bio">BTech at National Institute of Technology, Tiruchirappalli (NITT)</p>
-      </div>
-      <div class="author__urls-wrapper">
-        <button class="btn btn--inverse">Follow</button>
-        <ul class="author__urls social-icons">
-          <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> Tiruchirappalli, Tamil Nadu</li>
-          <li><a href="mailto:pandyamk27@gmail.com"><i class="fa fa-fw fa-envelope-square" aria-hidden="true"></i> Email</a></li>
-          <li><a href="https://github.com/MargiPandya27/"><i class="fa fa-fw fa-github" aria-hidden="true"></i> Github</a></li>
-          <li><a href="https://drive.google.com/drive/u/0/folders/1REPTAcCSlPhdo8LxhpK_7GSFKqZB5QfF"><i class="fa fa-fw fa-file" aria-hidden="true"></i> Updated CV (April 2024)</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-    
-  <!-- Main Content -->
-  <main style="flex: 1; padding: 10px; max-width: 1000px;">
-    <h2>Notes</h2>
-    <p>
-      This page includes all the important bits and pieces of information that I found have to be stored.
-    </p>
-    <div>
-      <div class="toggle-header" onclick="toggleSection('deepGenList')">📂 Deep Generative Models</div>
-      <ul class="nested-list" id="deepGenList">
-        <li><a href="https://margipandya27.github.io/MargiPandya/vae.html">Variational Autoencoder</a></li>
-        <li>Generative Adversarial Networks</li>
-        <li>LLMs</li>
-        <li>VLMs</li>
-      </ul>
     </div>
 
-    <div>
-      <div class="toggle-header" onclick="toggleSection('RAG')">📂 Retrieval Augmented Generation</div>
-      <ul class="nested-list" id="RAG">
-        <li><a href="https://margipandya27.github.io/MargiPandya/naive_rag.html">Naive RAG</a></li>
-      </ul>
-    </div>
-  </main>
+    <!-- Main Content -->
+    <main style="flex: 1; padding: 10px; max-width: 1000px;">
+      <h2>Notes</h2>
+      <p>
+        This page includes all the important bits and pieces of information that I found have to be stored.
+      </p>
+
+      <!-- Toggleable Sections -->
+      <div>
+        <div class="toggle-header" onclick="toggleSection('deepGenList')">📂 Deep Generative Models</div>
+        <ul class="nested-list" id="deepGenList">
+          <li><a href="https://margipandya27.github.io/MargiPandya/vae.html">Variational Autoencoder</a></li>
+          <li>Generative Adversarial Networks</li>
+          <li>LLMs</li>
+          <li>VLMs</li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="toggle-header" onclick="toggleSection('RAG')">📂 Retrieval Augmented Generation</div>
+        <ul class="nested-list" id="RAG">
+          <li><a href="https://margipandya27.github.io/MargiPandya/naive_rag.html">Naive RAG</a></li>
+        </ul>
+      </div>
+    </main>
   </div>
+
+  <footer class="page__meta">
+    <!-- Any additional metadata or footer information goes here -->
+  </footer>
+
+  <div class="page__footer">
+    <footer>
+      <p>@2025 Margi Pandya</p>
+    </footer>
+  </div>
+
+  <!-- ✅ Toggle Section Script -->
+  <script>
+    function toggleSection(id) {
+      const section = document.getElementById(id);
+      section.style.display = section.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Optionally collapse all sections by default on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.nested-list').forEach(list => {
+        list.style.display = 'none';
+      });
+    });
+  </script>
+
 
   <footer class="page__meta">
     <!-- Any additional metadata or footer information goes here -->
