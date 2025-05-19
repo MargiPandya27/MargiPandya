@@ -192,26 +192,39 @@ _<!DOCTYPE html>
 
   <hr>
 
-  <h2>Simplest RAG Pipeline using LangChain & HuggingFace</h2>
-  <p>This example walks through how to build a simple Retrieval-Augmented Generation pipeline using LangChain.</p>
+  <!-- All-in-One RAG Pipeline -->
+<h3>All-in-One RAG Pipeline (LangChain + HuggingFace)</h3>
 
-  <!-- .txt Loader -->
-  <h3>1. Loading Text from <code>.txt</code> File</h3>
-  <pre><button class="copy-btn" onclick="copyToClipboard('code1')">📋</button><code id="code1">from langchain_community.document_loaders import TextLoader
+<!-- Clipboard Copy Script -->
+<script>
+  function copyToClipboard(codeId) {
+    const text = document.getElementById(codeId).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Code copied to clipboard!");
+    });
+  }
+</script>
 
-loader = TextLoader("sample.txt")
-docs = loader.load()</code></pre>
+<!-- Combined Code Block -->
+<pre>
+  <button class="copy-btn" onclick="copyToClipboard('combined-code')">📋</button>
+  <code id="combined-code">
+# 1. Load documents
+from langchain_community.document_loaders import TextLoader, PyPDFLoader
 
-  <!-- PDF Loader -->
-  <h3>2. Loading PDF</h3>
-  <pre><button class="copy-btn" onclick="copyToClipboard('code2')">📋</button><code id="code2">from langchain_community.document_loaders import PyPDFLoader
+# Load from .txt
+txt_loader = TextLoader("sample.txt")
+txt_docs = txt_loader.load()
 
-loader = PyPDFLoader("/content/Survey_Amodal_completion.pdf")
-docs = loader.load()</code></pre>
+# Load from PDF
+pdf_loader = PyPDFLoader("/content/Survey_Amodal_completion.pdf")
+pdf_docs = pdf_loader.load()
 
-  <!-- Chunking -->
-  <h3>3. Chunking the Text</h3>
-  <pre><button class="copy-btn" onclick="copyToClipboard('code3')">📋</button><code id="code3">from langchain.text_splitter import RecursiveCharacterTextSplitter
+# Combine all documents
+docs = txt_docs + pdf_docs
+
+# 2. Chunk the text
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 raw_texts = [doc.page_content for doc in docs]
 
@@ -219,24 +232,22 @@ text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=1000,
     chunk_overlap=100
 )
-texts = text_splitter.create_documents(raw_texts)</code></pre>
+texts = text_splitter.create_documents(raw_texts)
 
-  <!-- Embedding -->
-  <h3>4. Embedding</h3>
-  <pre><button class="copy-btn" onclick="copyToClipboard('code4')">📋</button><code id="code4">from langchain.embeddings import HuggingFaceEmbeddings
+# 3. Generate embeddings
+from langchain.embeddings import HuggingFaceEmbeddings
 
-embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")</code></pre>
+embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-  <!-- Vector DB -->
-  <h3>5. Similarity Search</h3>
-  <pre><button class="copy-btn" onclick="copyToClipboard('code5')">📋</button><code id="code5">from langchain_community.vectorstores import FAISS
+# 4. Create vector store
+from langchain_community.vectorstores import FAISS
 
 db = FAISS.from_documents(texts, embedding)
-retriever = db.as_retriever()</code></pre>
+retriever = db.as_retriever()
 
-  <!-- Retrieval + Prompt -->
-  <h3>6. Combining Retrieval with Prompt</h3>
-  <pre><button class="copy-btn" onclick="copyToClipboard('code6')">📋</button><code id="code6">retrieved_docs = retriever.get_relevant_documents("What are the related works that have been done on this?")
+# 5. Retrieve relevant documents and prepare prompt
+query = "What are the related works that have been done on this?"
+retrieved_docs = retriever.get_relevant_documents(query)
 context = "\n\n".join([doc.page_content for doc in retrieved_docs])
 
 prompt = f"""
@@ -247,7 +258,12 @@ You are reading a research paper. The following is extracted content from the ab
 Please summarize the related work section of the paper, highlighting prior approaches, key methodologies, and how this paper builds upon or differs from them.
 """
 
-response = model.generate_content(prompt)</code></pre>
+# 6. Generate a response using your preferred model
+# Replace this with actual LLM call (OpenAI, HuggingFace, etc.)
+print(prompt)
+# print(response)  # Uncomment after adding model integration
+  </code>
+</pre>
 
   <p>
     References:  
