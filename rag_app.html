@@ -58,6 +58,9 @@ _<!DOCTYPE html>
         <!-- Title Section -->
         <h1>Retrieval-Augmented Generation (RAG) System for Academic Research Papers</h1>
 
+  
+        <img src="rag.png" alt="Alternative text for the image">
+
         <!-- Overview Section -->
         <section class="overview">
             <h2>Overview</h2>
@@ -123,69 +126,7 @@ _<!DOCTYPE html>
             </p>
         </section>
 
-  <h2>RAGs for Research Papers</h2>
-
-  <img src="rag.png" alt="Alternative text for the image">
-
-  <h3>Overview</h3>
-  <p>
-    This project implements an advanced Retrieval-Augmented Generation (RAG) system tailored for academic research papers. It allows users to query either a predefined corpus or upload their own papers for real-time processing, embedding, and retrieval. The system supports two modes:
-  </p>
-  <ul>
-    <li><strong>Predefined Corpus Mode:</strong> Operates on a curated dataset of academic papers.</li>
-    <li><strong>User-Provided Papers Mode:</strong> Enables users to upload their own documents for on-the-fly processing.</li>
-  </ul>
-  <p>
-    Key components of this system include:
-  </p>
-  <ul>
-    <li>Document preprocessing</li>
-    <li>Semantic chunking</li>
-    <li>Embedding generation using <strong>SciBERT</strong></li>
-    <li>Efficient similarity search using <strong>FAISS</strong> with <strong>HNSW</strong> indexing</li>
-    <li><strong>Semantic routing</strong> to distinguish between content-based and metadata-based queries</li>
-  </ul>
-
-  <h3>Plan</h3>
-  <p>
-    The goal is to enable the system to respond accurately to user queries such as:
-  </p>
-  <blockquote>
-    “From the given context, can you explain this concept?” <br>
-    “Which papers published after 2024 discuss X?”
-  </blockquote>
-
-  <h4>Embedding Model</h4>
-  <p>
-    At the core of the pipeline is an embedding model trained on scientific literature—<strong>SciBERT</strong>—used to generate semantic vector representations of text. To perform efficient similarity search, we use <strong>FAISS</strong> (Facebook AI Similarity Search) in combination with <strong>Hierarchical Navigable Small World (HNSW)</strong> graphs. HNSW enables fast and scalable approximate nearest neighbor searches in the vector space.
-  </p>
-
-  <h4>Semantic Chunking</h4>
-  <p>
-    When a user uploads a PDF, the system performs <strong>semantic chunking</strong> instead of random text segmentation. It breaks the paper into meaningful sections like <strong>Abstract</strong>, <strong>Introduction</strong>, <strong>Related Work</strong>, and <strong>Methodology</strong>. This approach preserves contextual integrity and improves retrieval performance by aligning chunks with the paper's logical structure.
-  </p>
-
-  <h4>Semantic Routing</h4>
-  <p>
-    Semantic routing helps direct user queries to the appropriate processing logic. The system distinguishes between:
-  </p>
-  <ul>
-    <li><strong>Content-based queries</strong> (e.g., “What methods are used for X?”)</li>
-    <li><strong>Metadata-based queries</strong> (e.g., “Show papers published after 2024 on Y”)</li>
-  </ul>
-  <p>
-    This enables flexible querying of both the full text and metadata without overloading a single retrieval mechanism.
-  </p>
-
-  <h4>Evaluation Metrics for RAG</h4>
-<!--   <ul>
-    <li><strong>Retrieval Accuracy:</strong> How frequently relevant documents are returned.</li>
-    <li><strong>Response Quality:</strong> Evaluation (human or automated) of the generated answers.</li>
-    <li><strong>Latency:</strong> Time taken to respond after a query is issued.</li>
-    <li><strong>Scalability:</strong> System performance as the corpus size increases.</li>
-    <li><strong>Metadata Precision:</strong> Accuracy in extracting and returning structured information (e.g., author names, publication years).</li>
-  </ul>
- -->
+ 
 </main>
 
 
