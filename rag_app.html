@@ -117,22 +117,6 @@ _<!DOCTYPE html>
     <li><strong>Metadata Precision:</strong> Accuracy in extracting and returning structured information (e.g., author names, publication years).</li>
   </ul>
 
-  <h4>Processing of Contents for the PDF Submitted by the User</h4>
-  <p>
-    Before the chunking of the given PDF, the system first preprocesses the data by creating a `.json` file for each section in the PDF. This is necessary because each chunk may vary slightly or significantly depending on the quality of the writing in the paper. After preprocessing, the chunked data is tokenized and passed to the embedding models, where it is then vectorized for further processing.
-  </p>
-
-  <h4>Processing of Metadata for the PDF Submitted by the User</h4>
-  <p>
-    When it comes to queries based on metadata, such as “List the papers that were published after 2024” or “Which papers were presented at a particular conference?”, the system first extracts key metadata from the PDF. This includes details like the PDF file name, title, author(s), year, abstract, and keywords, which are essential for searching through a specific topic.
-  </p>
-  <p>
-    Unlike the simpler chunking process based on section titles, metadata extraction requires detailed processing. Each part of the metadata needs to be extracted separately and carefully. For instance, the publication date is typically in the format `yyyymmddhhmmss` (e.g., `20170428001908`), but it needs to be converted into a standardized ISO 8601 format, like `2017-04-28T00:19:08+00:00`.
-  </p>
-  <p>
-    Additionally, since there is no fixed format for metadata across all research papers, the system must be designed to account for various cases and ensure that all the relevant metadata is accurately extracted, regardless of the format it’s in.
-  </p>
-  
 </main>
 
 
