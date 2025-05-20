@@ -120,9 +120,23 @@ _<!DOCTYPE html>
 
 
 
+<h4> Processing of contents for the pdf submitted by the user</h4>
+
+<p> Before the chunking of the given pdf I first preprocess the data create the .json file for each section in the pdfs as each chunk might vary slightly or significantly depending on the quality of the writing of the papers. The chunked data is tokenized and given to the embedding models of the and then vectorized. </p>
+
+
 <h4> Processing of Meta Data for pdf submitted by the user</h4>
 
-  <p> This step first of all involves the given pdf and extract the meta details like pdf file name, title, author,  </p>
+  What are the questions that are based on the meta data. for eg. List the papers that were published after 2024 or published at some particular conference.
+
+  <p> This step first of all involves the given pdf and extract the meta details like pdf file name, title, author, year, abstract and keywords to search through a particular topic. 
+  Unlike the simple chunking that was used based on the title of different sections of the pdfs. The metadata requires a lot of processing. The each part of the metadata extraction has to be done separately. 
+
+    For the date, the dates are in the format of    yyyymmddhhmmss has to be converted to 2017-04-28T00:19:08+00:00.. 
+
+    Since there no fixed format for all the research papers from where they are coming there is a chance of we need to make sure that the all those cases are involved and then the data is extracted.
+  
+  </p>
 
 
 
