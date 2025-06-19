@@ -130,8 +130,10 @@
       </p>
       <ul>
         <li><strong>Advantages:</strong> Tailors the model to specific domains or applications. Improves performance on narrow tasks.</li>
-        <li><strong>Disadvantages:</strong> Requires additional training and computational resources. May reduce the model's generalization ability if not done carefully.</li>
+        <li><strong>Disadvantages:</strong> Requires additional training and computational resources. May reduce the model's generalization ability.</li>
       </ul>
+
+    <p> Relying on only one method when working with LLMs often does not yield the best results. Fine-tuned models may stop performing well beyond a certain point, in which case using RAG to ground the model in context can be helpful. RAG can also be combined with chain-of-thought prompting to create agentic RAG systems. </p>
 
 
       <h2>What is RAG?</h2>
@@ -152,7 +154,7 @@
         Indexing involves breaking down source documents into smaller chunks that fit within the context window of the embedding model. Each chunk is then passed through an embedding model that converts it into a vector representation, capturing the semantic meaning of the text. These vectors are stored in a <strong>vector database</strong>, where semantically similar chunks are placed close together in vector space.
       </p>
 
-      <h4>2. Retrieval</h4>
+      <h3>2. Retrieval</h3>
       <p>
         When a user submits a query, it is also embedded into a vector using the same embedding model. The system then searches for the most semantically relevant document chunks in the vector database.
       </p>
