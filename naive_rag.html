@@ -103,18 +103,38 @@
         }
       </script>
 
-      <h2>Introduction to RAGs</h2>
+      <h2>Introduction to RAG</h2>
       <p>
         Large Language Models (LLMs), or any kind of foundational models, are typically trained on static datasets. Retraining these models every time new data becomes available on the internet is not feasible. While domain-specific fine-tuning can be beneficial for particular use cases, it is not a scalable or timely solution for keeping up with continuously evolving information.
       </p>
       <p>
-        For example, if you ask ChatGPT to list papers on "Multi-Agent Systems for Autonomous Driving," it might return publications available up to 2023 or 2024. While useful, what if you're looking for research published just yesterday? In rapidly evolving fields like Machine Learning and Deep Learning, hundreds—if not thousands—of papers are published daily. Continuously retraining LLMs to keep up with this influx is simply impractical.
+        For example, if you ask ChatGPT to list papers on "Multi-Agent Systems for Autonomous Driving," it might return publications available up to 2023 or 2024. While useful, what if you're looking for research published just a few minutes ago? In rapidly evolving fields like Machine Learning and Deep Learning, hundreds—if not thousands—of papers are published daily. Continuously retraining LLMs to keep up with this influx is simply impractical.
       </p>
       <p>
         This is where techniques like <strong>Retrieval-Augmented Generation (RAG)</strong>, <strong>Prompt Engineering</strong>, and <strong>Fine-Tuning</strong> become invaluable. These approaches help dynamically ground the responses of foundational models based on the user’s query and the latest available information. Each method has its strengths and limitations, and the appropriate choice depends on the specific application and context.
       </p>
 
-      <h3>What is RAG?</h3>
+      <h2>Alternative Approaches to RAG</h2>
+     <h3>Prompt Engineering</h3>
+      <p>
+        Prompt engineering refers to crafting inputs (prompts) in a way that effectively elicits the desired response from large language models (LLMs) such as those by OpenAI or Meta. These models demonstrate zero-shot and few-shot reasoning capabilities when prompted correctly.
+      </p>
+      <ul>
+        <li><strong>Advantages:</strong> Simple to use. No additional training or fine-tuning is required. Effective with sufficiently large models.</li>
+        <li><strong>Disadvantages:</strong> Responses are limited by the model's pre-trained capabilities. Less reliable for domain-specific or nuanced queries.</li>
+      </ul>
+      
+      <h3>Fine-tuning</h3>
+      <p>
+        Fine-tuning involves taking a pre-trained LLM and further training it on a smaller, domain-specific dataset. This helps the model specialize in tasks or behavior relevant to a particular application.
+      </p>
+      <ul>
+        <li><strong>Advantages:</strong> Tailors the model to specific domains or applications. Improves performance on narrow tasks.</li>
+        <li><strong>Disadvantages:</strong> Requires additional training and computational resources. May reduce the model's generalization ability if not done carefully.</li>
+      </ul>
+
+
+      <h2>What is RAG?</h2>
       <p>
         RAG can be thought of as an intelligent pre-processing layer for LLMs. Instead of feeding a model an enormous corpus of documents from diverse sources (e.g., web pages, PDFs), RAG selectively retrieves and supplies only the <em>most relevant chunks</em> of documents as context, along with the user’s query. The model then generates a grounded response based on this curated input.
       </p>
@@ -127,7 +147,7 @@
         <li><strong>Generation</strong></li>
       </ul>
 
-      <h4>1. Indexing</h4>
+      <h3>1. Indexing</h3>
       <p>
         Indexing involves breaking down source documents into smaller chunks that fit within the context window of the embedding model. Each chunk is then passed through an embedding model that converts it into a vector representation, capturing the semantic meaning of the text. These vectors are stored in a <strong>vector database</strong>, where semantically similar chunks are placed close together in vector space.
       </p>
@@ -143,7 +163,7 @@
         To overcome this, more scalable methods like <strong>Approximate Nearest Neighbor (ANN)</strong> algorithms are used. A popular technique is the <strong>Hierarchical Navigable Small World (HNSW)</strong> graph. HNSW is built on graph and skip-list principles and significantly reduces search time to <code>O(log(N))</code>, making real-time retrieval more efficient.
       </p>
 
-      <h4>3. Generation</h4>
+      <h3>3. Generation</h3>
       <p>
         The final step is generating a meaningful response using the retrieved context. This stage consists of two key components:
       </p>
@@ -152,7 +172,7 @@
         <li><strong>Choice of LLM</strong>: The selected model depends on factors such as context window size, speed, cost, and domain specialization.</li>
       </ul>
 
-      <h4>Comparison of LLMs</h4>
+      <h3>Comparison of LLMs</h3>
       <table border="1" cellpadding="6">
         <thead>
           <tr>
@@ -232,7 +252,7 @@
 
       <hr>
 
-     <h3>All-in-One RAG Pipeline (LangChain + HuggingFace)</h3>
+     <h2>All-in-One RAG Pipeline (LangChain + HuggingFace)</h2>
 
 <div style="position: relative;">
   <button class="copy-btn" onclick="copyToClipboard('combined-code')">📋 Copy</button>
