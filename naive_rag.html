@@ -9,7 +9,7 @@
   <script id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-  <!-- Custom Heading Styles -->
+  <!-- Improved heading styles -->
   <style>
     h2 {
       font-size: 28px;
@@ -67,6 +67,7 @@
           <li><a href="https://margipandya27.github.io/MargiPandya/vae.html">Deep Generative Models</a></li>
           <li><a href="agents.html">Agents</a></li>
           <li><a href="https://margipandya27.github.io/MargiPandya/naive_rag.html">RAGs</a></li>
+          <!-- Add more links as needed -->
         </ul>
       </div>
     </div>
@@ -84,14 +85,22 @@
 
       <h2>Introduction to RAGs</h2>
       <p>
-        Large Language Models (LLMs), or any kind of foundational models, are typically trained on static datasets...
+        Large Language Models (LLMs), or any kind of foundational models, are typically trained on static datasets. Retraining these models every time new data becomes available on the internet is not feasible. While domain-specific fine-tuning can be beneficial for particular use cases, it is not a scalable or timely solution for keeping up with continuously evolving information.
+      </p>
+      <p>
+        For example, if you ask ChatGPT to list papers on "Multi-Agent Systems for Autonomous Driving," it might return publications available up to 2023 or 2024. While useful, what if you're looking for research published just yesterday? In rapidly evolving fields like Machine Learning and Deep Learning, hundreds—if not thousands—of papers are published daily. Continuously retraining LLMs to keep up with this influx is simply impractical.
+      </p>
+      <p>
+        This is where techniques like <strong>Retrieval-Augmented Generation (RAG)</strong>, <strong>Prompt Engineering</strong>, and <strong>Fine-Tuning</strong> become invaluable. These approaches help dynamically ground the responses of foundational models based on the user’s query and the latest available information. Each method has its strengths and limitations, and the appropriate choice depends on the specific application and context.
       </p>
 
       <h3>What is RAG?</h3>
       <p>
-        RAG can be thought of as an intelligent pre-processing layer for LLMs...
+        RAG can be thought of as an intelligent pre-processing layer for LLMs. Instead of feeding a model an enormous corpus of documents from diverse sources (e.g., web pages, PDFs), RAG selectively retrieves and supplies only the <em>most relevant chunks</em> of documents as context, along with the user’s query. The model then generates a grounded response based on this curated input.
       </p>
-
+      <p>
+        At a high level, a typical RAG system consists of three core components:
+      </p>
       <ul>
         <li><strong>Indexing</strong></li>
         <li><strong>Retrieval</strong></li>
@@ -100,18 +109,28 @@
 
       <h4>1. Indexing</h4>
       <p>
-        Indexing involves breaking down source documents into smaller chunks...
+        Indexing involves breaking down source documents into smaller chunks that fit within the context window of the embedding model. Each chunk is then passed through an embedding model that converts it into a vector representation, capturing the semantic meaning of the text. These vectors are stored in a <strong>vector database</strong>, where semantically similar chunks are placed close together in vector space.
       </p>
 
       <h4>2. Retrieval</h4>
       <p>
-        When a user submits a query, it is also embedded into a vector...
+        When a user submits a query, it is also embedded into a vector using the same embedding model. The system then searches for the most semantically relevant document chunks in the vector database.
+      </p>
+      <p>
+        A basic approach is using <strong>k-Nearest Neighbors (k-NN)</strong>, which measures cosine similarity between the query vector and vectors in the database. However, this approach has a time complexity of <code>O(N)</code>, which becomes inefficient as the number of stored vectors grows.
+      </p>
+      <p>
+        To overcome this, more scalable methods like <strong>Approximate Nearest Neighbor (ANN)</strong> algorithms are used. A popular technique is the <strong>Hierarchical Navigable Small World (HNSW)</strong> graph. HNSW is built on graph and skip-list principles and significantly reduces search time to <code>O(log(N))</code>, making real-time retrieval more efficient.
       </p>
 
       <h4>3. Generation</h4>
       <p>
-        The final step is generating a meaningful response using the retrieved context...
+        The final step is generating a meaningful response using the retrieved context. This stage consists of two key components:
       </p>
+      <ul>
+        <li><strong>Prompt Engineering</strong>: Techniques like zero-shot, few-shot, and chain-of-thought prompting guide the model to reason and respond more effectively.</li>
+        <li><strong>Choice of LLM</strong>: The selected model depends on factors such as context window size, speed, cost, and domain specialization.</li>
+      </ul>
 
       <h4>Comparison of LLMs</h4>
       <table border="1" cellpadding="6">
@@ -125,9 +144,41 @@
         </thead>
         <tbody>
           <tr>
-            <td>LLaMA 2</td><td>Open-source</td><td>Locally deployable, no API costs...</td><td>Requires setup...</td>
+            <td>LLaMA 2</td>
+            <td>Open-source</td>
+            <td>Locally deployable, no API costs, highly customizable</td>
+            <td>Requires setup, GPU-intensive</td>
           </tr>
-          <!-- More rows as needed -->
+          <tr>
+            <td>Mistral</td>
+            <td>Open-source</td>
+            <td>Lightweight, fast, suitable for edge devices</td>
+            <td>Limited support for long-context inputs</td>
+          </tr>
+          <tr>
+            <td>Falcon</td>
+            <td>Open-source</td>
+            <td>Highly scalable, permissive licensing</td>
+            <td>Inconsistent output formatting</td>
+          </tr>
+          <tr>
+            <td>Claude</td>
+            <td>Commercial</td>
+            <td>Excellent reasoning capabilities, safe output generation</td>
+            <td>Slower performance, less control over formatting</td>
+          </tr>
+          <tr>
+            <td>GPT-4</td>
+            <td>Commercial</td>
+            <td>High-quality responses, strong reasoning</td>
+            <td>Limited API availability, higher cost</td>
+          </tr>
+          <tr>
+            <td>Gemini 1.5 Flash</td>
+            <td>Commercial</td>
+            <td>Fast, consistent formatting, large context support</td>
+            <td>Requires API key and service integration</td>
+          </tr>
         </tbody>
       </table>
 
@@ -141,22 +192,92 @@
         </thead>
         <tbody>
           <tr>
+            <td>GPT-3</td>
+            <td>2,049 tokens</td>
+          </tr>
+          <tr>
             <td>GPT-4o</td>
             <td>128K tokens</td>
           </tr>
-          <!-- More rows as needed -->
+          <tr>
+            <td>LLaMA 3</td>
+            <td>32K tokens</td>
+          </tr>
+          <tr>
+            <td>Gemini</td>
+            <td>128K tokens</td>
+          </tr>
         </tbody>
       </table>
 
       <hr>
 
       <h3>All-in-One RAG Pipeline (LangChain + HuggingFace)</h3>
+
+      <script>
+        function copyToClipboard(codeId) {
+          const text = document.getElementById(codeId).innerText;
+          navigator.clipboard.writeText(text).then(() => {
+            alert("Code copied to clipboard!");
+          });
+        }
+      </script>
+
       <pre>
         <button class="copy-btn" onclick="copyToClipboard('combined-code')">📋</button>
         <code id="combined-code">
 # 1. Load documents
 from langchain_community.document_loaders import TextLoader, PyPDFLoader
-...
+
+# Load from .txt
+txt_loader = TextLoader("ADD PATH FOR YOUR FILE")
+txt_docs = txt_loader.load()
+
+# Load from PDF
+pdf_loader = PyPDFLoader("ADD PATH FOR YOUR FILE")
+pdf_docs = pdf_loader.load()
+
+# Combine all documents
+docs = txt_docs + pdf_docs
+
+# 2. Chunk the text
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+raw_texts = [doc.page_content for doc in docs]
+
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=1000,
+    chunk_overlap=100
+)
+texts = text_splitter.create_documents(raw_texts)
+
+# 3. Generate embeddings
+from langchain.embeddings import HuggingFaceEmbeddings
+
+embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+
+# 4. Create vector store
+from langchain_community.vectorstores import FAISS
+
+db = FAISS.from_documents(texts, embedding)
+retriever = db.as_retriever()
+
+# 5. Retrieve relevant documents and prepare prompt
+query = "What are the related works that have been done on this?"
+retrieved_docs = retriever.get_relevant_documents(query)
+context = "\n\n".join([doc.page_content for doc in retrieved_docs])
+
+prompt = f"""
+You are reading a research paper. The following is extracted content from the abstract and related work sections:
+
+{context}
+
+Please summarize the related work section of the paper, highlighting prior approaches, key methodologies, and how this paper builds upon or differs from them.
+"""
+
+# 6. Generate a response using your preferred model
+# Replace this with actual LLM call (OpenAI, HuggingFace, etc.)
+print(prompt)
 # print(response)  # Uncomment after adding model integration
         </code>
       </pre>
