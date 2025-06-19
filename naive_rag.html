@@ -170,9 +170,18 @@
         The final step is generating a meaningful response using the retrieved context. This stage consists of two key components:
       </p>
       <ul>
-        <li><strong>Prompt Engineering</strong>: Techniques like zero-shot, few-shot, and chain-of-thought prompting guide the model to reason and respond more effectively.</li>
         <li><strong>Choice of LLM</strong>: The selected model depends on factors such as context window size, speed, cost, and domain specialization.</li>
       </ul>
+      <p>
+        The table below compares several popular large language models (LLMs) used in RAG pipelines. Each model is evaluated based on its type (open-source or commercial), strengths, and limitations. 
+        Open-source models such as LLaMA 2 and Mistral are often preferred for local deployment or cost-effective experimentation, while commercial models like GPT-4 and Claude typically offer stronger reasoning capabilities and more reliable output at a higher cost.
+      </p>
+      <p>
+        Choosing the right LLM depends on your application needs—whether you prioritize reasoning quality, response time, token limits, or infrastructure control.
+      </p>
+
+      
+
 
       <h3>Comparison of LLMs</h3>
       <table border="1" cellpadding="6">
@@ -223,6 +232,14 @@
           </tr>
         </tbody>
       </table>
+
+      <p>
+        The context window size determines how much input text (in tokens) the model can process at once. Larger context windows allow the LLM to reason over longer documents or conversations without losing track of earlier information.
+      </p>
+      <p>
+        For example, GPT-4o and Gemini models support up to 128K tokens, making them well-suited for use cases like multi-document summarization, long conversations, or complex RAG pipelines. In contrast, smaller models like GPT-3 and Mistral may require aggressive chunking of inputs.
+      </p>
+
 
       <h4>Context Window Sizes</h4>
       <table border="1" cellpadding="6">
