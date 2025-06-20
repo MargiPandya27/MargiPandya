@@ -59,17 +59,25 @@
   <section class="overview">
     <h2>Overview</h2>
     <p>
-      This project creates an advanced Retrieval-Augmented Generation (RAG) system designed to work with academic research papers. The system is built to answer user queries in real time, making it highly efficient for academic research. It has two main modes of operation:
+     In the naive RAG, we saw different sections of RAG like indexing, retrieval and generation. However, this is not the end of the world, we can see how these basic module in the naive RAG should be tweaked to cater to a real world application. 
     </p>
-    <ul>
-      <li><strong>Predefined Corpus Mode:</strong> The system works with a set of curated academic papers.</li>
-      <li><strong>User-Provided Papers Mode:</strong> Users can upload their own papers for immediate processing, embedding, and retrieval.</li>
-    </ul>
+
     <p>
-      This flexibility allows the system to handle both pre-existing research collections and individual user-submitted documents. The system is built with several key components that work together seamlessly.
+      At its core, our system combines dense vector retrieval with generative language modeling. When given a query q and a corpus of documents D, it generates a summary y as follows:
+        y* = arg max P(y | q, R(q, D); θ) (1)
+      Here, R(q, D) represents the set of document chunks retrieved in response to query q, and θ represents the parameters of our generative language model.
+      The system is modular, processing user queries through three distinct pathways: corpus-level summarization, document-specific summarization, and metadata extraction. Each pathway follows a similar basic pipeline (preprocessing, semantic indexing, and response generation) but operates on different data sources and task scopes. Figure 1 (add figure) provides a high-level overview of our end-to-end pipeline, which we describe in detail in the following section.
     </p>
-    <p>
-      First, it starts with document preprocessing, where the paper's content is prepared for further analysis. Then, semantic chunking breaks the paper into smaller, meaningful sections, making it easier to process. The system then uses SciBERT, a model designed to understand academic language, to create embeddings (representations of the document's content). For quick retrieval of relevant information, the system uses FAISS with HNSW indexing, a method that ensures the system can find relevant content quickly. Finally, the system includes semantic routing, which helps it understand whether the user is asking about the content of the paper itself or the metadata (such as publication date or conference name).
+
+    <h2>Dataset and Knowledge Base</h2>
+    <p>To support flexible and accurate query answering, the system combines a large-scale academic corpus with dynamic user inputs. For the background knowledge base, we use the entire arXiv Dataset for Summarization from Hugging Face [13], which contains thousands of arXiv papers paired with their abstracts. This corpus spans a wide range of scientific fields, giving the system a strong foundation of factual, domain-specific knowledge.
+    
+    In addition to this static corpus, users can also upload any number of their own PDF documents,
+    whether they’re unpublished papers, project reports, or drafts. Once uploaded, the system automatically processes these documents and builds a custom vector database on the fly. This makes it possible to perform fast semantic retrieval across both the public corpus and user-specific content, ensuring that responses are grounded in the most relevant and personalized information available.
+    Earlier versions of our system used a smaller prototype knowledge base built from just 10 papers
+    across contrasting domains. This helped us test the system’s ability to handle multi-topic inputs and
+    different writing styles. Now, with both large-scale corpus support and flexible document upload, our
+    system can be scaled for a wide range of use cases.
     </p>
   </section>
 
