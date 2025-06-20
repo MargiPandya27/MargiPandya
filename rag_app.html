@@ -261,23 +261,31 @@
   </p>
 
   <p>
-    The final decoding objective, as shown in Equation 1, is approximated by constructing a prompt \( c \) from the retrieved chunks \( R(q, D) \) and decoding with a generative language model. The model autoregressively generates the output sequence
-    \( y = \{y_1, y_2, \ldots, y_T\} \)
-    by maximizing its conditional log-likelihood:
-  </p>
-  
-  <p style="text-align: center;">
-    \( P(y \mid c; \theta) = \prod_{t=1}^{T} P(y_t \mid y_{<t}, c; \theta) \)
-  </p>
-  
-  <p>
-    where \( \theta \) are the model parameters, \( y_{<t} \) represents all the tokens generated up to time \( t \), and \( c \) includes both the retrieved context and any additional instructions provided to facilitate role-based conditioning. The context vector \( c \) is structured as:
-  </p>
+  The final decoding objective, as shown in Equation 1, is approximated by constructing a prompt <code>c</code>
+  from the retrieved chunks \( R(q, D) \) and decoding with a generative language model.
+</p>
 
+<p>
+  The model autoregressively generates the output sequence
+  \( y = \{y_1, y_2, \ldots, y_T\} \)
+  by maximizing its conditional log-likelihood:
+</p>
 
-  <p style="text-align: center;">
-    \( c = [\text{INSTRUCTION: "Summarize this paper..."}] + [\text{RETRIEVED\_CONTEXT}] \)
-  </p>
+<p style="text-align: center;">
+  \( P(y \mid c; \theta) = \prod_{t=1}^{T} P(y_t \mid y_{<t}, c; \theta) \)
+</p>
+
+<p>
+  where \( \theta \) are the model parameters, \( y_{<t} \) represents all the tokens generated up to time \( t \),
+  and \( c \) includes both the retrieved context and any additional instructions or context we provide
+  to facilitate role-based conditioning.
+</p>
+
+<p>
+  The context vector \( c \) is of the form:
+</p>
+
+<pre><code>c = [INSTRUCTION: "Summarize this paper..."] + [RETRIEVED_CONTEXT]</code></pre>
 
   <p>
     This approach does not modify the underlying model weights; instead, it acts as a form of soft conditioning, similar to prefix- or prompt-tuning approaches used in parameter-efficient fine-tuning methods.
