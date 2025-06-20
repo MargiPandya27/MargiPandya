@@ -271,9 +271,10 @@
   by maximizing its conditional log-likelihood:
 </p>
 
-<p style="text-align: center;">
-  \[ P(y \mid c; \theta) = \prod_{t=1}^{T} P(y_t \mid y_{<t}, c; \theta) \]
+<p>
+  \( P(y \mid c; \theta) = \prod_{t=1}^{T} P(y_t \mid y_{\lt t}, c; \theta) \)
 </p>
+
 
 <p>
   where \( \theta \) are the model parameters, \( y_{\lt t} \) represents all the tokens generated up to time \( t \),
