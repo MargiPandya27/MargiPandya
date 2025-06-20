@@ -62,7 +62,15 @@
 <section class="overview">
   <h2>Overview</h2>
   <p>
-    In the naive RAG, we saw different sections of RAG like indexing, retrieval and generation. However, this is not the end of the world—we can see how these basic modules in the naive RAG should be tweaked to cater to a real-world application. 
+    In the naive RAG, we saw different sections of RAG like indexing, retrieval and generation. However, this is not the end of the world—we can see how these basic modules in the naive RAG can be tweaked to cater to a real-world application that is more robust.
+  </p>
+
+   <p>
+   The system is designed to be modular such that it can process user queries through one of three distinct pathways: corpus-level summarization, document-specific summarization, and metadata extraction.
+   </p>  
+
+  <p>
+    Each route has a similar basic pipeline (preprocessing, semantic indexing, and response generation), but operates on different data sources and task scopes. Figure 1 provides a high-level overview of our end-to-end pipeline, which we describe in detail in the rest of this section.
   </p>
 
   <p>
@@ -74,32 +82,22 @@
   </p>
 
   <p>
-    Here, \( R(q, D) \) is the set of document chunks retrieved in response to the query \( q \), and \( \theta \) represents all the parameters of the generative language model we used.
+    Here, \( R(q, D) \) is the set of document chunks retrieved in response to the query \( q \), and \( \theta \) represents all the parameters of the generative language model used.
   </p>
-
-  <p>
-    We have designed the system to be modular such that it can process user queries through one of three distinct pathways: corpus-level summarization, document-specific summarization, and metadata extraction.
-  </p>
-
-  <p>
-    Each route has a similar basic pipeline (preprocessing, semantic indexing, and response generation), but operates on different data sources and task scopes. Figure 1 provides a high-level overview of our end-to-end pipeline, which we describe in detail in the rest of this section.
-  </p>
+ 
 </section>
 
 <section class="dataset-knowledge">
   <h2>Dataset and Knowledge Base</h2>
 
   <p>
-    To support flexible and accurate query answering, the system combines a <strong>large-scale academic corpus</strong> with <strong>dynamic user inputs</strong>. For the background knowledge base, we use the entire arXiv Dataset for Summarization</a> from Hugging Face, which contains thousands of arXiv papers paired with their abstracts. This corpus spans a wide range of scientific fields, providing the system with a strong foundation of factual, domain-specific knowledge.
+    To support flexible and accurate query answering, the system combines a <strong>large-scale academic corpus</strong> with <strong>dynamic user inputs</strong>. For the background knowledge base, the entire arXiv Dataset for Summarization</a> from Hugging Face sounds to be a good choice, which contains thousands of arXiv papers paired with their abstracts. This corpus spans a wide range of scientific fields, providing the system with a strong foundation of factual, domain-specific knowledge.
   </p>
 
   <p>
     In addition to this static corpus, users can also upload any number of their own PDF documents—whether they’re unpublished papers, project reports, or drafts. Once uploaded, the system automatically processes these documents and builds a custom <strong>vector database on the fly</strong>. This enables fast semantic retrieval across both public and user-specific content, ensuring that responses are grounded in the most relevant and personalized information available.
   </p>
 
-  <p>
-    Earlier versions of our system used a smaller prototype knowledge base built from just 10 papers across contrasting domains. This helped us test the system’s ability to handle multi-topic inputs and varied writing styles. Now, with both <strong>large-scale corpus support</strong> and <strong>flexible document upload</strong>, the system is scalable for a wide range of academic and research-oriented use cases.
-  </p>
 </section>
 
 <section class="semantic-routing">
@@ -117,12 +115,13 @@
     </li>
 
     <li>
-      <strong>Metadata Query Routing:</strong> These are targeted queries about bibliographic or structural information from specific papers (e.g., "Who are the authors of paper 2?"). A metadata module handles these queries through section-aware PDF parsing and rule-based heuristics to extract fields like title, authors, venue, and publication year. The parsed metadata is stored in a structured index for quick access.
+      <strong>Document-Specific Query Routing:</strong> When queries reference specific uploaded documents (e.g., "Summarize the results section of paper 3 for a policymaker"), retrieval scope is restricted to those documents. This approach improves factual alignment and reduces hallucinations by providing the LLM with a focused context window tailored to the user's intent.
     </li>
 
     <li>
-      <strong>Document-Specific Query Routing:</strong> When queries reference specific uploaded documents (e.g., "Summarize the results section of paper 3 for a policymaker"), retrieval scope is restricted to those documents. This approach improves factual alignment and reduces hallucinations by providing the LLM with a focused context window tailored to the user's intent.
+      <strong>Metadata Query Routing:</strong> These are targeted queries about bibliographic or structural information from specific papers (e.g., "Who are the authors of NeRF: 'Representing Scenes as Neural Radiance Fields for View Synthesis'?"). A metadata module handles these queries through section-aware PDF parsing and rule-based heuristics to extract fields like title, authors, venue, and publication year. The parsed metadata is stored in a structured index for quick access.
     </li>
+    
   </ul>
 
   <p>
@@ -130,7 +129,7 @@
   </p>
 
   <pre><code>
-c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
+      c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
   </code></pre>
 
   <p>
@@ -161,12 +160,12 @@ c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
   <ul>
     <li>Chunks align with sentence boundaries where possible, using natural language parsing tools.</li>
     <li>Chunks maintain a 10% overlap as a buffer to ensure coherence and self-containment.</li>
-    <li>The token length of each chunk is limited by a maximum threshold \( T_{\text{max}} \), where \( \text{len}(x_{ij}) \leq T_{\text{max}} \). In this implementation, \( T_{\text{max}} \) is set to 256 tokens.</li>
+    <li>The token length of each chunk is limited by a maximum threshold \( T_{\text{max}} \), where \( \text{len}(x_{ij}) \leq T_{\text{max}} \). In this implementation, \( T_{\text{max}} \) is set to 1000 tokens.</li>
   </ul>
 
   <h3>Dense Embedding and Retrieval Module</h3>
   <p>
-    After segmentation, each chunk \( x \in D \) is converted into a dense vector using a sentence-level transformer model. <strong>SciBERT</strong> (a BERT-based model trained specifically on scientific text) [14] is used to capture technical language and domain-specific concepts common in research papers. SciBERT outperforms general-purpose models on this scientific content.
+    After segmentation, each chunk \( x \in D \) is converted into a dense vector using a sentence-level transformer model. <strong>SciBERT</strong> (a BERT-based model trained specifically on scientific text) is used to capture technical language and domain-specific concepts common in research papers. SciBERT outperforms general-purpose models on this scientific content.
   </p>
 
   <p>
@@ -190,7 +189,7 @@ c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
   </p>
 
   <p>
-    The <strong>HNSW</strong> (Hierarchical Navigable Small World) indexing strategy [15] from the <strong>FAISS</strong> (Facebook AI Similarity Search) library [16] is implemented to store and search all \( z_x \) vectors. Unlike the previous flat indexing approach using brute-force search across the entire embedding space, HNSW creates a multi-layer graph where nodes represent embeddings and edges connect semantically similar points. This structure enables more efficient approximate nearest neighbor (ANN) search, particularly when handling multiple documents.
+    The <strong>HNSW</strong> (Hierarchical Navigable Small World) indexing strategy from the <strong>FAISS</strong> (Facebook AI Similarity Search) library is implemented to store and search all \( z_x \) vectors. Unlike the previous flat indexing approach using brute-force search across the entire embedding space, HNSW creates a multi-layer graph where nodes represent embeddings and edges connect semantically similar points. This structure enables more efficient approximate nearest neighbor (ANN) search, particularly when handling multiple documents.
   </p>
 
   <p>
@@ -224,7 +223,7 @@ c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
 
   <h3>Metadata Indexing and Query Resolution</h3>
   <p>
-    Once structured, metadata entries are stored in a key-value format and indexed using FAISS to allow semantic matching when queries are less exact. Given a metadata query \( q \), such as “Who wrote paper 2?”, the system performs the following steps:
+    Once structured, metadata entries are stored in a key-value format and indexed using FAISS to allow semantic matching when queries are less exact. Given a metadata query \( q \), such as “Who wrote paper?”, the system performs the following steps:
   </p>
 
   <ul>
@@ -257,7 +256,7 @@ c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
   </p>
 
   <p>
-    Using the set of top-\(k\) retrieved segments \( R(q, D) = \{x_1, x_2, \ldots, x_k\} \) from the previous step, a single, concatenated prompt \( c \) is generated, which acts as input to a generative transformer model. Currently, Google’s Gemini 2.0 Flash is used, as it supports longer contexts, has proven zero-shot summarization capabilities, and follows instructions well—aligning with the goal of role-based conditioning.
+    Using the set of top-\(k\) retrieved segments \( R(q, D) = \{x_1, x_2, \ldots, x_k\} \) from the previous step, a single, concatenated prompt \( c \) is generated, which acts as input to a generative transformer model. Currently, Google’s Gemini 2.0 Flash (for this project the LLM model was not fine-tuned, then Gemini made a good sense) is used, as it supports longer contexts, has proven zero-shot summarization capabilities, and follows instructions well—aligning with the goal of role-based conditioning.
   </p>
 
   <p>
