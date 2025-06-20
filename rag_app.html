@@ -90,7 +90,7 @@
   <h2>Dataset and Knowledge Base</h2>
 
   <p>
-    To support flexible and accurate query answering, the system combines a <strong>large-scale academic corpus</strong> with <strong>dynamic user inputs</strong>. For the background knowledge base, we use the entire <a href="https://huggingface.co/datasets/ccdv/arxiv-summarization" target="_blank">arXiv Dataset for Summarization</a> from Hugging Face<sup>[13]</sup>, which contains thousands of arXiv papers paired with their abstracts. This corpus spans a wide range of scientific fields, providing the system with a strong foundation of factual, domain-specific knowledge.
+    To support flexible and accurate query answering, the system combines a <strong>large-scale academic corpus</strong> with <strong>dynamic user inputs</strong>. For the background knowledge base, we use the entire arXiv Dataset for Summarization</a> from Hugging Face, which contains thousands of arXiv papers paired with their abstracts. This corpus spans a wide range of scientific fields, providing the system with a strong foundation of factual, domain-specific knowledge.
   </p>
 
   <p>
@@ -106,14 +106,14 @@
   <h2>Semantic Routing</h2>
 
   <p>
-    A key limitation in our initial system was its tendency to treat all queries the same. Regardless of user intent, the pipeline followed a uniform path, often producing mismatched, incoherent, or irrelevant summaries. To address this, we introduced a semantic routing layer that recognizes the type of question being asked and dynamically routes it to the most appropriate processing module.
+    A key limitation in the initial system was its tendency to treat all queries the same. Regardless of user intent, the pipeline followed a uniform path, often producing mismatched, incoherent, or irrelevant summaries. To address this, a semantic routing layer was introduced that recognizes the type of question being asked and dynamically routes it to the most appropriate processing module.
   </p>
 
   <p>The current implementation supports three distinct routing paths:</p>
 
   <ul>
     <li>
-      <strong>Corpus Query Routing:</strong> These are broad, open-ended queries (e.g., "What are recent trends in transformer-based vision models?") that require synthesis across multiple papers. For such queries, we apply a multi-document RAG pipeline that retrieves relevant chunks from the entire corpus and generates a role-conditioned summary using a large language model. This route excels at cross-document exploration and thematic synthesis.
+      <strong>Corpus Query Routing:</strong> These are broad, open-ended queries (e.g., "What are recent trends in transformer-based vision models?") that require synthesis across multiple papers. For such queries, a multi-document RAG pipeline is applied that retrieves relevant chunks from the entire corpus and generates a role-conditioned summary using a large language model. This route excels at cross-document exploration and thematic synthesis.
     </li>
 
     <li>
@@ -121,7 +121,7 @@
     </li>
 
     <li>
-      <strong>Document-Specific Query Routing:</strong> When queries reference specific uploaded documents (e.g., "Summarize the results section of paper 3 for a policymaker"), we restrict the retrieval scope to those documents. This approach improves factual alignment and reduces hallucinations by providing the LLM with a focused context window tailored to the user's intent.
+      <strong>Document-Specific Query Routing:</strong> When queries reference specific uploaded documents (e.g., "Summarize the results section of paper 3 for a policymaker"), retrieval scope is restricted to those documents. This approach improves factual alignment and reduces hallucinations by providing the LLM with a focused context window tailored to the user's intent.
     </li>
   </ul>
 
@@ -147,7 +147,7 @@ c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
   </p>
 
   <p>
-    We begin by segmenting each document into text chunks \( x_{ij} \):
+    Each document is segmented into text chunks \( x_{ij} \):
   </p>
 
   <p style="text-align: center;">
@@ -155,22 +155,22 @@ c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
   </p>
 
   <p>
-    Each \( x_{ij} \) represents an overlapping chunk of text (usually a paragraph or logical subsection) extracted from document \( d_i \), designed to capture a self-contained scientific argument, result, or claim. We apply the following chunking constraints:
+    Each \( x_{ij} \) represents an overlapping chunk of text (usually a paragraph or logical subsection) extracted from document \( d_i \), designed to capture a self-contained scientific argument, result, or claim. The following chunking constraints are applied:
   </p>
 
   <ul>
     <li>Chunks align with sentence boundaries where possible, using natural language parsing tools.</li>
     <li>Chunks maintain a 10% overlap as a buffer to ensure coherence and self-containment.</li>
-    <li>The token length of each chunk is limited by a maximum threshold \( T_{\text{max}} \), where \( \text{len}(x_{ij}) \leq T_{\text{max}} \). In our implementation, \( T_{\text{max}} \) is set to 256 tokens.</li>
+    <li>The token length of each chunk is limited by a maximum threshold \( T_{\text{max}} \), where \( \text{len}(x_{ij}) \leq T_{\text{max}} \). In this implementation, \( T_{\text{max}} \) is set to 256 tokens.</li>
   </ul>
 
   <h3>Dense Embedding and Retrieval Module</h3>
   <p>
-    After segmentation, we convert each chunk \( x \in D \) into a dense vector using a sentence-level transformer model. We use <strong>SciBERT</strong> (a BERT-based model trained specifically on scientific text) [14] to capture technical language and domain-specific concepts common in research papers. SciBERT outperforms general-purpose models on our scientific content.
+    After segmentation, each chunk \( x \in D \) is converted into a dense vector using a sentence-level transformer model. <strong>SciBERT</strong> (a BERT-based model trained specifically on scientific text) [14] is used to capture technical language and domain-specific concepts common in research papers. SciBERT outperforms general-purpose models on this scientific content.
   </p>
 
   <p>
-    We define our embedding function \( f_{\phi} \), where \( \phi \) represents the SciBERT encoder parameters. For any text chunk \( x \) and user query \( q \), the vector representations are:
+    The embedding function \( f_{\phi} \), where \( \phi \) represents the SciBERT encoder parameters, is defined such that for any text chunk \( x \) and user query \( q \), the vector representations are:
   </p>
 
   <p style="text-align: center;">
@@ -178,7 +178,7 @@ c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
   </p>
 
   <p>
-    Since both vectors exist in the same semantic space, we measure their similarity using cosine distance. We retrieve the most relevant content by selecting the top-\( k \) chunks based on this similarity:
+    Since both vectors exist in the same semantic space, similarity is measured using cosine distance. The most relevant content is retrieved by selecting the top-\( k \) chunks based on this similarity:
   </p>
 
   <p style="text-align: center;">
@@ -190,11 +190,11 @@ c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
   </p>
 
   <p>
-    We implement the <strong>HNSW</strong> (Hierarchical Navigable Small World) indexing strategy [15] from the <strong>FAISS</strong> (Facebook AI Similarity Search) library [16] to store and search all \( z_x \) vectors. Unlike our previous flat indexing approach that used brute-force search across the entire embedding space, HNSW creates a multi-layer graph where nodes represent embeddings and edges connect semantically similar points. This structure enables more efficient approximate nearest neighbor (ANN) search, particularly when handling multiple documents.
+    The <strong>HNSW</strong> (Hierarchical Navigable Small World) indexing strategy [15] from the <strong>FAISS</strong> (Facebook AI Similarity Search) library [16] is implemented to store and search all \( z_x \) vectors. Unlike the previous flat indexing approach using brute-force search across the entire embedding space, HNSW creates a multi-layer graph where nodes represent embeddings and edges connect semantically similar points. This structure enables more efficient approximate nearest neighbor (ANN) search, particularly when handling multiple documents.
   </p>
 
   <p>
-    After retrieving the top-\( k \) most relevant chunks, we pass them to the generation module, where they are combined with the user's query and prompt instructions to produce a role-aware response using a large language model (LLM).
+    After retrieving the top-\( k \) most relevant chunks, these are passed to the generation module, where they are combined with the user's query and prompt instructions to produce a role-aware response using a large language model (LLM).
   </p>
 </section>
 
@@ -203,7 +203,7 @@ c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
 
   <h3>Pre-processing</h3>
   <p>
-    In addition to answering content-based questions, our system also supports queries that target structured metadata. These include questions like “Who are the authors of this paper?” or “What year was it published?”—queries that don’t require deep semantic reasoning, but instead depend on accurate extraction of key bibliographic fields from the uploaded document.
+    In addition to answering content-based questions, the system also supports queries targeting structured metadata. These include questions such as “Who are the authors of this paper?” or “What year was it published?”—queries that do not require deep semantic reasoning but depend on accurate extraction of key bibliographic fields from the uploaded document.
   </p>
   <p>
     The metadata pipeline begins with document-level pre-processing, where uploaded PDFs are parsed using layout-aware text extraction methods. This stage removes LaTeX artifacts, isolates header and footer regions, and prepares the raw text for field-based extraction.
@@ -211,7 +211,7 @@ c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
 
   <h3>Metadata Formatting</h3>
   <p>
-    Next, we extract structured fields from each document \( d_i \) to form its metadata record \( M_i \). Each record is defined as:
+    Next, structured fields are extracted from each document \( d_i \) to form its metadata record \( M_i \). Each record is defined as:
   </p>
 
   <p style="text-align: center;">
@@ -219,12 +219,12 @@ c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
   </p>
 
   <p>
-    To populate \( M_i \), we use regular expression-based heuristics along with simple formatting logic. Titles are typically identified by detecting bold, center-aligned text blocks near the top of the document. Authors are parsed using keyword patterns (e.g., affiliations, “and” conjunctions, email addresses), while the venue and year are extracted from footnote regions or known templates.
+    To populate \( M_i \), regular expression-based heuristics are combined with simple formatting logic. Titles are typically identified by detecting bold, center-aligned text blocks near the top of the document. Authors are parsed using keyword patterns (e.g., affiliations, “and” conjunctions, email addresses), while the venue and year are extracted from footnote regions or known templates.
   </p>
 
   <h3>Metadata Indexing and Query Resolution</h3>
   <p>
-    Once structured, the metadata entries are stored in a key-value format and indexed using FAISS to allow for semantic matching when queries are less exact. Given a metadata query \( q \), such as “Who wrote paper 2?”, the system performs the following steps:
+    Once structured, metadata entries are stored in a key-value format and indexed using FAISS to allow semantic matching when queries are less exact. Given a metadata query \( q \), such as “Who wrote paper 2?”, the system performs the following steps:
   </p>
 
   <ul>
@@ -245,20 +245,19 @@ c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
   </p>
 
   <p>
-    Our metadata routing path is designed for speed and accuracy. While we still use a language model to generate the final response in the next step, it’s grounded in structured metadata that’s already been extracted. This helps reduce hallucinations and keeps the model focused on phrasing, not fact-finding, making the system both lightweight and reliable.
+    The metadata routing path is designed for speed and accuracy. Although a language model is used to generate the final response in the next step, it is grounded in structured metadata that has already been extracted. This helps reduce hallucinations and keeps the model focused on phrasing rather than fact-finding, making the system both lightweight and reliable.
   </p>
 </section>
-
 
 <section class="generative-modeling">
   <h2>Generative Language Modeling and Role-based Conditioning</h2>
 
   <p>
-    After retrieving relevant context chunks using semantic similarity search, the next stage of our pipeline is language generation; this phase acts on the outputs of all three previous modules (corpus, metadata, and user-uploaded PDFs). We use a large language model (LLM) that has been conditioned on both retrieved evidence and user-specific instructions.
+    After retrieving relevant context chunks using semantic similarity search, the next stage of the pipeline is language generation; this phase acts on the outputs of all three previous modules (corpus, metadata, and user-uploaded PDFs). A large language model (LLM) is used that has been conditioned on both retrieved evidence and user-specific instructions.
   </p>
 
   <p>
-    Using the set of top-\(k\) retrieved segments \( R(q, D) = \{x_1, x_2, \ldots, x_k\} \) from the previous step, we generate a single, concatenated prompt \( c \), which acts as input to a generative transformer model. We currently use Google’s Gemini 2.0 Flash, as it supports longer contexts, has proven zero-shot summarization capabilities, and follows instructions well — aligning with our goal of role-based conditioning.
+    Using the set of top-\(k\) retrieved segments \( R(q, D) = \{x_1, x_2, \ldots, x_k\} \) from the previous step, a single, concatenated prompt \( c \) is generated, which acts as input to a generative transformer model. Currently, Google’s Gemini 2.0 Flash is used, as it supports longer contexts, has proven zero-shot summarization capabilities, and follows instructions well—aligning with the goal of role-based conditioning.
   </p>
 
   <p>
@@ -272,7 +271,7 @@ c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
   </p>
 
   <p>
-    where \( \theta \) are the model parameters, \( y_{<t} \) represents all the tokens generated up to time \( t \), and \( c \) includes both the retrieved context and any additional instructions we provide to facilitate role-based conditioning. The context vector \( c \) is structured as:
+    where \( \theta \) are the model parameters, \( y_{<t} \) represents all the tokens generated up to time \( t \), and \( c \) includes both the retrieved context and any additional instructions provided to facilitate role-based conditioning. The context vector \( c \) is structured as:
   </p>
 
   <p style="text-align: center;">
@@ -284,7 +283,7 @@ c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
   </p>
 
   <p>
-    We designed a variety of role-based prompt templates, which let users shape how information is presented in the final outcome. Some examples include:
+    A variety of role-based prompt templates have been designed, allowing users to shape how information is presented in the final outcome. Some examples include:
   </p>
 
   <ul>
@@ -294,9 +293,6 @@ c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
   </ul>
 </section>
 
-
-
-      
 </main>
 
 <footer class="page__meta">
