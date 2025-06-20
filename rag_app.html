@@ -52,10 +52,10 @@
 
   <!-- Title Section -->
   <h1>Retrieval-Augmented Generation (RAG) System for Academic Research Papers</h1>
-  <figure style="text-align: center; margin: 20px 0;">
-  <img src="rag.png" alt="Alternative text for the image" style="max-width: 100%; height: auto;">
-  <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
-</figure>
+  <figure class="rag-figure">
+    <img src="rag.png" alt="Alternative text for the image">
+    <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
+  </figure>
 
 
   <!-- Overview Section -->
@@ -63,12 +63,12 @@
 
     <p>
     In the naive RAG, we saw different sections of RAG like indexing, retrieval and generation. However, this is not the end of the world—we can see how these basic modules in the naive RAG can be tweaked to cater to a real-world application that is more robust.
-  </p>
+    </p>
 
   <h2>Overview</h2>
 
    <p>
-  Research papers are often written with a single audience in mind, but real-world readers have different goals and backgrounds. In this work, we develop a system that generates role-aware summaries, adapting the tone and content of a paper’s summary to suit the reader’s perspective. Our approach identifies the intent behind a user’s query and routes it to a summarization strategy that balances factual accuracy with contextual relevance. 
+   Research papers are often written with a single audience in mind, but real-world readers have different goals and backgrounds. In this work, we develop a system that generates role-aware summaries, adapting the tone and content of a paper’s summary to suit the reader’s perspective. Our approach identifies the intent behind a user’s query and routes it to a summarization strategy that balances factual accuracy with contextual relevance. 
    The system is designed to be modular such that it can process user queries through one of three distinct pathways: corpus-level summarization, document-specific summarization, and metadata extraction.
    </p>  
 
@@ -105,11 +105,9 @@
 
 <section class="semantic-routing">
   <h2>Semantic Routing</h2>
-
   <p>
-    A key limitation in the initial system was its tendency to treat all queries the same. Regardless of user intent, the pipeline followed a uniform path, often producing mismatched, incoherent, or irrelevant summaries. To address this, a semantic routing layer was introduced that recognizes the type of question being asked and dynamically routes it to the most appropriate processing module.
+  Semantic Routing is necessary because, based on the query type provided, it is essential to route the query to the correct module. A key limitation in the initial system was its tendency to treat all queries the same. Regardless of user intent, the pipeline followed a uniform path, often producing mismatched, incoherent, or irrelevant summaries. To address this, a semantic routing layer was introduced that recognizes the type of question being asked and dynamically routes it to the most appropriate processing module.
   </p>
-
   <p>The current implementation supports three distinct routing paths:</p>
 
   <ul>
@@ -127,18 +125,18 @@
     
   </ul>
 
-  <p>
+   <p>
     Routing decisions employ a hybrid strategy that combines heuristic intent detection with semantic similarity scoring. Given a query embedding \( z_q \) and a set of prototype intent vectors \( \{z_c\}_{c \in C} \), the selected route \( c^* \) is defined as:
   </p>
-
-  <pre><code>
-      c* = arg max<sub>c ∈ C</sub> cos(z<sub>q</sub>, z<sub>c</sub>)
-  </code></pre>
-
-  <p>
-    where \( C \) is the set of routing classes and \( \cos(\cdot, \cdot) \) denotes cosine similarity. This lightweight formulation enables the system to handle diverse queries while maintaining interpretability and modularity.
+  
+  <p style="text-align: center;">
+    \( c^* = \arg\max_{c \in C} \cos(z_q, z_c) \)
   </p>
-</section>
+
+  
+  <p>
+    where \( c^* \) is the set of routing classes and \( \cos(\cdot, \cdot) \) denotes cosine similarity. This lightweight formulation enables the system to handle diverse queries while maintaining interpretability and modularity.
+  </p>
 
 <section class="corpus-document-modules">
   <h2>Corpus- and Document-level Modules</h2>
@@ -301,7 +299,7 @@
         <li>Cohan, Arman, et al. “A Discourse-Aware Attention Model for Abstractive Summarization of Long Documents.” NAACL HLT Short Papers (June 2018). Available at Hugging Face: ccdv/arxiv-summarization (accessed May 2025)</li>
         <li>Beltagy, Iz, Kyle Lo, and Arman Cohan. "SciBERT: A pretrained language model for scientific text." arXiv preprint arXiv:1903.10676 (2019).</li>
         <li>Malkov, Yu. A., and D. A. Yashunin. “Efficient and Robust Approximate Nearest Neighbor Search Using Hierarchical Navigable Small World Graphs.” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 42, no. 4, Apr. 2020, pp. 824–36. IEEE.</li>
-        <li><a href="https://github.com/langchain-ai/rag-from-scratch" target="_blank">LangChain RAG from scratch GitHub</a></li>
+        <li>Johnson, Jeff, Matthijs Douze, and Hervé Jégou. “Billion-Scale Similarity Search with GPUs.” IEEE Transactions on Big Data, vol. 7, no. 3, July 2021, pp. 535–47. IEEE.</li>  
         </ul>
       
 </main>
