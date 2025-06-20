@@ -1,4 +1,4 @@
-_<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -44,106 +44,95 @@ _<!DOCTYPE html>
         <li><a href="https://margipandya27.github.io/MargiPandya/vae.html">Deep Generative Models</a></li>
         <li><a href="agents.html">Agents</a></li>
         <li><a href="https://margipandya27.github.io/MargiPandya/naive_rag.html">RAGs</a></li>
-        <!-- Add more links as needed -->
       </ul>
     </div>
   </div>
 
-
-
 <!-- Main Content -->
 <main style="flex: 1; padding: 20px; max-width: 1000px;">
 
-  
-        <!-- Title Section -->
-        <h1>Retrieval-Augmented Generation (RAG) System for Academic Research Papers</h1>
+  <!-- Title Section -->
+  <h1>Retrieval-Augmented Generation (RAG) System for Academic Research Papers</h1>
 
-  
-        <img src="rag.png" alt="Alternative text for the image">
+  <img src="rag.png" alt="Alternative text for the image">
 
-        <!-- Overview Section -->
-        <section class="overview">
-            <h2>Overview</h2>
-            <p>
-                This project creates an advanced Retrieval-Augmented Generation (RAG) system designed to work with academic research papers. The system is built to answer user queries in real time, making it highly efficient for academic research. It has two main modes of operation:
-            </p>
-            <ul>
-                <li><strong>Predefined Corpus Mode:</strong> The system works with a set of curated academic papers.</li>
-                <li><strong>User-Provided Papers Mode:</strong> Users can upload their own papers for immediate processing, embedding, and retrieval.</li>
-            </ul>
-            <p>
-                This flexibility allows the system to handle both pre-existing research collections and individual user-submitted documents. The system is built with several key components that work together seamlessly.
-            </p>
-            <p>
-                First, it starts with document preprocessing, where the paper's content is prepared for further analysis. Then, semantic chunking breaks the paper into smaller, meaningful sections, making it easier to process. The system then uses SciBERT, a model designed to understand academic language, to create embeddings (representations of the document's content). For quick retrieval of relevant information, the system uses FAISS with HNSW indexing, a method that ensures the system can find relevant content quickly. Finally, the system includes semantic routing, which helps it understand whether the user is asking about the content of the paper itself or the metadata (such as publication date or conference name).
-            </p>
-        </section>
+  <!-- Overview Section -->
+  <section class="overview">
+    <h2>Overview</h2>
+    <p>
+      This project creates an advanced Retrieval-Augmented Generation (RAG) system designed to work with academic research papers. The system is built to answer user queries in real time, making it highly efficient for academic research. It has two main modes of operation:
+    </p>
+    <ul>
+      <li><strong>Predefined Corpus Mode:</strong> The system works with a set of curated academic papers.</li>
+      <li><strong>User-Provided Papers Mode:</strong> Users can upload their own papers for immediate processing, embedding, and retrieval.</li>
+    </ul>
+    <p>
+      This flexibility allows the system to handle both pre-existing research collections and individual user-submitted documents. The system is built with several key components that work together seamlessly.
+    </p>
+    <p>
+      First, it starts with document preprocessing, where the paper's content is prepared for further analysis. Then, semantic chunking breaks the paper into smaller, meaningful sections, making it easier to process. The system then uses SciBERT, a model designed to understand academic language, to create embeddings (representations of the document's content). For quick retrieval of relevant information, the system uses FAISS with HNSW indexing, a method that ensures the system can find relevant content quickly. Finally, the system includes semantic routing, which helps it understand whether the user is asking about the content of the paper itself or the metadata (such as publication date or conference name).
+    </p>
+  </section>
 
-        <!-- Plan Section -->
-        <section class="plan">
-            <h2>User-Provided Papers Mode</h2>
-            <p>
-                The main goal of this system is to provide accurate answers to various user queries related to academic papers. These queries can range from asking for detailed explanations of concepts in the paper to searching for specific papers based on metadata (like papers published after a certain year). For example, a user might ask:
-            </p>
-            <ul>
-                <li><strong>“Can you explain this concept from the paper?”</strong></li>
-                <li><strong>“Which papers published after 2024 discuss X?”</strong></li>
-            </ul>
-            <p>
-                By handling both content-based and metadata-based queries, the system can meet a wide range of research needs.
-            </p>
-        </section>
+  <!-- Plan Section -->
+  <section class="plan">
+    <h2>User-Provided Papers Mode</h2>
+    <p>
+      The main goal of this system is to provide accurate answers to various user queries related to academic papers. These queries can range from asking for detailed explanations of concepts in the paper to searching for specific papers based on metadata (like papers published after a certain year). For example, a user might ask:
+    </p>
+    <ul>
+      <li><strong>“Can you explain this concept from the paper?”</strong></li>
+      <li><strong>“Which papers published after 2024 discuss X?”</strong></li>
+    </ul>
+    <p>
+      By handling both content-based and metadata-based queries, the system can meet a wide range of research needs.
+    </p>
+  </section>
 
-        <!-- Processing of Contents Section -->
-        <section class="processing">
-            <h3>Processing of Contents for the PDF Submitted by the User</h3>
-            <p>
-                When a user uploads a PDF, the system starts by preprocessing the document. It creates a .json file for each section of the paper. This is important because academic papers can have different structures, and this preprocessing ensures that the system understands each section properly.
-            </p>
-            <p>
-                After this, the text is tokenized (broken down into smaller parts) and passed through the embedding model to generate vectorized representations. These embeddings are what allow the system to understand the meaning of different sections of the paper and help it find relevant information when the user asks a question.
-            </p>
-        </section>
+  <!-- Processing of Contents Section -->
+  <section class="processing">
+    <h3>Processing of Contents for the PDF Submitted by the User</h3>
+    <p>
+      When a user uploads a PDF, the system starts by preprocessing the document. It creates a .json file for each section of the paper. This is important because academic papers can have different structures, and this preprocessing ensures that the system understands each section properly.
+    </p>
+    <p>
+      After this, the text is tokenized (broken down into smaller parts) and passed through the embedding model to generate vectorized representations. These embeddings are what allow the system to understand the meaning of different sections of the paper and help it find relevant information when the user asks a question.
+    </p>
+  </section>
 
-        <!-- Processing of Metadata Section -->
-        <section class="processing">
-            <h3>Processing of Metadata for the PDF Submitted by the User</h3>
-            <p>
-                Along with processing the paper's content, the system also needs to handle the metadata—the information that describes the paper, such as its title, authors, publication date, abstract, and keywords. This metadata allows the system to answer questions like:
-            </p>
-            <ul>
-                <li><strong>“Which papers were published after 2024?”</strong></li>
-                <li><strong>“Which papers were presented at a particular conference?”</strong></li>
-            </ul>
-            <p>
-                The system extracts this metadata by identifying key details such as the file name, title, author(s), publication year, abstract, and keywords.
-            </p>
-            <p>
-                However, there is a challenge when dealing with metadata: it is often presented in different formats across various papers. For example, dates might be in a format like yyyymmddhhmmss (e.g., 20170428001908), which needs to be converted into a standard format, like 2017-04-28T00:19:08+00:00. This conversion ensures that the date can be uniformly processed and used for queries.
-            </p>
-            <p>
-                Because research papers come from many different sources, there is no fixed format for metadata. This means the system must be flexible enough to handle various ways that metadata might be formatted. For example, conference names, locations, or dates might be listed in different ways, so the system needs special rules to accurately extract and index that information.
-            </p>
-        </section>
+  <!-- Processing of Metadata Section -->
+  <section class="processing">
+    <h3>Processing of Metadata for the PDF Submitted by the User</h3>
+    <p>
+      Along with processing the paper's content, the system also needs to handle the metadata—the information that describes the paper, such as its title, authors, publication date, abstract, and keywords. This metadata allows the system to answer questions like:
+    </p>
+    <ul>
+      <li><strong>“Which papers were published after 2024?”</strong></li>
+      <li><strong>“Which papers were presented at a particular conference?”</strong></li>
+    </ul>
+    <p>
+      The system extracts this metadata by identifying key details such as the file name, title, author(s), publication year, abstract, and keywords.
+    </p>
+    <p>
+      However, there is a challenge when dealing with metadata: it is often presented in different formats across various papers. For example, dates might be in a format like yyyymmddhhmmss (e.g., 20170428001908), which needs to be converted into a standard format, like 2017-04-28T00:19:08+00:00. This conversion ensures that the date can be uniformly processed and used for queries.
+    </p>
+    <p>
+      Because research papers come from many different sources, there is no fixed format for metadata. This means the system must be flexible enough to handle various ways that metadata might be formatted. For example, conference names, locations, or dates might be listed in different ways, so the system needs special rules to accurately extract and index that information.
+    </p>
+  </section>
 
- 
 </main>
 
+<footer class="page__meta">
+  <!-- Any additional metadata or footer information goes here -->
+</footer>
 
+<div class="page__footer">
+  <footer>
+    <!-- Your footer content goes here -->
+    <p>@2025 Margi Pandya</p>
+  </footer>
+</div>
 
-</body>
-   <footer class="page__meta">
-                    <!-- Any additional metadata or footer information goes here -->
-                </footer>
-            </div>
-        </article>
-    </div>
-
-    <div class="page__footer">
-        <footer>
-            <!-- Your footer content goes here -->
-            <p>@2025 Margi Pandya</p>
-        </footer>
-    </div>
 </body>
 </html>
