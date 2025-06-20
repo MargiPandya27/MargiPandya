@@ -81,6 +81,145 @@
     </p>
   </section>
 
+<h2>Semantic Routing</h2>
+  A key limitation in our initial system was its tendency to treat all queries the same. Regardless of user intent, the pipeline followed a uniform path, often producing mismatched, incoherent, or irrelevant summaries. To address this, we introduced a semantic routing layer that recognizes the type of question being asked and dynamically routes it to the most appropriate processing module.
+
+The current implementation supports three distinct routing paths:
+<ul>
+<li><strong>Corpus Query Routing:</strong> These are broad, open-ended queries (e.g., "What are recent trends in transformer-based vision models?") that require synthesis across multiple papers. For such queries, we apply a multi-document RAG pipeline that retrieves relevant chunks from the entire corpus and generates a role-conditioned summary using a large language model. This route excels at cross-document exploration and thematic synthesis.</li>
+
+<li><strong>Metadata Query Routing</strong>: These are targeted queries about bibliographic or structural information from specific papers (e.g., "Who are the authors of paper 2?"). A metadata module handles these queries through section-aware PDF parsing and rule-based heuristics to
+
+extract fields like title, authors, venue, and publication year. This parsed metadata is stored in a structured index for quick access.</li>
+
+<li><strong>Document-Specific Query Routing:</strong>strong> When queries reference specific uploaded documents (e.g., "Summarize the results section of paper 3 for a policymaker"), we restrict the retrieval scope to those documents. This approach improves factual alignment and reduces hallucinations by providing the LLM with a focused context window tailored to the user's intent.</li>li
+</ul>
+Routing decisions employ a hybrid strategy combining heuristic intent detection with semantic similarity scoring. Given a query embedding zq and a set of prototype intent vectors {zc}c∈C, the selected route c* is defined as:
+
+c* = arg max
+c∈C
+cos(zq, zc)
+
+where C is the set of routing classes and cos(·, ·) denotes cosine similarity. This lightweight formulation enables the system to handle diverse queries while maintaining interpretability and modularity.
+
+
+<h2>Corpus- and Document-level Modules</h2>
+  <h3>Document Pre-processing and Semantic Chunking</h3>
+Using the notations from Equation 1, let D = {d1, d2, ..., dN} be a corpus of N documents or research papers. Each document di is split into sections, which are further divided into paragraphs. Most papers in D contain standard sections like abstract, introduction, methodology, results, and conclusion. These sections vary in their format and content—for example, methods and results typically contain more numerical and mathematical content than the introduction and conclusion.
+
+We begin by segmenting each document into text chunks xij:
+
+di → {xi1, xi2, ..., xiT}
+
+Each xij represents an overlapping chunk of text (usually a paragraph or logical subsection) extracted from document di, designed to capture a self-contained scientific argument, result, or claim. We apply these chunking constraints:
+
+• Chunks align with sentence boundaries where possible, using natural language parsing tools
+• Chunks maintain a 10% overlap as a buffer to ensure coherence and self-containment
+• The token length of each chunk is limited by a maximum threshold Tmax, where len(xij) ≤ Tmax
+In our implementation, Tmax is set to 256 tokens.
+
+<h3>Dense Embedding and Retrieval Module</h3>
+After segmentation, we convert each chunk x ∈ D into a dense vector using a sentence-level transformer model. We use SciBERT (a BERT-based model trained specifically on scientific text) [14] to capture technical language and domain-specific concepts common in research papers. SciBERT outperforms general-purpose models on our scientific content.
+
+We define our embedding function fϕ, where ϕ represents the SciBERT encoder parameters. For any text chunk x and user query q, the vector representations are:
+
+zx = fϕ(x), zq = fϕ(q)
+
+Since both vectors exist in the same semantic space, we measure their similarity using cosine distance. We retrieve the most relevant content by selecting the top-k chunks based on this similarity:
+
+R(q, D) = top−k{x ∈ D : cos(zq, zx)} (2)
+
+where
+
+cos(a, b) = a · b
+∥a∥ ∥b∥
+(3)
+
+We implement the HNSW (Hierarchical Navigable Small World) indexing strategy [15] from the FAISS (Facebook AI Similarity Search) library [16] to store and search all zx vectors. Unlike our previous flat indexing approach that used brute-force search across the entire embedding space, HNSW creates a multi-layer graph where nodes represent embeddings and edges connect semantically similar points. This structure enables more efficient approximate nearest neighbor (ANN) search, particularly when handling multiple documents.
+
+After retrieving the top-k most relevant chunks, we pass them to the generation module, where they combine with the user's query and prompt instructions to produce a role-aware response using a LLM.
+
+
+<h2>Metadata Module</h2>
+<h3>Pre-processing</h3>
+In addition to answering content-based questions, our system also supports queries that target
+structured metadata. These include questions like “Who are the authors of this paper?” or “What
+year was it published?”; queries that don’t require deep semantic reasoning, but instead depend on
+accurate extraction of key bibliographic fields from the uploaded document.
+The metadata pipeline begins with document-level pre-processing, where uploaded PDFs are parsed
+using layout-aware text extraction methods. This stage removes LaTeX artifacts, isolates header and
+footer regions, and prepares the raw text for field-based extraction.
+
+<h3>Metadata Formatting</h3>
+Next, we extract structured fields from each document di
+to form its metadata record Mi
+. Each record
+is defined as:
+Mi = {titlei
+, authorsi
+, venuei
+, yeari}
+To populate Mi
+, we use regular expression-based heuristics along with simple formatting logic. Titles
+are typically identified by detecting bold, center-aligned text blocks near the top of the document.
+Authors are parsed using keyword patterns (e.g., affiliations, “and” conjunctions, email addresses),
+while the venue and year are extracted from footnote regions or known templates.
+2.5.3 Metadata Indexing and Query Resolution
+Once structured, the metadata entries are stored in a key-value format and indexed using FAISS to
+allow for semantic matching when queries are less exact. Given a metadata query q, such as “Who
+wrote paper 2?”, the system performs the following steps:
+• Embed the query using a lightweight sentence encoder: zq = fϕ(q)
+• Retrieve the top matching metadata record Mi using cosine similarity:
+M∗ = arg max
+Mi
+cos(zq, zMi
+)
+• Extract the relevant field from M∗
+, based on a simple query-to-slot mapping function:
+f(q) ∈ {title, authors, venue, year}
+Our metadata routing path is designed for speed and accuracy. While we still use a language model
+to generate the final response in the next step, it’s grounded in structured metadata that’s already been
+extracted. This helps reduce hallucinations and keeps the model focused on phrasing, not fact-finding,
+making the system both lightweight and reliable.
+
+
+<h2>Generative Language Modeling and Role-based Conditioning</h2>
+After retrieving relevant context chunks using semantic similarity search, the next stage of our pipeline
+is language generation; this phase acts on the outputs of all three previous modules (corpus, metadata
+and user-uploaded pdf). We use a LLM that has been conditioned on both retrieved evidence and
+user-specific instructions. Using the set of top-k retrieved segments R(q, D) = {x1, x2, . . . , xk} from
+the previous step, we generate a single, concatenated prompt c, which acts as input to a generative
+transformer model. We currently use Google’s Gemini 2.0 Flash, because it can support longer
+contexts, has proven zero-shot summarization capabilities and follows instructions well (which aligns
+with our goal of role-based conditioning).
+The final decoding objective as shown in Equation 1 is approximated by constructing a prompt c
+from the retrieved chunks R(q, D) and decoding with a generative language model. The model
+autoregressively generates the output sequence
+y = {y1, y2, . . . , yT }
+by maximizing its conditional log-likelihood:
+P(y | c; θ) = Y
+T
+t=1
+P(yt | y<t, c; θ)
+where θ are the model parameters and y<t represents all the tokens generated up to time t and c
+includes both the retrieved context and any additional instructions or context we provide to facilitate
+role-based conditioning. The context vector c is of the form
+c = [INSTRUCTION: "Summarize this paper..."] + [RETRIEVED_CONTEXT]
+This approach does not modify the underlying model weights; instead it acts as a form of soft
+conditioning, which acts similar to the prefix- or prompt-tuning approach used in parameter-efficient
+fine-tuning methods. We designed a variety of role-based prompt templates, which let users shape
+how information is presented in the final outcome. Some e.g.s include:
+• Corpus module: "Explain interpretable machine learning to a policymaker."
+• PDF-based module: Summarize this uploaded report for a product manager who needs to
+decide whether to deploy this system."
+• Metadata module: "Provide a quick citation-style summary including the paper’s title,
+authors, venue, and year for a researcher updating their bibliography."
+
+
+
+
+  
+
   <!-- Plan Section -->
   <section class="plan">
     <h2>User-Provided Papers Mode</h2>
