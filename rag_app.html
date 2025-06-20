@@ -81,7 +81,7 @@
   </p>
 
   <p style="text-align: center;">
-    \( y^* = \arg\max_y \; P(y \mid q, R(q, D); \theta) \)
+    \( y^* = \arg\max_y \; P(y \mid q, R(q, D); \theta) \quad \text{(1)} \)
   </p>
 
   <p>
@@ -241,7 +241,7 @@
   </ul>
 
   <p style="text-align: center;">
-    \( f(q) \in \{\text{title}, \text{authors}, \text{venue}, \text{year}\} \)
+    \( f(q) \in  \{ \text{title}_i, \text{authors}_i, \text{venue}_i, \text{year}_i \}  \)
   </p>
 
   <p>
@@ -265,14 +265,15 @@
     \( y = \{y_1, y_2, \ldots, y_T\} \)
     by maximizing its conditional log-likelihood:
   </p>
-
+  
   <p style="text-align: center;">
     \( P(y \mid c; \theta) = \prod_{t=1}^{T} P(y_t \mid y_{<t}, c; \theta) \)
   </p>
-
+  
   <p>
     where \( \theta \) are the model parameters, \( y_{<t} \) represents all the tokens generated up to time \( t \), and \( c \) includes both the retrieved context and any additional instructions provided to facilitate role-based conditioning. The context vector \( c \) is structured as:
   </p>
+
 
   <p style="text-align: center;">
     \( c = [\text{INSTRUCTION: "Summarize this paper..."}] + [\text{RETRIEVED\_CONTEXT}] \)
