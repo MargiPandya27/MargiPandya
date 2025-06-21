@@ -55,7 +55,7 @@
   <main style="flex: 1; padding: 10px; max-width: 1000px;">
     <h1>About Me :) </h1>
 
-    <p>
+    <p style="text-align: justify;">
     Hi, I’m Margi Pandya, a Master’s student in Electrical and Computer Engineering at UC San Diego, specializing in Computer Vision, Natural Language Processing, and Multimodal Learning.
     </p>
 
@@ -70,7 +70,7 @@
       <li>Multimodal integration across language and vision</li>
     </ul>
 
-    <p>I received my B.Tech. degree in Electrical and Electronics Engineering from National Institute of Technology, Tiruchirappalli, where I was advised by Avik Hati.</p>
+    <p style="text-align: justify;">I received my B.Tech. degree in Electrical and Electronics Engineering from National Institute of Technology, Tiruchirappalli, where I was advised by Avik Hati.</p>
 
     <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
       <img src="https://raw.githubusercontent.com/MargiPandya27/MargiPandya/main/images/UCSD.png" alt="NIT Trichy Logo" width="150" height="150">
@@ -83,20 +83,29 @@
     <h2>Research Projects</h2>
     
     <ol>
-    
     <li>
-    <p><strong>Multiple Foreground Co-segmentation</strong><br /> 
-    Advisor: <span style="color:blue"> <a href="https://www.nitt.edu/home/academics/departments/ece/faculty/avikhati/">Dr. Avik Hati</a></span><br />
-    Multiple foreground common object co-segmentation is a task in computer vision with applications ranging from image understanding to object recognition. The goal is to segment common objects shared among multiple images within a given group. Till now, research in this area has primarily focused on single foreground co-segmentation, where only a single common object is segmented across multiple images. In this project, we work on key approaches such as deep learning-based methods, graph-based algorithms, and optimization techniques to develop an algorithm advised for multiple foreground co-segmentation. 
-    </p>
+      <p style="text-align: justify;">
+        <strong>Multiple Foreground Co-segmentation</strong><br />
+        Advisor: <span style="color:blue">
+          <a href="https://www.nitt.edu/home/academics/departments/ece/faculty/avikhati/">Dr. Avik Hati</a>
+        </span><br />
+        This project focuses on multiple foreground common object co-segmentation, a computer vision task with applications in image understanding and object recognition. The goal is to segment common objects shared across a group of images. While most prior work has focused on single foreground co-segmentation, we explore techniques to identify and segment multiple shared objects. Our approach integrates deep learning methods, graph-based algorithms, and optimization strategies to design a robust co-segmentation framework.
+      </p>
     </li>
-    
+  
     <li>
-    <p><strong>Contrastive Fusion of Transformer and CNN based Deep Features for Semantic Segmentation</strong><br /> 
-    Advisor: <span style="color:blue"> <a href="https://www.iitk.ac.in/new/tushar-sandhan">Dr. Tushar Sandhan</a></span><br /> 
-    Image segmentation is crucial in various computer vision applications for accurately identifying and extracting objects or regions of interest within an image. Despite significant advancements in state-of-the-art (SOTA) models for semantic segmentation, many still rely on additional datasets for improved performance. We introduce ContraFusionNet, a novel segmentation architecture combining the spatial understanding property of Convolutional Neural Network (CNN) and deep feature extraction capability of attention in transformers for robust semantic segmentation even in limited data. It uses student-teacher learning with contrastive loss for improved feature assimilation. This model proved to reduce misclassifications while predicting the correct segmentation label. Notably, our model outperformed others when trained on the Cityscape dataset without soliciting any external dataset. This is a significant step in reducing the data dependency for the segmentation task. Widely used benchmark finely annotated benchmark Cityscape datasets and extensive experimental findings on the validation dataset have shown the superiority of the suggested strategy over the most advanced techniques.
-    <span style="color:blue"> <a href="https://github.com/MargiPandya27/ContraFusionNet">[Code]</a></span></p>
+      <p style="text-align: justify;">
+        <strong>Contrastive Fusion of Transformer and CNN-based Deep Features for Semantic Segmentation</strong><br />
+        Advisor: <span style="color:blue">
+          <a href="https://www.iitk.ac.in/new/tushar-sandhan">Dr. Tushar Sandhan</a>
+        </span><br />
+        Semantic segmentation is essential in computer vision for accurately identifying and extracting objects or regions within an image. Despite advances in state-of-the-art models, many still require large external datasets for effective performance. We propose <em>ContraFusionNet</em>, a novel architecture that combines the spatial localization capabilities of CNNs with the global contextual understanding of Transformers. Using a student-teacher learning paradigm with contrastive loss, our model achieves robust segmentation even under limited data conditions. Notably, ContraFusionNet outperformed other methods when trained solely on the Cityscapes dataset, demonstrating its effectiveness in reducing data dependency.
+        <span style="color:blue">
+          <a href="https://github.com/MargiPandya27/ContraFusionNet">[Code]</a>
+        </span>
+      </p>
     </li>
+  </ol>
 
     
   </main>
