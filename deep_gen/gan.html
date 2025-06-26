@@ -53,66 +53,58 @@
 
   <!-- Main Content -->
   <main style="flex: 1; padding: 20px; max-width: 1000px;">
+<h2>Generative Adversarial Networks (GANs)</h2>
 
-    <h1>Generative Models</h1>
+<p>
+  GANs are a class of generative models where a generator \( G \) and a discriminator \( D \) are trained in a two-player minimax game. The goal is for \( G \) to generate data that is indistinguishable from real data, and for \( D \) to distinguish between real and generated (fake) data.
+</p>
 
-  <p>Generative models aim to learn the underlying distribution of each class. The goal is to determine the probability of generating an image from the joint distribution <code>p(x, y)</code>, particularly when <code>y = 1</code> or <code>y = -1</code>.</p>
+<h3>Objective Function</h3>
+<p>
+  The overall loss function is given by:
+</p>
+<div class="math">
+\[
+\min_G \max_D \left( \mathbb{E}_{x \sim p_{\text{data}}(x)} [\log D(x)] + \mathbb{E}_{z \sim p_z(z)} [\log(1 - D(G(z)))] \right)
+\]
+</div>
 
-  <h2>Fully Visible Models</h2>
-
-  <h2>Latent Variable Models</h2>
-
-  <ul>
-    <li><strong>Implicit</strong></li>
-    <li><strong>Explicit</strong></li>
-  </ul>
-
-  <p>Explicit models often struggle with generating high-fidelity images, especially compared to implicit models, which tend to perform better in that regard.</p>
-
-  <h2>Generative Adversarial Networks (GANs)</h2>
-
-  <p>GANs are explicit generative models. The core idea is to learn the distribution of the data without explicitly modeling it, using a parameterized model <code>p<sub>model</sub>(θ)</code> to approximate the real data distribution.</p>
-
-  <img src="attachment:9b27e263-8f71-4d2a-acc5-cf4c36ed2843:4E4F4B09-8365-4C3D-BFE4-708E121408A6.png" alt="GAN architecture diagram">
-
-  <p>A normally distributed random variable <code>z</code> is passed through the generator to produce fake images that resemble real images from the original dataset. The training goal is to optimize a zero-sum loss function so that the generator becomes good enough to fool the discriminator into classifying generated images as real.</p>
-
-  <p>The generator <code>G</code> is trained so that the discriminator misclassifies the generated sample <code>x̂</code> as class 1, i.e., it becomes indistinguishable from real samples <code>x ∼ p<sub>data</sub></code> and generated samples <code>x̂ ∼ p<sub>G</sub></code>.</p>
-
-  <pre>
-min<sub>G</sub> max<sub>D</sub> [ E<sub>x ∼ p<sub>data</sub></sub>[log D(x)] + E<sub>z ∼ p<sub>z</sub></sub>[log(1 − D(G(z)))] ]
-  </pre>
-
-  <ul>
-    <li>
-      <strong>O1:</strong> <code>max<sub>D</sub> E<sub>x ∼ p<sub>data</sub></sub>[log D(x)]</code><br>
-      Train discriminator <code>D</code> to maximize the log probability of correctly classifying real samples.
-    </li>
-    <li>
-      <strong>O2:</strong> <code>min<sub>G</sub> E<sub>z ∼ p<sub>z</sub></sub>[log(1 − D(G(z)))]</code><br>
-      Train generator <code>G</code> to maximize the log probability that the discriminator misclassifies generated samples as real.
-    </li>
-  </ul>
-
-  <img src="attachment:7782d291-e3f9-4dee-a7c1-df844c2d2447:BE424223-AE53-45EF-88BA-97E8C6AEEECE.png" alt="GAN training loss illustration">
-
-  <h2>Training Strategy</h2>
-
-  <p>When starting with a pretrained discriminator, it might become too confident in identifying fake images. In such a case, <code>log(1 − D(G(z)))</code> becomes <code>log(1 − 0) = 0</code>, leading to no gradient for the generator to learn from.</p>
-
-  <p>Therefore, it is essential to train both the generator and discriminator alternately on different mini-batches using the following objective:</p>
-
-  <pre>
-min<sub>G</sub> max<sub>D</sub> [ E<sub>x ∼ p<sub>data</sub></sub>[log D(x)] + E<sub>z ∼ p<sub>z</sub></sub>[log(1 − D(G(z)))] ]
-  </pre>
-
-
-   <footer class="page__meta">
-                    <!-- Any additional metadata or footer information goes here -->
-                </footer>
-            </div>
-        </article>
+<p>
+  The two components of this loss correspond to:
+</p>
+<ul>
+  <li>
+    <strong>Discriminator loss:</strong>
+    <div class="math">
+    \[
+    \max_D \, \mathbb{E}_{x \sim p_{\text{data}}(x)}[\log D(x)]
+    \]
     </div>
+    Train \( D \) to correctly classify real data \( x \sim p_{\text{data}} \).
+  </li>
+  <li>
+    <strong>Generator loss:</strong>
+    <div class="math">
+    \[
+    \min_G \, \mathbb{E}_{z \sim p_z(z)}[\log(1 - D(G(z)))]
+    \]
+    </div>
+    Train \( G \) to generate samples \( G(z) \) such that \( D \) classifies them as real.
+  </li>
+</ul>
+
+<h3>Training Strategy</h3>
+<p>
+  If the discriminator is pretrained or initially too strong, it might perfectly classify fake samples, making \( \log(1 - D(G(z))) = \log(1 - 0) = 0 \), resulting in no useful gradient for the generator. Hence, it is crucial to train both \( G \) and \( D \) iteratively over different mini-batches.
+</p>
+
+<h3>GAN Generation Pipeline</h3>
+<ol>
+  <li>Sample noise vector \( z \sim \mathcal{N}(0, I) \)</li>
+  <li>Generate fake sample \( \hat{x} = G(z) \)</li>
+  <li>Discriminator receives both real \( x \) and fake \( \hat{x} \), and learns to assign high probability to real and low to fake</li>
+  <li>Generator is updated to maximize the probability of discriminator misclassifying \( \hat{x} \) as real</li>
+</ol>
 
     <div class="page__footer">
         <footer>
