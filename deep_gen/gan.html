@@ -53,8 +53,6 @@
 
   <!-- Main Content -->
   <main style="flex: 1; padding: 20px; max-width: 1000px;">
- 
-
 
 
 <h2>Generative Adversarial Network</h2>
@@ -110,22 +108,17 @@ O_2 = \min_G \, \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
   Therefore, it is essential to train both the generator and the discriminator alternately using different mini-batches. This avoids collapse and ensures both models improve progressively.
 </p>
 
+
+
+<p>
+  The minimax objective of a Generative Adversarial Network is:
+</p>
 <div style="border: 2px solid #ccc; padding: 15px; border-radius: 8px; background-color: #f9f9f9; margin: 20px 0;">
   <div class="math">
   \[
   \min_G \max_D \left( \mathbb{E}_{x \sim p_{\text{data}}}[\log D(x)] + \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))] \right)
   \]
   </div>
-</div>
-
-
-<p>
-  The minimax objective of a Generative Adversarial Network is:
-</p>
-<div class="math">
-\[
-\min_G \max_D \, \mathbb{E}_{x \sim p_{\text{data}}}[\log D(x)] + \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
-\]
 </div>
 
 <p>Expanding the expectations using the change of variables:</p>
