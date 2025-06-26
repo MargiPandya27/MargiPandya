@@ -77,7 +77,7 @@
 \]
 </div>
 
-<h4>Discriminator Objective \( O_1 \)</h4>
+<h3>Discriminator Objective \( O_1 \)</h3>
 <p>
   Train discriminator \( D \) to maximize the log probability of correctly classifying real samples:
 </p>
@@ -87,7 +87,7 @@ O_1 = \max_D \, \mathbb{E}_{x \sim p_{\text{data}}}[\log D(x)]
 \]
 </div>
 
-<h4>Generator Objective \( O_2 \)</h4>
+<h3>Generator Objective \( O_2 \)</h3>
 <p>
   Train generator \( G \) to maximize the probability that the discriminator misclassifies generated samples as real:
 </p>
@@ -101,7 +101,7 @@ O_2 = \min_G \, \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
 <img src="attachment:9b27e263-8f71-4d2a-acc5-cf4c36ed2843:4E4F4B09-8365-4C3D-BFE4-708E121408A6.png" alt="GAN architecture diagram">
 <img src="attachment:7782d291-e3f9-4dee-a7c1-df844c2d2447:BE424223-AE53-45EF-88BA-97E8C6AEEECE.png" alt="GAN training strategy diagram">
 
-<h3>Training Strategy</h3>
+<h2>Training Strategy</h2>
 <p>
   If a pretrained discriminator is used initially, it might confidently classify all generated images as fake, resulting in \( \log(1 - D(G(z))) = \log(1 - 0) = 0 \), which leads to zero gradient for training the generator.
 </p>
