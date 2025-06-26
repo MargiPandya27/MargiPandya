@@ -207,8 +207,16 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
 <p>So the GAN objective simplifies to:</p>
 <div class="math">
 \[
-\min_G \left( 2 \cdot \text{JSD}(p_{\text{data}} \,\|\, p_G) - \log 4 \right)
+\argmin_G \left( 2 \cdot \text{JSD}(p_{\text{data}} \,\|\, p_G) - \log 4 \right) 
 \]
+</div>
+
+<div style="border: 2px solid #ccc; padding: 15px; border-radius: 8px; background-color: #f9f9f9; margin: 20px 0;">
+<div class="math">
+\[
+\( p_G = p_{\text{data}} \)
+\]
+</div>
 </div>
 
 <p>This expression is minimized when \( p_G = p_{\text{data}} \), since Jensen–Shannon divergence is non-negative and equals 0 only when the two distributions are identical.</p>
