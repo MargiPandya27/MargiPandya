@@ -210,6 +210,52 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
 <p>This expression is minimized when \( p_G = p_{\text{data}} \), since Jensen–Shannon divergence is non-negative and equals 0 only when the two distributions are identical.</p>
 
 
+<h2>Deep Convolution Generative Adversarial Network (DCGAN)</h2>
+
+<p>Architectural Guidelines for Stable GAN Training:</p>
+
+<ul>
+  <li>
+    Replaces deterministic spatial pooling functions (e.g., max pooling) with <strong>strided convolutions</strong>  
+    <ul>
+      <li>Allows the network to learn spatial downsampling</li>
+    </ul>
+  </li>
+  
+  <li>
+    <strong>Removes fully connected hidden layers</strong>  
+    <ul>
+      <li>Supports deeper and more scalable architectures</li>
+    </ul>
+  </li>
+  
+  <li>
+    <strong>Batch Normalization</strong> in both Generator and Discriminator  
+    <ul>
+      <li>Prevents generator collapse</li>
+      <li>Enables stable gradient flow in deeper networks</li>
+      <li>Not applied at the output layer of the generator or input layer of the discriminator</li>
+    </ul>
+  </li>
+  
+  <li>
+    <strong>Non-linear Activations:</strong>
+    <ul>
+      <li><strong>Generator:</strong> ReLU activations in all layers except the output</li>
+      <li><strong>Discriminator:</strong> Leaky ReLU activations with slope 0.2</li>
+    </ul>
+  </li>
+  
+  <li>
+    <strong>Output Activations:</strong>
+    <ul>
+      <li><strong>Generator:</strong> tanh</li>
+      <li><strong>Discriminator:</strong> sigmoid</li>
+    </ul>
+  </li>
+</ul>
+
+
 <footer class="page__meta">
                     <!-- Any additional metadata or footer information goes here -->
                 </footer>
