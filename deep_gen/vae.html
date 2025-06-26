@@ -52,7 +52,40 @@
 
   <!-- Main Content -->
     <main style="flex: 1; padding: 20px; max-width: 1000px;">
-      <h2>Variational Autoencoder (VAE)</h2>
+
+<h2>Deep Generative Models</h2>
+      
+
+      
+<h3>Implicit vs Explicit Generative Models</h3>
+
+<ul>
+  <li><strong>Implicit Generative Models</strong>
+    <ul>
+      <li>Give up estimating the explicit form of \( p(x) \)</li>
+      <li>Aim only to sample images from the model; no explicit likelihood assignment</li>
+      <li>Capable of generating high-quality samples</li>
+      <li>Support fast sampling speeds</li>
+    </ul>
+  </li>
+  <li><strong>Explicit Generative Models</strong>
+    <ul>
+      <li>Write an explicit function \( p(x) = f(x, \theta) \)</li>
+      <li><strong>Input:</strong> Image \( x \)</li>
+      <li><strong>Output:</strong> Likelihood value for image</li>
+      <li><strong>Parameter:</strong> Weights \( \theta \)</li>
+      <li>Assign explicit likelihoods to images</li>
+      <li>Enables tasks like outlier detection</li>
+      <li>Often compromises image quality or sampling speed</li>
+    </ul>
+  </li>
+</ul>
+
+<p>
+  Explicit models struggle with low fidelity in generated images and often underperform compared to implicit models.
+</p>
+  
+<h2>Variational Autoencoder (VAE)</h2>
 <p>
   A Variational Autoencoder is a type of generative model that learns a latent representation of data and can be used to generate similar data samples. While VAEs were originally used for images, changing the decoder enables them to generate text or other data types.
 </p>
