@@ -110,11 +110,14 @@ O_2 = \min_G \, \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
   Therefore, it is essential to train both the generator and the discriminator alternately using different mini-batches. This avoids collapse and ensures both models improve progressively.
 </p>
 
-<div class="math">
-\[
-\min_G \max_D \left( \mathbb{E}_{x \sim p_{\text{data}}}[\log D(x)] + \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))] \right)
-\]
+<div style="border: 2px solid #ccc; padding: 15px; border-radius: 8px; background-color: #f9f9f9; margin: 20px 0;">
+  <div class="math">
+  \[
+  \min_G \max_D \left( \mathbb{E}_{x \sim p_{\text{data}}}[\log D(x)] + \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))] \right)
+  \]
+  </div>
 </div>
+
 
 
 <h2>GAN Objective Derivation</h2>
@@ -159,12 +162,16 @@ f'(y) = \frac{a}{y} - \frac{b}{1 - y} = 0 \quad \Rightarrow \quad y = \frac{a}{a
 <p>
   Substituting back:
 </p>
+
+<div style="border: 2px solid #ccc; padding: 15px; border-radius: 8px; background-color: #f9f9f9; margin: 20px 0;">
 <div class="math">
 \[
 D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
 \]
 </div>
+</div>
 
+  
 <p>Now substitute this optimal discriminator into the original objective:</p>
 <div class="math">
 \[
