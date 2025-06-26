@@ -265,6 +265,35 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
 </ul>
 
 
+<section>
+  <h2>Conditional Generative Adversarial Networks (cGANs)</h2>
+  
+  <p>
+    So far, we have seen the impressive generation capabilities of GANs. However, a key limitation is the lack of control over what the GAN generates — for example, generating images of a specific class or outputs from other modalities like text.
+  </p>
+  
+  <p>
+    <strong>(cGANs)</strong> address this limitation by introducing an additional conditioning variable <code>y</code>, which can be a class label, text embedding, or any other feature vector derived from a different modality. In this framework, both the generator and the discriminator are conditioned on <code>y</code>:
+  </p>
+  
+  <ul>
+    <li><strong>Generator:</strong> The latent noise vector <code>z</code> is concatenated with <code>y</code>, enabling the model to learn the <em>conditional probability distribution</em> <code>p(x|y)</code>.</li>
+    <li><strong>Discriminator:</strong> Both the generated/real sample <code>x</code> and the conditioning variable <code>y</code> are provided as input, allowing the model to evaluate whether <code>x</code> is a realistic sample <em>given</em> <code>y</code>.</li>
+  </ul>
+
+  <p>The objective function for a conditional GAN becomes:</p>
+
+  <pre><code>
+min<sub>G</sub> max<sub>D</sub> V(D, G) = E<sub>x ∼ p<sub>data</sub>(x)</sub>[log D(x|y)] 
+                                      + E<sub>z ∼ p<sub>z</sub>(z)</sub>[log(1 − D(G(z|y)))]
+  </code></pre>
+
+  <p>
+    cGANs have been successfully used to generate both <strong>unimodal outputs</strong> (e.g., generating images from class labels) and <strong>multimodal outputs</strong> (e.g., generating descriptive tags from images). By conditioning the model on different modalities, the generator can produce relevant outputs in either the <em>same modality</em> or a <em>different one</em>, thereby demonstrating <strong>cross-modal generation capabilities</strong>.
+  </p>
+</section>
+
+
 <footer class="page__meta">
                     <!-- Any additional metadata or footer information goes here -->
                 </footer>
