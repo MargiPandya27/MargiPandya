@@ -131,6 +131,120 @@ O_2 = \min_G \, \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
 </div>
 
 
+<h2>GAN Objective Derivation</h2>
+
+<p>
+  The minimax objective of a Generative Adversarial Network is:
+</p>
+<div class="math">
+\[
+\min_G \max_D \, \mathbb{E}_{x \sim p_{\text{data}}}[\log D(x)] + \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
+\]
+</div>
+
+<p>Expanding the expectations using the change of variables:</p>
+<div class="math">
+\[
+\min_G \max_D \int_x p_{\text{data}}(x) \log D(x) + p_G(x) \log(1 - D(x)) \, dx
+\]
+</div>
+
+<p>Now take the max inside the integral:</p>
+<div class="math">
+\[
+\min_G \int_x \max_D \left( p_{\text{data}}(x) \log D(x) + p_G(x) \log(1 - D(x)) \right) dx
+\]
+</div>
+
+<p>Let \( y = D(x), \quad a = p_{\text{data}}(x), \quad b = p_G(x) \). Define:</p>
+<div class="math">
+\[
+f(y) = a \log y + b \log(1 - y)
+\]
+</div>
+<p>To maximize \( f(y) \), take the derivative and set it to zero:</p>
+<div class="math">
+\[
+f'(y) = \frac{a}{y} - \frac{b}{1 - y} = 0 \quad \Rightarrow \quad y = \frac{a}{a + b}
+\]
+</div>
+
+<h3>Optimal Discriminator \( D^*_G(x) \)</h3>
+<p>
+  Substituting back:
+</p>
+<div class="math">
+\[
+D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
+\]
+</div>
+
+<p>Now substitute this optimal discriminator into the original objective:</p>
+<div class="math">
+\[
+\min_G \int_x \left( p_{\text{data}}(x) \log \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)} + p_G(x) \log \frac{p_G(x)}{p_{\text{data}}(x) + p_G(x)} \right) dx
+\]
+</div>
+
+<p>Rewriting the expression using expectations:</p>
+<div class="math">
+\[
+\min_G \, \mathbb{E}_{x \sim p_{\text{data}}} \left[ \log \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)} \right] + \mathbb{E}_{x \sim p_G} \left[ \log \frac{p_G(x)}{p_{\text{data}}(x) + p_G(x)} \right]
+\]
+</div>
+
+<p>Multiply numerator and denominator by 2:</p>
+<div class="math">
+\[
+\min_G \, \mathbb{E}_{x \sim p_{\text{data}}} \left[ \log \frac{2 p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)} \right] + \mathbb{E}_{x \sim p_G} \left[ \log \frac{2 p_G(x)}{p_{\text{data}}(x) + p_G(x)} \right] - \log 4
+\]
+</div>
+
+<p>Which leads to the final expression involving KL divergence:</p>
+<div class="math">
+\[
+\min_G \left[ \text{KL} \left( p_{\text{data}} \,\|\, \frac{p_{\text{data}} + p_G}{2} \right) + \text{KL} \left( p_G \,\|\, \frac{p_{\text{data}} + p_G}{2} \right) - \log 4 \right]
+\]
+</div>
+
+<h3>Jensen–Shannon Divergence (JSD)</h3>
+<div class="math">
+\[
+\text{JSD}(p_{\text{data}} \,\|\, p_G) = \frac{1}{2} \text{KL} \left( p_{\text{data}} \,\|\, \frac{p_{\text{data}} + p_G}{2} \right) + \frac{1}{2} \text{KL} \left( p_G \,\|\, \frac{p_{\text{data}} + p_G}{2} \right)
+\]
+</div>
+
+<p>So the GAN objective simplifies to:</p>
+<div class="math">
+\[
+\min_G \left( 2 \cdot \text{JSD}(p_{\text{data}} \,\|\, p_G) - \log 4 \right)
+\]
+</div>
+
+<p>This expression is minimized when \( p_G = p_{\text{data}} \), since Jensen–Shannon divergence is non-negative and equals 0 only when the two distributions are identical.</p>
+
+<h3>Summary of Optimality</h3>
+<ul>
+  <li>
+    <strong>Optimal Discriminator:</strong>
+    <div class="math">
+    \[
+    D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
+    \]
+    </div>
+  </li>
+  <li>
+    <strong>Optimal Generator:</strong>
+    <div class="math">
+    \[
+    p_G(x) = p_{\text{data}}(x)
+    \]
+    </div>
+  </li>
+</ul>
+
+
+
     <div class="page__footer">
         <footer>
             <!-- Your footer content goes here -->
