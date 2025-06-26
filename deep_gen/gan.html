@@ -266,7 +266,7 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
 
 
 <section>
-  <h2>Conditional Generative Adversarial Networks (cGANs)</h2>
+  <h2>Conditional Generative Adversarial Network (cGAN)</h2>
   
   <p>
     So far, we have seen the impressive generation capabilities of GANs. However, a key limitation is the lack of control over what the GAN generates — for example, generating images of a specific class or outputs from other modalities like text.
@@ -292,6 +292,112 @@ min<sub>G</sub> max<sub>D</sub> V(D, G) = E<sub>x ∼ p<sub>data</sub>(x)</sub>[
     cGANs have been successfully used to generate both <strong>unimodal outputs</strong> (e.g., generating images from class labels) and <strong>multimodal outputs</strong> (e.g., generating descriptive tags from images). By conditioning the model on different modalities, the generator can produce relevant outputs in either the <em>same modality</em> or a <em>different one</em>, thereby demonstrating <strong>cross-modal generation capabilities</strong>.
   </p>
 </section>
+
+
+
+<section>
+  <h2>Cycle Generative Adversarial Network (CycleGAN)</h2>
+
+  <p>
+    <strong>CycleGAN</strong> enables image-to-image translation between two domains without requiring paired training examples. When trained on a specific image collection, it captures the distinct characteristics of that domain and learns how to translate those features to another image collection. This is done under the assumption that there exists some underlying relationship between the two domains — for example, that both are different renderings of the same underlying scene.
+  </p>
+
+  <p>
+    CycleGAN is widely known for its applications in <em>style transfer, object transfiguration, season transfer, and photo enhancement</em>. It is especially popular in the computer vision and generative AI communities due to its ability to perform unpaired image translation.
+  </p>
+
+  <p>
+    A notable yet sometimes underappreciated contribution of CycleGAN is its approach to ensuring <strong>training stability</strong>. Using only adversarial loss is not sufficient to maintain control over the mappings between domains. Therefore, CycleGAN introduces a <strong>cycle consistency loss</strong> to encourage bijective translation — i.e., translating from domain X to Y and back should yield the original image: <code>F(G(x)) ≈ x</code> and <code>G(F(y)) ≈ y</code>. This is analogous to translating a sentence from English to French and back to English, where the final sentence should closely match the original.
+  </p>
+
+  <h3>Adversarial Loss</h3>
+  <p>
+    For domain translation from X to Y using generator <code>G</code> and discriminator <code>D<sub>Y</sub></code>, the adversarial loss is:
+  </p>
+  <pre><code>
+L<sub>GAN</sub>(G, D<sub>Y</sub>, X, Y) = E<sub>y ∼ p<sub>data</sub>(y)</sub>[log D<sub>Y</sub>(y)] 
+                                      + E<sub>x ∼ p<sub>data</sub>(x)</sub>[log(1 − D<sub>Y</sub>(G(x)))]
+  </code></pre>
+
+  <p>
+    Similarly, for domain translation from Y to X using generator <code>F</code> and discriminator <code>D<sub>X</sub></code>, the adversarial loss is:
+  </p>
+  <pre><code>
+L<sub>GAN</sub>(F, D<sub>X</sub>, Y, X)
+  </code></pre>
+
+  <h3>Cycle Consistency Loss</h3>
+  <p>
+    To ensure that the translation preserves key content, CycleGAN uses a cycle consistency loss that penalizes discrepancies between the original and reconstructed images:
+  </p>
+  <pre><code>
+L<sub>cyc</sub>(G, F) = E<sub>x ∼ p<sub>data</sub>(x)</sub>[||F(G(x)) − x||₁] 
+                    + E<sub>y ∼ p<sub>data</sub>(y)</sub>[||G(F(y)) − y||₁]
+  </code></pre>
+
+  <h3>Full Objective</h3>
+  <p>
+    The complete training objective combines the adversarial and cycle consistency losses:
+  </p>
+  <pre><code>
+L(G, F, D<sub>X</sub>, D<sub>Y</sub>) = 
+  L<sub>GAN</sub>(G, D<sub>Y</sub>, X, Y) + 
+  L<sub>GAN</sub>(F, D<sub>X</sub>, Y, X) + 
+  λ · L<sub>cyc</sub>(G, F)
+  </code></pre>
+
+  <p>
+    The optimization goal is:
+  </p>
+  <pre><code>
+G*, F* = arg min<sub>G,F</sub> max<sub>D<sub>X</sub>,D<sub>Y</sub></sub> L(G, F, D<sub>X</sub>, D<sub>Y</sub>)
+  </code></pre>
+
+  <h3>Stabilizing with Least Squares Loss</h3>
+  <p>
+    To further stabilize training, CycleGAN replaces the negative log-likelihood in the GAN loss with a <strong>least squares loss</strong>. This modifies the generator and discriminator losses as follows:
+  </p>
+  <ul>
+    <li><strong>Generator loss:</strong> <code>E<sub>x ∼ p<sub>data</sub>(x)</sub>[(D(G(x)) − 1)<sup>2</sup>]</code></li>
+    <li><strong>Discriminator loss:</strong> <code>E<sub>y ∼ p<sub>data</sub>(y)</sub>[(D(y) − 1)<sup>2</sup>] + E<sub>x ∼ p<sub>data</sub>(x)</sub>[(D(G(x)))<sup>2</sup>]</code></li>
+  </ul>
+
+  <p>
+    This formulation improves gradient flow and leads to more stable training dynamics.
+  </p>
+</section>
+
+  
+
+
+
+  
+  <p>
+    So far, we have seen the impressive generation capabilities of GANs. However, a key limitation is the lack of control over what the GAN generates — for example, generating images of a specific class or outputs from other modalities like text.
+  </p>
+  
+  <p>
+    <strong>(cGANs)</strong> address this limitation by introducing an additional conditioning variable <code>y</code>, which can be a class label, text embedding, or any other feature vector derived from a different modality. In this framework, both the generator and the discriminator are conditioned on <code>y</code>:
+  </p>
+  
+  <ul>
+    <li><strong>Generator:</strong> The latent noise vector <code>z</code> is concatenated with <code>y</code>, enabling the model to learn the <em>conditional probability distribution</em> <code>p(x|y)</code>.</li>
+    <li><strong>Discriminator:</strong> Both the generated/real sample <code>x</code> and the conditioning variable <code>y</code> are provided as input, allowing the model to evaluate whether <code>x</code> is a realistic sample <em>given</em> <code>y</code>.</li>
+  </ul>
+
+  <p>The objective function for a conditional GAN becomes:</p>
+
+  <pre><code>
+min<sub>G</sub> max<sub>D</sub> V(D, G) = E<sub>x ∼ p<sub>data</sub>(x)</sub>[log D(x|y)] 
+                                      + E<sub>z ∼ p<sub>z</sub>(z)</sub>[log(1 − D(G(z|y)))]
+  </code></pre>
+
+  <p>
+    cGANs have been successfully used to generate both <strong>unimodal outputs</strong> (e.g., generating images from class labels) and <strong>multimodal outputs</strong> (e.g., generating descriptive tags from images). By conditioning the model on different modalities, the generator can produce relevant outputs in either the <em>same modality</em> or a <em>different one</em>, thereby demonstrating <strong>cross-modal generation capabilities</strong>.
+  </p>
+</section>
+
+
 
 
 <footer class="page__meta">
