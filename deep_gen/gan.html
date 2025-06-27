@@ -105,14 +105,7 @@ O_2 = \min_G \, \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
 \]
 </div>
 
-<figure style="text-align: center;">
-  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/gan _strategy.png" 
-       alt="GAN training strategy diagram" 
-       style="max-width: 20%; height: auto; display: block; margin: 0 auto;">
-  <figcaption style="font-style: italic; margin-top: 0.5em;">
-    Figure: Training strategy of a GAN — the generator tries to fool the discriminator, which learns to distinguish real from generated samples.
-  </figcaption>
-</figure>
+
 
 
 
@@ -121,6 +114,16 @@ O_2 = \min_G \, \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
   If a pretrained discriminator is used initially, it might confidently classify all generated images as fake, resulting in \( \log(1 - D(G(z))) = \log(1 - 0) = 0 \), which leads to zero gradient for training the generator.
 </p>
 
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/gan _strategy.png" 
+       alt="GAN training strategy diagram" 
+       style="max-width: 20%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Training strategy of a GAN — the generator tries to fool the discriminator, which learns to distinguish real from generated samples.
+  </figcaption>
+</figure>
+    
 <p>
   Therefore, it is essential to train both the generator and the discriminator alternately using different mini-batches. This avoids collapse and ensures both models improve progressively.
 </p>
