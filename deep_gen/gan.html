@@ -61,6 +61,8 @@
   GANs are implicit generative models. The goal is to learn the distribution of data \( p_{\text{model}}(\theta) \) as closely as possible to the true data distribution without explicitly modeling the likelihood.
 </p>
 
+<img src="https://margipandya27.github.io/MargiPandya/deep_gen/vanilla_gan.png" alt="GAN architecture diagram">
+
 <p>
   A normally distributed random variable \( z \sim \mathcal{N}(0, I) \) is passed through the generator network to produce fake images with a similar distribution to the real dataset. To train the generator, GANs use a zero-sum loss function, encouraging the generator to produce images that the discriminator classifies as real.
 </p>
@@ -95,9 +97,8 @@ O_2 = \min_G \, \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
 \]
 </div>
 
-<!-- Replace these src values with correct relative or hosted image paths if needed -->
-<img src="attachment:9b27e263-8f71-4d2a-acc5-cf4c36ed2843:4E4F4B09-8365-4C3D-BFE4-708E121408A6.png" alt="GAN architecture diagram">
-<img src="attachment:7782d291-e3f9-4dee-a7c1-df844c2d2447:BE424223-AE53-45EF-88BA-97E8C6AEEECE.png" alt="GAN training strategy diagram">
+<img src="<img src="https://margipandya27.github.io/MargiPandya/deep_gen/gan_strategy.png" alt="GAN training strategy diagram">
+
 
 <h2>Training Strategy</h2>
 <p>
@@ -264,9 +265,13 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
   </li>
 </ul>
 
+<img src="<img src="https://margipandya27.github.io/MargiPandya/deep_gen/dcgan.png" alt="DCGAN training strategy diagram">
+    
 
 <section>
   <h2>3. Conditional Generative Adversarial Network (cGAN)</h2>
+
+  <img src="<img src="https://margipandya27.github.io/MargiPandya/deep_gen/cgan.png" alt="cGAN architecture">
   
   <p>
     So far, we have seen the impressive generation capabilities of GANs. However, a key limitation is the lack of control over what the GAN generates — for example, generating images of a specific class or outputs from other modalities like text.
@@ -293,6 +298,9 @@ min<sub>G</sub> max<sub>D</sub> V(D, G) = E<sub>x ∼ p<sub>data</sub>(x)</sub>[
   </p>
 </section>
 
+      <img src="<img src="https://margipandya27.github.io/MargiPandya/deep_gen/unimodal_cgan.png" alt="cGAN unimodal">
+      <img src="<img src="https://margipandya27.github.io/MargiPandya/deep_gen/mulitmodal_cgan.png" alt="cGAN multimodal">
+
 
 <section>
   <h2>4. Cycle Generative Adversarial Network (CycleGAN)</h2>
@@ -301,6 +309,8 @@ min<sub>G</sub> max<sub>D</sub> V(D, G) = E<sub>x ∼ p<sub>data</sub>(x)</sub>[
     <strong>CycleGAN</strong> enables image-to-image translation between two domains without requiring paired training examples. When trained on a specific image collection, it captures the distinct characteristics of that domain and learns how to translate those features to another image collection. This is done under the assumption that there exists some underlying relationship between the two domains — for example, that both are different renderings of the same underlying scene.
   </p>
 
+    <img src="<img src="https://margipandya27.github.io/MargiPandya/deep_gen/cyclegan_result.png" alt="Cycle GAN Result">
+    <img src="<img src="https://margipandya27.github.io/MargiPandya/deep_gen/cyclegan.png" alt="Cycle GAN">
   <p>
     CycleGAN is widely known for its applications in <em>style transfer, object transfiguration, season transfer, and photo enhancement</em>. It is especially popular in the computer vision and generative AI communities due to its ability to perform unpaired image translation.
   </p>
