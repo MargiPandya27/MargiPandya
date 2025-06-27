@@ -354,10 +354,9 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
   <h2>4. Cycle Generative Adversarial Network (CycleGAN)</h2>
 
   <p>
-    <strong>CycleGAN</strong> enables image-to-image translation between two domains without requiring paired training examples...
+    <strong>CycleGAN</strong> enables image-to-image translation between two visual domains without requiring paired training examples. When trained on two unpaired image collections, CycleGAN learns to capture the domain-specific characteristics of each and translates between them. The model assumes that there is some underlying shared structure between domains — for example, both being different renderings or styles of the same scene — and seeks to learn a mapping between them.
   </p>
 
-  <!-- Image results and architecture (unchanged) -->
   <figure style="text-align: center;">
     <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cyclegan_result.png" 
          alt="CycleGAN results" 
@@ -377,13 +376,18 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
   </figure>
 
   <p>
-    ...
+    CycleGAN has become widely popular for tasks like <em>style transfer, object transfiguration, season conversion, and photo enhancement</em>. Its unique capability to perform translations without paired data makes it powerful for real-world applications where aligned datasets are unavailable.
+  </p>
+
+  <p>
+    A key insight from CycleGAN is that <strong>adversarial loss alone is insufficient</strong> to ensure meaningful translations. The model might map multiple inputs to the same output or introduce artifacts. To solve this, CycleGAN introduces the concept of <strong>cycle consistency</strong>, which enforces that translating from one domain to another and back again should yield the original image. This is analogous to translating a sentence from English to French and then back to English — the result should closely resemble the original sentence.
   </p>
 
   <h3>Adversarial Loss</h3>
   <p>
-    For domain translation from X to Y using generator \( G \) and discriminator \( D_Y \), the adversarial loss is:
+    The adversarial loss ensures that the generated images from one domain are indistinguishable from real images in the target domain.
   </p>
+
   <p>
     \[
     \mathcal{L}_{GAN}(G, D_Y, X, Y) = \mathbb{E}_{y \sim p_{data}(y)}[\log D_Y(y)] + \mathbb{E}_{x \sim p_{data}(x)}[\log(1 - D_Y(G(x)))]
@@ -391,18 +395,27 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
   </p>
 
   <p>
-    Similarly, for domain translation from Y to X:
+    Similarly, for the reverse direction:
   </p>
+
   <p>
     \[
-    \mathcal{L}_{GAN}(F, D_X, Y, X)
+    \mathcal{L}_{GAN}(F, D_X, Y, X) = \mathbb{E}_{x \sim p_{data}(x)}[\log D_X(x)] + \mathbb{E}_{y \sim p_{data}(y)}[\log(1 - D_X(F(y)))]
     \]
   </p>
 
   <h3>Cycle Consistency Loss</h3>
   <p>
-    To ensure the translated image can be mapped back to the original:
+    To preserve the content between translations, CycleGAN uses a cycle consistency loss. This ensures that:
+    \[
+    F(G(x)) \approx x \quad \text{and} \quad G(F(y)) \approx y
+    \]
   </p>
+
+  <p>
+    The cycle consistency loss is defined as:
+  </p>
+
   <p>
     \[
     \mathcal{L}_{cyc}(G, F) = \mathbb{E}_{x \sim p_{data}(x)}[\|F(G(x)) - x\|_1] + \mathbb{E}_{y \sim p_{data}(y)}[\|G(F(y)) - y\|_1]
@@ -411,8 +424,9 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
 
   <h3>Full Objective</h3>
   <p>
-    The full training objective:
+    The full objective combines both adversarial and cycle consistency losses:
   </p>
+
   <p>
     \[
     \mathcal{L}(G, F, D_X, D_Y) = \mathcal{L}_{GAN}(G, D_Y, X, Y) + \mathcal{L}_{GAN}(F, D_X, Y, X) + \lambda \cdot \mathcal{L}_{cyc}(G, F)
@@ -420,25 +434,34 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
   </p>
 
   <p>
-    Optimization goal:
+    The optimization problem becomes:
   </p>
+
   <p>
     \[
     G^*, F^* = \arg\min_{G, F} \max_{D_X, D_Y} \mathcal{L}(G, F, D_X, D_Y)
     \]
   </p>
 
-  <h3>Stabilizing with Least Squares Loss</h3>
+  <h3>Stabilizing Training with Least Squares Loss</h3>
   <p>
-    For more stable training, CycleGAN uses least squares loss instead of negative log-likelihood:
+    To improve training stability and gradient flow, CycleGAN replaces the binary cross-entropy loss with a least squares loss. This change modifies the generator and discriminator objectives as follows:
   </p>
+
   <ul>
     <li><strong>Generator loss:</strong> \( \mathbb{E}_{x \sim p_{data}(x)}[(D(G(x)) - 1)^2] \)</li>
-    <li><strong>Discriminator loss:</strong> \( \mathbb{E}_{y \sim p_{data}(y)}[(D(y) - 1)^2] + \mathbb{E}_{x \sim p_{data}(x)}[D(G(x))^2] \)</li>
+    <li><strong>Discriminator loss:</strong> \( \mathbb{E}_{y \sim p_{data}(y)}[(D(y) - 1)^2] + \mathbb{E}_{x \sim p_{data}(x)}[(D(G(x)))^2] \)</li>
   </ul>
 
-  <p>This improves gradient flow and stabilizes training.</p>
+  <p>
+    This formulation leads to smoother gradients, helping the model learn more effectively, and avoids issues like vanishing gradients often seen in vanilla GAN training.
+  </p>
+
+  <p>
+    In summary, CycleGAN elegantly solves the unpaired image-to-image translation problem by combining adversarial training with cycle consistency, enabling powerful and flexible cross-domain generation without requiring paired data.
+  </p>
 </section>
+
 
   
 
