@@ -324,6 +324,17 @@ So,
 <p>
 The VAE is a high-variance model due to stochastic sampling, making it non-differentiable. To backpropagate through stochastic nodes, we use the reparameterization trick:
 </p>
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/vae_reparameterize.png"
+       alt="GAN architecture diagram"
+       style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Architecture of a Vanilla GAN. The generator learns to map noise to data samples, while the discriminator distinguishes real from generated samples.
+  </figcaption>
+</figure>
+
+      
 <div class="math">
 \[
 z = \mu_\phi(x) + \sigma_\phi(x) \cdot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)
