@@ -56,8 +56,17 @@
   <h2>Generative Models</h2>
 
 <p>
-  Generative models aim to learn the underlying distribution of each class. The objective is to estimate the probability of generating an image from the joint distribution \( p(x, y) \), particularly when \( y = 1 \) or \( y = -1 \).
+  Generative models aim to learn the underlying distribution of each class unlike the discriminative models. The objective is to estimate the probability of generating an image from the joint distribution \( p(x, y) \), particularly when \( y = 1 \) or \( y = -1 \).
 </p>
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/dis_vs_gen.png"
+       alt="Dis_vs_Gen"
+       style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em; max-width: 70%; margin-left: auto; margin-right: auto;">
+    Figure: Discriminative vs Generative Models.
+  </figcaption>
+</figure>
 
       
 <h3>Implicit vs Explicit Generative Models</h3>
@@ -327,7 +336,7 @@ The VAE is a high-variance model due to stochastic sampling, making it non-diffe
 
 <figure style="text-align: center;">
   <img src="https://margipandya27.github.io/MargiPandya/deep_gen/vae_reparameterize.png"
-       alt="GAN architecture diagram"
+       alt="VAE architecture diagram"
        style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
   <figcaption style="font-style: italic; margin-top: 0.5em;">
     Figure: VAE using the reparameterization trick to enable backpropagation through the encoder.
