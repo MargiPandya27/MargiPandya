@@ -54,11 +54,11 @@
   <!-- Main Content -->
   <main style="flex: 1; padding: 20px; max-width: 1000px;">
 
+<p>Generative Adversarial Networks (GANs) started with vanilla GANs—uncontrolled models that generate data by competing generator and discriminator networks, but without specific output control. To enable targeted generation, conditional GANs (cGANs) were developed, which use extra information like class labels to guide both the generator and discriminator. This allows cGANs to produce data with desired attributes, supporting advanced applications such as image-to-image translation and controlled synthesis</p>
 
 <h2>1. Vanilla Generative Adversarial Network</h2>
-
 <p>
-  GANs are implicit generative models. The goal is to learn the distribution of data \( p_{\text{model}}(\theta) \) as closely as possible to the true data distribution without explicitly modeling the likelihood.
+GANs (Generative Adversarial Networks) are implicit generative models: rather than explicitly computing or modeling likelihood functions, they aim to learn how to sample from the underlying data distribution. The objective is for the generator to produce samples that closely resemble the true data distribution, without ever directly estimating the probability density or likelihood
 </p>
 
 <figure style="text-align: center;">
@@ -70,20 +70,13 @@
   </figcaption>
 </figure>
 
-
 <p>
   A normally distributed random variable \( z \sim \mathcal{N}(0, I) \) is passed through the generator network to produce fake images with a similar distribution to the real dataset. To train the generator, GANs use a zero-sum loss function, encouraging the generator to produce images that the discriminator classifies as real.
 </p>
 
 <p>
-  Train the generator \( G \) such that the discriminator \( D \) misclassifies the generated sample \( \hat{x} \) into class 1, making it indistinguishable from real data \( x \sim p_{\text{data}} \).
+  Train the generator \( G \) such that the discriminator \( D \) misclassifies the generated sample \( \hat{x} \) into class 1 (real data and 0 for fake gernated sample), making it indistinguishable from real data \( x \sim p_{\text{data}} \).
 </p>
-
-<div class="math">
-\[
-\min_G \max_D \left( \mathbb{E}_{x \sim p_{\text{data}}}[\log D(x)] + \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))] \right)
-\]
-</div>
 
 <h3>Discriminator Objective \( O_1 \)</h3>
 <p>
@@ -240,7 +233,7 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
 
 
 <h2>2. Deep Convolution Generative Adversarial Network (DCGAN)</h2>
-
+DCGAN bridge the gap between the unsupervised method and success of Convolutional Neural Networks stablize the training of Vanilla GANs.
 <p>Architectural Guidelines for Stable GAN Training:</p>
 
 <ul>
@@ -284,12 +277,17 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
   </li>
 </ul>
 
+<p>
+DCGAN demonstrates an interesting experiment with the latent space: when the latent vector of a man with glasses is subtracted from that of a man, and the result is added to the latent vector of a woman, the resulting vector generates images of women with glasses.
+</p>
+
+    
 <figure style="text-align: center;">
   <img src="https://margipandya27.github.io/MargiPandya/deep_gen/dcgan.png" 
        alt="DCGAN architecture" 
        style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
   <figcaption style="font-style: italic; margin-top: 0.5em;">
-    Figure: DCGAN architecture — deep convolutional networks are used in both the generator and discriminator for stable and high-quality image generation.
+    Figure: DCGAN architecture — vector arthimetic in latent space.
   </figcaption>
 </figure>
 
@@ -327,12 +325,7 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
     \]
   </p>
 
-  <p>
-    cGANs have been successfully used to generate both <strong>unimodal outputs</strong> (e.g., generating images from class labels) and <strong>multimodal outputs</strong> (e.g., generating descriptive tags from images). By conditioning the model on different modalities, the generator can produce relevant outputs in either the <em>same modality</em> or a <em>different one</em>, thereby demonstrating <strong>cross-modal generation capabilities</strong>.
-  </p>
-</section>
-    
-<div style="display: flex; justify-content: center; gap: 2em; flex-wrap: wrap;">
+  <div style="display: flex; justify-content: center; gap: 2em; flex-wrap: wrap;">
   <figure style="text-align: center; flex: 1; min-width: 300px; max-width: 45%;">
     <img src="https://margipandya27.github.io/MargiPandya/deep_gen/unimodal_cgan.png" 
          alt="Unimodal cGAN" 
@@ -351,7 +344,12 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
     </figcaption>
   </figure>
 </div>
-
+  
+  <p>
+    cGANs have been successfully used to generate both <strong>unimodal outputs</strong> (e.g., generating images from class labels) and <strong>multimodal outputs</strong> (e.g., generating descriptive tags from images). By conditioning the model on different modalities, the generator can produce relevant outputs in either the <em>same modality</em> or a <em>different one</em>, thereby demonstrating <strong>cross-modal generation capabilities</strong>.
+  </p>
+</section>
+    
 
 <section>
   <h2>4. Cycle Generative Adversarial Network (CycleGAN)</h2>
