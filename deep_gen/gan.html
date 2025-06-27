@@ -328,26 +328,27 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
     cGANs have been successfully used to generate both <strong>unimodal outputs</strong> (e.g., generating images from class labels) and <strong>multimodal outputs</strong> (e.g., generating descriptive tags from images). By conditioning the model on different modalities, the generator can produce relevant outputs in either the <em>same modality</em> or a <em>different one</em>, thereby demonstrating <strong>cross-modal generation capabilities</strong>.
   </p>
 </section>
-
-<!-- Images for unimodal and multimodal cGANs (unchanged) -->
+    
 <div style="display: flex; justify-content: center; gap: 2em; flex-wrap: wrap;">
+  <figure style="text-align: center; flex: 1; min-width: 300px; max-width: 45%;">
     <img src="https://margipandya27.github.io/MargiPandya/deep_gen/unimodal_cgan.png" 
          alt="Unimodal cGAN" 
-         style="width: 100%; height: auto;">
+         style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
     <figcaption style="font-style: italic; margin-top: 0.5em;">
       Figure: Unimodal cGAN — generating images conditioned on class labels.
     </figcaption>
   </figure>
 
-  <figure style="text-align: center; flex: 1; max-width: 45%;">
+  <figure style="text-align: center; flex: 1; min-width: 300px; max-width: 45%;">
     <img src="https://margipandya27.github.io/MargiPandya/deep_gen/multimodal_cgan.png" 
          alt="Multimodal cGAN" 
-         style="width: 100%; height: auto; display: block; margin: 0 auto;">
+         style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
     <figcaption style="font-style: italic; margin-top: 0.5em;">
       Figure: Multimodal cGAN — generating semantic tags conditioned on image features.
     </figcaption>
   </figure>
 </div>
+
 
 <section>
   <h2>4. Cycle Generative Adversarial Network (CycleGAN)</h2>
@@ -356,14 +357,16 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
     <strong>CycleGAN</strong> enables image-to-image translation between two visual domains without requiring paired training examples. When trained on two unpaired image collections, CycleGAN learns to capture the domain-specific characteristics of each and translates between them. The model assumes that there is some underlying shared structure between domains — for example, both being different renderings or styles of the same scene — and seeks to learn a mapping between them.
   </p>
 
-  <figure style="text-align: center;">
-    <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cyclegan_result.png" 
-         alt="CycleGAN results" 
-         style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
-    <figcaption style="font-style: italic; margin-top: 0.5em;">
-      Figure: Sample results from CycleGAN — unpaired image-to-image translation across domains.
-    </figcaption>
-  </figure>
+  
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cyclegan_result.png"
+       alt="CycleGAN results"
+       style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em; max-width: 70%; margin-left: auto; margin-right: auto;">
+    Figure: Sample results from CycleGAN — unpaired image-to-image translation across domains.
+  </figcaption>
+</figure>
+
 
   <p>
     CycleGAN has become widely popular for tasks like <em>style transfer, object transfiguration, season conversion, and photo enhancement</em>. Its unique capability to perform translations without paired data makes it powerful for real-world applications where aligned datasets are unavailable.
@@ -377,13 +380,14 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
 
   
   <figure style="text-align: center; margin-top: 2em;">
-    <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cyclegan.png" 
-         alt="CycleGAN architecture" 
-         style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
-    <figcaption style="font-style: italic; margin-top: 0.5em;">
-      Figure: Architecture of CycleGAN — two generators and two discriminators trained with cycle consistency loss.
-    </figcaption>
-  </figure>
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cyclegan.png"
+       alt="CycleGAN architecture"
+       style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em; max-width: 70%; margin-left: auto; margin-right: auto;">
+    Figure: Architecture of CycleGAN — two generators and two discriminators trained with cycle consistency loss.
+  </figcaption>
+</figure>
+
 
   <p>
     The adversarial loss ensures that the generated images from one domain are indistinguishable from real images in the target domain.
