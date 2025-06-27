@@ -61,7 +61,15 @@
   GANs are implicit generative models. The goal is to learn the distribution of data \( p_{\text{model}}(\theta) \) as closely as possible to the true data distribution without explicitly modeling the likelihood.
 </p>
 
-<img src="https://margipandya27.github.io/MargiPandya/deep_gen/vanilla_gan.png" alt="GAN architecture diagram">
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/vanilla_gan.png" 
+       alt="GAN architecture diagram" 
+       style="max-width: 70%; height: auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Architecture of a Vanilla GAN. The generator learns to map noise to data samples, while the discriminator distinguishes real from generated samples.
+  </figcaption>
+</figure>
+
 
 <p>
   A normally distributed random variable \( z \sim \mathcal{N}(0, I) \) is passed through the generator network to produce fake images with a similar distribution to the real dataset. To train the generator, GANs use a zero-sum loss function, encouraging the generator to produce images that the discriminator classifies as real.
@@ -97,7 +105,15 @@ O_2 = \min_G \, \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
 \]
 </div>
 
-<img src="https://margipandya27.github.io/MargiPandya/deep_gen/gan_strategy.png" alt="GAN training strategy diagram">
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/gan_strategy.png" 
+       alt="GAN training strategy diagram" 
+       style="max-width: 70%; height: auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Training strategy of a GAN — the generator tries to fool the discriminator, which learns to distinguish real from generated samples.
+  </figcaption>
+</figure>
+
 
 
 <h2>Training Strategy</h2>
@@ -265,13 +281,29 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
   </li>
 </ul>
 
-<img src="https://margipandya27.github.io/MargiPandya/deep_gen/dcgan.png" alt="DCGAN training strategy diagram">
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/dcgan.png" 
+       alt="DCGAN architecture" 
+       style="max-width: 70%; height: auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: DCGAN architecture — deep convolutional networks are used in both the generator and discriminator for stable and high-quality image generation.
+  </figcaption>
+</figure>
+
     
 
 <section>
   <h2>3. Conditional Generative Adversarial Network (cGAN)</h2>
+  
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cgan.png" 
+       alt="cGAN architecture" 
+       style="max-width: 70%; height: auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Architecture of a conditional GAN (cGAN). The generator and discriminator are both conditioned on auxiliary information such as class labels or other modalities.
+  </figcaption>
+</figure>
 
-  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cgan.png" alt="cGAN architecture">
   
   <p>
     So far, we have seen the impressive generation capabilities of GANs. However, a key limitation is the lack of control over what the GAN generates — for example, generating images of a specific class or outputs from other modalities like text.
@@ -298,8 +330,28 @@ min<sub>G</sub> max<sub>D</sub> V(D, G) = E<sub>x ∼ p<sub>data</sub>(x)</sub>[
   </p>
 </section>
 
-      <img src="https://margipandya27.github.io/MargiPandya/deep_gen/unimodal_cgan.png" alt="cGAN unimodal">
-      <img src="https://margipandya27.github.io/MargiPandya/deep_gen/multimodal_cgan.png" alt="cGAN multimodal">
+<div style="display: flex; justify-content: center; gap: 2em; flex-wrap: wrap;">
+
+  <figure style="text-align: center; flex: 1; max-width: 45%;">
+    <img src="https://margipandya27.github.io/MargiPandya/deep_gen/unimodal_cgan.png" 
+         alt="Unimodal cGAN" 
+         style="width: 100%; height: auto;">
+    <figcaption style="font-style: italic; margin-top: 0.5em;">
+      Figure: Unimodal cGAN — generating images conditioned on class labels.
+    </figcaption>
+  </figure>
+
+  <figure style="text-align: center; flex: 1; max-width: 45%;">
+    <img src="https://margipandya27.github.io/MargiPandya/deep_gen/multimodal_cgan.png" 
+         alt="Multimodal cGAN" 
+         style="width: 100%; height: auto;">
+    <figcaption style="font-style: italic; margin-top: 0.5em;">
+      Figure: Multimodal cGAN — generating semantic tags conditioned on image features.
+    </figcaption>
+  </figure>
+
+</div>
+
 
 
 <section>
@@ -309,8 +361,24 @@ min<sub>G</sub> max<sub>D</sub> V(D, G) = E<sub>x ∼ p<sub>data</sub>(x)</sub>[
     <strong>CycleGAN</strong> enables image-to-image translation between two domains without requiring paired training examples. When trained on a specific image collection, it captures the distinct characteristics of that domain and learns how to translate those features to another image collection. This is done under the assumption that there exists some underlying relationship between the two domains — for example, that both are different renderings of the same underlying scene.
   </p>
 
-    <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cyclegan_result.png" alt="Cycle GAN Result">
-    <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cyclegan.png" alt="Cycle GAN">
+    <figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cyclegan_result.png" 
+       alt="CycleGAN results" 
+       style="max-width: 70%; height: auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Sample results from CycleGAN — unpaired image-to-image translation across domains.
+  </figcaption>
+</figure>
+
+<figure style="text-align: center; margin-top: 2em;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cyclegan.png" 
+       alt="CycleGAN architecture" 
+       style="max-width: 70%; height: auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Architecture of CycleGAN — two generators and two discriminators trained with cycle consistency loss.
+  </figcaption>
+</figure>
+
   <p>
     CycleGAN is widely known for its applications in <em>style transfer, object transfiguration, season transfer, and photo enhancement</em>. It is especially popular in the computer vision and generative AI communities due to its ability to perform unpaired image translation.
   </p>
