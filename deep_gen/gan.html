@@ -366,15 +366,6 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
     </figcaption>
   </figure>
 
-  <figure style="text-align: center; margin-top: 2em;">
-    <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cyclegan.png" 
-         alt="CycleGAN architecture" 
-         style="max-width: 70%; height: auto;">
-    <figcaption style="font-style: italic; margin-top: 0.5em;">
-      Figure: Architecture of CycleGAN — two generators and two discriminators trained with cycle consistency loss.
-    </figcaption>
-  </figure>
-
   <p>
     CycleGAN has become widely popular for tasks like <em>style transfer, object transfiguration, season conversion, and photo enhancement</em>. Its unique capability to perform translations without paired data makes it powerful for real-world applications where aligned datasets are unavailable.
   </p>
@@ -384,6 +375,17 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
   </p>
 
   <h3>Adversarial Loss</h3>
+
+  
+  <figure style="text-align: center; margin-top: 2em;">
+    <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cyclegan.png" 
+         alt="CycleGAN architecture" 
+         style="max-width: 70%; height: auto;">
+    <figcaption style="font-style: italic; margin-top: 0.5em;">
+      Figure: Architecture of CycleGAN — two generators and two discriminators trained with cycle consistency loss.
+    </figcaption>
+  </figure>
+
   <p>
     The adversarial loss ensures that the generated images from one domain are indistinguishable from real images in the target domain.
   </p>
