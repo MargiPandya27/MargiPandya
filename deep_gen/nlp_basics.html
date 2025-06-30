@@ -319,7 +319,7 @@
 </ul>
 
 
-<h2 id="glove">GloVE</h2>
+<h2 id="glove">GloVe</h2>
   As we saw eariler that the Word2vec method do not rightly use the statistics of the entire conrpus and is only limited to the local context window for the training, GloVe tries to explore this question of how we can use the statistics of cooccurane for learning the word representations. 
    The dataset contains 19,544 such questions, divided into a semantic subset and a syntactic subset. The semantic questions are typically analogies about people or places, like “Athens is to Greece as Berlin is to ?”. The syntactic questions are typically analogies about verb tenses or forms of adjectives, for example “dance is to dancing as fly is to?”. To correctly answer the question, the model should uniquely identify the missing term, with only an exact correspondence counted as a correct match. 
   We answer the question “a is to b as c is to ?” byfinding the word d whose representation wd is closest to wb wa +wc according to the cosine similarity
