@@ -51,204 +51,204 @@
     </div>
   </div>
 
+<!-- Main Content -->
+<main style="flex: 1; padding: 20px; max-width: 1000px;">
+  <h1>NLP Preprocessing Concepts</h1>
 
-  <!-- Main Content -->
-  <main style="flex: 1; padding: 20px; max-width: 1000px;">
-<h1>NLP Preprocessing Concepts</h1>
+  <h2>1. Tokenization</h2>
+  <p>Tokenization is the process of breaking down text into smaller units called tokens.</p>
 
-    <h2>1. Tokenization</h2>
-    <p>A token is the building unit of a text or sentence. Multiple tokens combine to form a sentence, and multiple sentences form a paragraph.</p>
+  <h3>Types of Tokenization:</h3>
+  <ul>
+    <li><strong>Character Tokenization:</strong><br>
+      “Project A is done.” ⇒ ‘P’, ‘r’, ‘o’, ‘j’, ‘e’, ‘c’, ‘t’, ‘ ’, ‘A’, ...
+    </li>
+    <li><strong>Word Tokenization:</strong><br>
+      “Project A is done.” ⇒ ‘Project’, ‘A’, ‘is’, ‘done’, ‘.’
+    </li>
+    <li><strong>Sentence Tokenization:</strong><br>
+      “Project A is done. We will start Project B tomorrow.”<br>
+      ⇒ ‘Project A is done.’, ‘We will start Project B tomorrow.’
+    </li>
+  </ul>
+  <p><strong>Common libraries:</strong> <code>re</code>, <code>nltk</code>, <code>spacy</code></p>
 
-    <h3>Different types of tokenization:</h3>
-    <ul>
-        <li>
-            <strong>Character Tokenization:</strong><br>
-            “We love NLP!” ⇒ ‘W’, ‘e’, ‘l’, ‘o’, ‘v’, ‘e’, ‘N’, ’L’, ’P’, ’!’
-        </li>
-        <li>
-            <strong>Word Tokenization:</strong><br>
-            “We love NLP!” ⇒ ‘We’, ‘love’, ‘NLP’, ‘!’
-        </li>
-        <li>
-            <strong>Sentence Tokenization:</strong><br>
-            “We love NLP! I should work hard.” ⇒ ‘We love NLP!’, ‘I should work hard.’
-        </li>
-    </ul>
-    <p><strong>Common libraries:</strong> <code>re</code>, <code>nltk</code>, <code>scapy</code></p>
+  <h2>2. Stemming</h2>
+  <p>Stemming reduces words to their base or root form (sometimes not a real word):</p>
+  <ul>
+    <li>meeting, meets, met ⇒ meet</li>
+    <li>connected, connecting ⇒ connect</li>
+    <li>history, historical ⇒ histori (incorrect root)</li>
+  </ul>
 
-    <h2>2. Stemming</h2>
-    <p>Stemming extracts the root form (stem) of words. For example:</p>
-    <ul>
-        <li>goes, go, going ⇒ go</li>
-        <li>history, historical ⇒ histori</li>
-    </ul>
+  <h2>3. Lemmatization</h2>
+  <p>Lemmatization also reduces words to their base form but ensures the result is a valid word:</p>
+  <ul>
+    <li>connected, connecting ⇒ connect</li>
+    <li>was, were ⇒ be</li>
+    <li>history, historical ⇒ history (preserves meaning)</li>
+  </ul>
 
-    <h2>3. Lemmatization</h2>
-    <p>Lemmatization also reduces words to their root form but retains the actual dictionary form (lemma), preserving the meaning.</p>
-    <ul>
-        <li>history, historical ⇒ history</li>
-    </ul>
+  <h2>4. Stopwords</h2>
+  <p>Stopwords are common words that do not add significant meaning to text (e.g., “the”, “is”, “an”, “we”).</p>
+  <p>Example sentence before and after removing stopwords:</p>
+  <ul>
+    <li>Original: “We have completed the project successfully.”</li>
+    <li>After stopword removal: “completed project successfully”</li>
+  </ul>
 
-    <h2>4. Stopwords</h2>
-    <p>Stopwords are common words that do not carry significant meaning and are removed to reduce noise.</p>
-    <p>Examples: “is”, “a”, “the”, etc.</p>
+  <h2>5. Case Sensitivity</h2>
+  <p>Text like “Email” and “email” are the same for humans but not for machines.</p>
+  <p><strong>Lowercasing:</strong> “Project EMAIL” ⇒ “project email”</p>
 
-    <h2>5. Case Sensitivity</h2>
-    <p>Machines treat ‘He’ and ‘he’ as different tokens. Normalize case (e.g., to lowercase) unless the case is important (e.g., for proper nouns).</p>
+  <h2>6. Bag-of-Words (BoW)</h2>
+  <p>BoW represents documents as a collection of word frequencies without considering order or grammar.</p>
 
-    <h2>6. Bag-of-Words (BoW)</h2>
-    <p>BoW represents text as the frequency of words after preprocessing (tokenization, stopword removal, etc.).</p>
+  <h3>Example Emails (Documents):</h3>
+  <ul>
+    <li>Doc1: “The project report was submitted.”</li>
+    <li>Doc2: “She submitted the final report.”</li>
+    <li>Doc3: “We reviewed the project and the report.”</li>
+  </ul>
 
-    <h3>Example Sentences:</h3>
-    <ul>
-        <li>Sentence 1: He is a good boy</li>
-        <li>Sentence 2: She is a good girl</li>
-        <li>Sentence 3: Boy and girl are good.</li>
-    </ul>
+  <h3>Binary BoW:</h3>
+  <table border="1">
+    <tr>
+      <th></th>
+      <th>project</th>
+      <th>report</th>
+      <th>submitted</th>
+    </tr>
+    <tr>
+      <td>Doc1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>Doc2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>Doc3</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+  </table>
 
-    <h3>Binary BoW:</h3>
-    <table border="1">
-        <tr>
-            <th></th>
-            <th>good</th>
-            <th>girl</th>
-            <th>boy</th>
-        </tr>
-        <tr>
-            <td>Sentence 1</td>
-            <td>1</td>
-            <td>0</td>
-            <td>1</td>
-        </tr>
-        <tr>
-            <td>Sentence 2</td>
-            <td>1</td>
-            <td>1</td>
-            <td>0</td>
-        </tr>
-        <tr>
-            <td>Sentence 3</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-        </tr>
-    </table>
+  <h3>Numerical BoW (word counts):</h3>
+  <table border="1">
+    <tr>
+      <th></th>
+      <th>project</th>
+      <th>report</th>
+      <th>submitted</th>
+    </tr>
+    <tr>
+      <td>Doc1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>Doc2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>Doc3</td>
+      <td>1</td>
+      <td>2</td>
+      <td>0</td>
+    </tr>
+  </table>
 
-    <h3>Numerical BoW:</h3>
-    <ul>
-        <li>Sentence 1: He is a good boy</li>
-        <li>Sentence 2: She is a good girl</li>
-        <li>Sentence 3: Girls are in general good than boys. Boy and girl are good.</li>
-    </ul>
-    <table border="1">
-        <tr>
-            <th></th>
-            <th>good</th>
-            <th>girl</th>
-            <th>boy</th>
-        </tr>
-        <tr>
-            <td>Sentence 1</td>
-            <td>1</td>
-            <td>0</td>
-            <td>1</td>
-        </tr>
-        <tr>
-            <td>Sentence 2</td>
-            <td>1</td>
-            <td>1</td>
-            <td>0</td>
-        </tr>
-        <tr>
-            <td>Sentence 3</td>
-            <td>2</td>
-            <td>2</td>
-            <td>2</td>
-        </tr>
-    </table>
+  <p><strong>Note:</strong> BoW does not capture word meaning or order.</p>
 
-    <p><strong>Note:</strong> BoW does not capture semantic information; it just counts the frequency of words.</p>
+  <h2>7. Term Frequency-Inverse Document Frequency (TF-IDF)</h2>
 
-    <h2>7. Term Frequency-Inverse Document Frequency (TF-IDF)</h2>
+  <h3>TF (Term Frequency):</h3>
+  <table border="1">
+    <tr>
+      <th></th>
+      <th>project</th>
+      <th>report</th>
+      <th>submitted</th>
+    </tr>
+    <tr>
+      <td>Doc1</td>
+      <td>1/3</td>
+      <td>1/3</td>
+      <td>1/3</td>
+    </tr>
+    <tr>
+      <td>Doc2</td>
+      <td>0</td>
+      <td>1/2</td>
+      <td>1/2</td>
+    </tr>
+    <tr>
+      <td>Doc3</td>
+      <td>1/3</td>
+      <td>2/3</td>
+      <td>0</td>
+    </tr>
+  </table>
 
-    <h3>Term Frequency (TF):</h3>
-    <table border="1">
-        <tr>
-            <th></th>
-            <th>good</th>
-            <th>girl</th>
-            <th>boy</th>
-        </tr>
-        <tr>
-            <td>Sentence 1</td>
-            <td>1/2</td>
-            <td>0</td>
-            <td>1/2</td>
-        </tr>
-        <tr>
-            <td>Sentence 2</td>
-            <td>1/2</td>
-            <td>1/2</td>
-            <td>0</td>
-        </tr>
-        <tr>
-            <td>Sentence 3</td>
-            <td>1/3</td>
-            <td>1/3</td>
-            <td>1/3</td>
-        </tr>
-    </table>
+  <h3>IDF (Inverse Document Frequency):</h3>
+  <table border="1">
+    <tr>
+      <th>Term</th>
+      <th>IDF</th>
+    </tr>
+    <tr>
+      <td>project</td>
+      <td>log(3/2)</td>
+    </tr>
+    <tr>
+      <td>report</td>
+      <td>log(3/3) = 0</td>
+    </tr>
+    <tr>
+      <td>submitted</td>
+      <td>log(3/2)</td>
+    </tr>
+  </table>
 
-    <h3>Inverse Document Frequency (IDF):</h3>
-    <table border="1">
-        <tr>
-            <th>Term</th>
-            <th>IDF</th>
-        </tr>
-        <tr>
-            <td>good</td>
-            <td>log(3/3)</td>
-        </tr>
-        <tr>
-            <td>girl</td>
-            <td>log(3/2)</td>
-        </tr>
-        <tr>
-            <td>boy</td>
-            <td>log(3/2)</td>
-        </tr>
-    </table>
+  <h3>TF-IDF Scores:</h3>
+  <table border="1">
+    <tr>
+      <th></th>
+      <th>project</th>
+      <th>report</th>
+      <th>submitted</th>
+    </tr>
+    <tr>
+      <td>Doc1</td>
+      <td>1/3 × log(3/2)</td>
+      <td>0</td>
+      <td>1/3 × log(3/2)</td>
+    </tr>
+    <tr>
+      <td>Doc2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1/2 × log(3/2)</td>
+    </tr>
+    <tr>
+      <td>Doc3</td>
+      <td>1/3 × log(3/2)</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </table>
 
-    <h3>TF-IDF Scores:</h3>
-    <table border="1">
-        <tr>
-            <th></th>
-            <th>good</th>
-            <th>girl</th>
-            <th>boy</th>
-        </tr>
-        <tr>
-            <td>Sentence 1</td>
-            <td>0</td>
-            <td>0</td>
-            <td>1/2 * log(3/2)</td>
-        </tr>
-        <tr>
-            <td>Sentence 2</td>
-            <td>0</td>
-            <td>1/2 * log(3/2)</td>
-            <td>0</td>
-        </tr>
-        <tr>
-            <td>Sentence 3</td>
-            <td>0</td>
-            <td>1/3 * log(3/2)</td>
-            <td>1/3 * log(3/2)</td>
-        </tr>
-    </table>
-
-    <p>TF-IDF helps in identifying the most relevant words in a document. It doesn’t capture semantic relationships but emphasizes word importance across documents.</p>
-  
+  <p><strong>TF-IDF</strong> helps identify important words across documents by balancing term frequency with how rare a term is in the corpus. It still does not capture word order or deep semantics.</p>
+</main>
 
 
 <footer class="page__meta">
