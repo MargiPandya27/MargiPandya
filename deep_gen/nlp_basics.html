@@ -49,6 +49,8 @@
         <li><a href="#bow">Bag-of-Words (BoW)</a></li>
         <li><a href="#tfidf">TF-IDF</a></li>
         <li><a href="#word2vec">Word2Vec</a></li>
+        <li><a href="#glove">GloVe</a></li>
+        <li><a href="#fasttext">FastText</a></li>
         <li><a href="#references">References</a></li>
       </ul>
     </div>
@@ -402,6 +404,66 @@
   </ul>
   <p>This function balances the model effectively and has strong empirical support.</p>
 
+
+<h2 id="fasttext">FastText</h2>
+
+<p>
+  The figure illustrates different forms of the word "Rama" in Sanskrit. Traditional models like Word2Vec treat each word as a distinct entity and represent them separately in vector space. However, this does not capture the fact that such words often originate from the same root. FastText, an extension of the Skip-gram model proposed by T. Mikolov et al., addresses this limitation by incorporating subword information using character n-grams.
+</p>
+
+<p>
+  FastText introduces two main innovations:
+</p>
+
+<ol>
+  <li>
+    <strong>Subword representation:</strong>  
+    Words are represented as a bag of character n-grams. For example, the word <code>where</code> with <code>n = 3</code> is represented as:
+    <code>&lt;wh, whe, her, ere, re&gt;</code>, where &lt; and &gt; are special boundary symbols.
+    The complete word itself (e.g., <code>&lt;where&gt;</code>) is also included in the set.
+  </li>
+
+  <li>
+    <strong>Scoring function:</strong>  
+    The scoring function for a word-context pair uses the sum of the word’s subword vector representations:
+    <br>
+    <span style="font-family: 'Courier New', monospace;">
+      \( s(w, c) = \sum_{g \in G_w} \mathbf{z}_g^\top \mathbf{v}_c \)
+    </span><br>
+    where \( G_w \) is the set of n-grams for word \( w \), \( \mathbf{z}_g \) is the vector for n-gram \( g \), and \( \mathbf{v}_c \) is the context word vector.
+    <br>
+    In practice, \( n \) is chosen such that \( 3 \leq n \leq 6 \).
+  </li>
+</ol>
+
+<p>
+  The objective function of the original continuous Skip-gram model is to maximize the log-likelihood of context words given a center word:
+</p>
+
+<p style="font-family: 'Courier New', monospace;">
+  \( \sum_{t=1}^{T} \sum_{c \in C_t} \log p(w_c \mid w_t) \)
+</p>
+
+<p>
+  FastText optimizes this objective using negative sampling (also from Mikolov et al.), reframing the task as a set of independent binary classification problems:
+</p>
+
+<p style="font-family: 'Courier New', monospace;">
+  \( \sum_{t=1}^{T} \sum_{c \in C_t} \left[ \ell(s(w_t, w_c)) + \sum_{n \in N_{t,c}} \ell(-s(w_t, n)) \right] \)
+</p>
+
+<p>
+  Here:
+</p>
+<ul>
+  <li>\( C_t \): the context window around the center word \( w_t \)</li>
+  <li>\( N_{t,c} \): a set of negatively sampled words from the vocabulary</li>
+  <li>\( \ell(x) = \log(1 + e^{-x}) \): the logistic loss function</li>
+</ul>
+
+<p>
+  This approach allows FastText to better represent rare and morphologically complex words by sharing representations across similar subword units.
+</p>
 
 
 
