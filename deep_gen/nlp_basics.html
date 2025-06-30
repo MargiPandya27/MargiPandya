@@ -316,6 +316,96 @@
   <li>While it performs well on morphological and syntactic relationships, it may not effectively model deeper semantic meaning or long-range dependencies.</li>
 </ul>
 
+
+<h2 id="glove">GloVE</h2>
+  As we saw eariler that the Word2vec method do not rightly use the statistics of the entire conrpus and is only limited to the local context window for the training, GloVe tries to explore this question of how we can use the statistics of cooccurane for learning the word representations. 
+   The dataset contains 19,544 such questions, divided into a semantic subset and a syntactic subset. The semantic questions are typically analogies about people or places, like “Athens is to Greece as Berlin is to ?”. The syntactic questions are typically analogies about verb tenses or forms of adjectives, for example “dance is to dancing as fly is to?”. To correctly answer the question, the model should uniquely identify the missing term, with only an exact correspondence counted as a correct match. 
+  We answer the question “a is to b as c is to ?” byfinding the word d whose representation wd is closest to wb wa +wc according to the cosine similarity
+  
+  <h3>Co-occurrence Matrix</h3>
+  <p>Let <strong>X</strong> be the word-word co-occurrence matrix.</p>
+  <ul>
+    <li>\( X_{ij} \) is the number of times word <em>j</em> appears in the context of word <em>i</em>.</li>
+    <li>\( X_i = \sum_k X_{ik} \) is the total number of words that appear in the context of word <em>i</em>.</li>
+    <li>The co-occurrence probability is defined as: <br>
+      \[
+      P_{ij} = \frac{X_{ij}}{X_i}
+      \]
+    </li>
+  </ul>
+
+  <h3>Insight through Co-occurrence Ratios</h3>
+  <p>To understand relationships between words, the model examines ratios of co-occurrence probabilities.</p>
+  <p>For example, let \( i = \text{ice} \), \( j = \text{steam} \), and let \( k \) be a context word. Then compute:</p>
+  \[
+  \frac{P(k | \text{ice})}{P(k | \text{steam})}
+  \]
+  <ul>
+    <li>If \( k = \text{solid} \), the ratio is high (strongly related to ice).</li>
+    <li>If \( k = \text{gas} \), the ratio is low (more related to steam).</li>
+    <li>If \( k = \text{water} \) or \( \text{fashion} \), the ratio is near 1 (equally or neutrally related).</li>
+  </ul>
+  <p>This shows that ratios are more informative than raw probabilities for distinguishing semantic relationships.</p>
+
+  <h3>Embedding Objective</h3>
+  <p>GloVe aims to find word vectors \( w_i \) and context word vectors \( \tilde{w}_k \) such that:</p>
+  \[
+  F(w_i - w_j, \tilde{w}_k) = \frac{P_{ik}}{P_{jk}}
+  \]
+  <p>This is simplified by assuming \( F \) is a dot product:</p>
+  \[
+  (w_i - w_j)^T \tilde{w}_k = \log \left( \frac{P_{ik}}{P_{jk}} \right)
+  \]
+  <p>Which leads to:</p>
+  \[
+  w_i^T \tilde{w}_k = \log(P_{ik}) = \log(X_{ik}) - \log(X_i)
+  \]
+  <p>To maintain symmetry between word and context roles, biases are introduced:</p>
+  \[
+  w_i^T \tilde{w}_k + b_i + \tilde{b}_k = \log(X_{ik})
+  \]
+  <p>To avoid issues with \( \log(0) \), the expression is modified to:</p>
+  \[
+  \log(1 + X_{ik})
+  \]
+
+  <h3>GloVe Cost Function (Training Objective)</h3>
+  <p>The model minimizes a weighted least squares loss:</p>
+  \[
+  J = \sum_{i,j=1}^V f(X_{ij}) \left( w_i^T \tilde{w}_j + b_i + \tilde{b}_j - \log(X_{ij}) \right)^2
+  \]
+  <p>Where:</p>
+  <ul>
+    <li>\( V \) is the vocabulary size</li>
+    <li>\( f(X_{ij}) \) is a weighting function that:
+      <ul>
+        <li>Reduces the influence of rare (noisy) co-occurrences</li>
+        <li>Reduces the influence of very frequent (uninformative) co-occurrences</li>
+        <li>Ensures \( f(0) = 0 \) for sparsity</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3>Weighting Function</h3>
+  <p>A practical choice for the weighting function is:</p>
+  \[
+  f(x) =
+  \begin{cases}
+    \left( \frac{x}{x_{\text{max}}} \right)^\alpha & \text{if } x < x_{\text{max}} \\
+    1 & \text{otherwise}
+  \end{cases}
+  \]
+  <p>With:</p>
+  <ul>
+    <li>\( x_{\text{max}} = 100 \)</li>
+    <li>\( \alpha = \frac{3}{4} \)</li>
+  </ul>
+  <p>This function balances the model effectively and has strong empirical support.</p>
+
+
+
+
+  
   
 <h2 id="references">References</h2>
       <ol>
@@ -325,6 +415,8 @@
         <li>CodeEmporium, “Word2Vec, GloVe, FastText – EXPLAINED!,” YouTube, Feb. 10, 2021. [Online]. Available: https://www.youtube.com/watch?v=ERibwqs9p38</li>  
         <li>Krish Naik, Live NLP Playlist, YouTube playlist, 18 videos, 2022. [Online]. Available: https://www.youtube.com/playlist?list=PLZoTAELRMXVNNrHSKv36Lr3_156yCo6Nn</li>
       </ol>
+
+
 
   
 </main>
