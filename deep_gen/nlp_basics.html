@@ -76,7 +76,7 @@
   </ul>
   <p><strong>Common libraries:</strong> <code>re</code>, <code>nltk</code>, <code>spacy</code></p>
 
-  <h2>2. Stemming</h2>
+  <h2 id="stemming">2. Stemming</h2>
   <p>Stemming reduces words to their base or root form (sometimes not a real word):</p>
   <ul>
     <li>meeting, meets, met ⇒ meet</li>
@@ -84,7 +84,7 @@
     <li>history, historical ⇒ histori (incorrect root)</li>
   </ul>
 
-  <h2>3. Lemmatization</h2>
+  <h2 id="lemmatization">3. Lemmatization</h2>
   <p>Lemmatization also reduces words to their base form but ensures the result is a valid word:</p>
   <ul>
     <li>connected, connecting ⇒ connect</li>
@@ -92,7 +92,7 @@
     <li>history, historical ⇒ history (preserves meaning)</li>
   </ul>
 
-  <h2>4. Stopwords</h2>
+  <h2 id="stopwords">4. Stopwords</h2>
   <p>Stopwords are common words that do not add significant meaning to text (e.g., “the”, “is”, “an”, “we”).</p>
   <p>Example sentence before and after removing stopwords:</p>
   <ul>
@@ -100,11 +100,11 @@
     <li>After stopword removal: “completed project successfully”</li>
   </ul>
 
-  <h2>5. Case Sensitivity</h2>
+  <h2 id="case-sensitivity">5. Case Sensitivity</h2>
   <p>Text like “Email” and “email” are the same for humans but not for machines.</p>
   <p><strong>Lowercasing:</strong> “Project EMAIL” ⇒ “project email”</p>
 
-  <h2>6. Bag-of-Words (BoW)</h2>
+  <h2 id="bow">6. Bag-of-Words (BoW)</h2>
   <p>BoW represents documents as a collection of word frequencies without considering order or grammar.</p>
 
   <h3>Example Emails (Documents):</h3>
@@ -172,7 +172,7 @@
 
   <p><strong>Note:</strong> BoW does not capture word meaning or order.</p>
 
-  <h2>7. Term Frequency-Inverse Document Frequency (TF-IDF)</h2>
+  <h2 id="tfidf">7. Term Frequency-Inverse Document Frequency (TF-IDF)</h2>
 
   <h3>TF (Term Frequency):</h3>
   <table border="1">
