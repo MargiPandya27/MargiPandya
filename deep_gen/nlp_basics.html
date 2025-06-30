@@ -309,6 +309,13 @@
   <li><strong>CBOW</strong> is computationally more efficient and performs well for frequent words and syntactic tasks, though it may underperform Skip-Gram on semantics.</li>
 </ul>
 
+<strong>Shortcomings<strong>
+ <ul>
+  <li>Fails to capture the global context across long sentences or paragraphs, as it considers only a limited window of surrounding words at a time.</li>
+  <li>While it performs well on morphological and syntactic relationships, it may not effectively model deeper semantic meaning or long-range dependencies.</li>
+</ul>
+
+  
 <h2 id="references">References</h2>
       <ol>
         <li>T. Mikolov et al., “Efficient estimation of word representations in vector space,” arXiv preprint arXiv:1301.3781, Jan. 2013.</li>
