@@ -319,11 +319,32 @@
 </ul>
 
 
-<h2 id="glove">GloVe</h2>
-  As we saw eariler that the Word2vec method do not rightly use the statistics of the entire conrpus and is only limited to the local context window for the training, GloVe tries to explore this question of how we can use the statistics of cooccurane for learning the word representations. 
-   The dataset contains 19,544 such questions, divided into a semantic subset and a syntactic subset. The semantic questions are typically analogies about people or places, like “Athens is to Greece as Berlin is to ?”. The syntactic questions are typically analogies about verb tenses or forms of adjectives, for example “dance is to dancing as fly is to?”. To correctly answer the question, the model should uniquely identify the missing term, with only an exact correspondence counted as a correct match. 
-  We answer the question “a is to b as c is to ?” byfinding the word d whose representation wd is closest to wb wa +wc according to the cosine similarity
-  
+<h2 id="glove">Global Co-occurrence Statistics in GloVe</h2>
+<p>
+As discussed earlier, the Word2Vec model primarily leverages local context windows during training and does not fully utilize the global co-occurrence statistics available in the corpus. <strong>GloVe</strong> (Global Vectors for Word Representation) addresses this limitation by explicitly incorporating global co-occurrence information to learn more informative word embeddings.
+</p>
+
+<p>
+To evaluate the quality of these embeddings, GloVe uses an analogy task consisting of 19,544 questions, divided into two categories: <strong>semantic</strong> and <strong>syntactic</strong>.
+</p>
+
+<ul>
+  <li><strong>Semantic analogies</strong> capture relationships between named entities, such as: <em>"Athens is to Greece as Berlin is to ?"</em></li>
+  <li><strong>Syntactic analogies</strong> reflect grammatical or morphological patterns, such as: <em>"Dance is to dancing as fly is to ?"</em></li>
+</ul>
+
+<p>
+To solve an analogy of the form <em>“a is to b as c is to ?”</em>, the model computes a target word vector using the following expression:
+</p>
+
+<p style="text-align: center;">
+  \( \vec{d} = \vec{b} - \vec{a} + \vec{c} \)
+</p>
+
+<p>
+The model then selects the word <em>d</em> whose vector representation \( \vec{d} \) is closest to the computed vector, based on cosine similarity. An answer is counted as correct only if it matches the expected word exactly—synonyms or near matches are not accepted.
+</p>
+
   <h3>Co-occurrence Matrix</h3>
   <p>Let <strong>X</strong> be the word-word co-occurrence matrix.</p>
   <ul>
