@@ -252,11 +252,16 @@
   <p><strong>TF-IDF</strong> helps identify important words across documents by balancing term frequency with how rare a term is in the corpus. It still does not capture word order or deep semantics.</p>
 
 
-  <h2>8. Word2Vec - Word Embedding</h2>
-  As of now, we consider the token as the singular atomic block of the sentence, without consider the semantic meaning each word in a vocabulary of words would share. Natural language is not disconnected, it has some kind of a connection between the words, these connection can be used to learn the continous embedding space representation.
-  Mikolov et al. suggests two techniques to do the same, first one is continous bag of words and skip gram. Both of these methods have a three layers, input, hidden and output layer. 
+<h2 id="word2vec">8. Word2Vec - Word Embedding</h2>
+<p>
+  Until now, we considered tokens as singular atomic units of a sentence without capturing the semantic meaning each word might share. Natural language is inherently connected—these connections can be leveraged to learn continuous vector space representations of words.
+</p>
 
-   <figure style="text-align: center;">
+<p>
+  <strong>Word2Vec</strong>, proposed by <strong>Mikolov et al.</strong>, introduces two techniques for learning these representations: <strong>Continuous Bag of Words (CBOW)</strong> and <strong>Skip-Gram</strong>. Both architectures use three layers: an input layer, a hidden layer, and an output layer.
+</p>
+
+<figure style="text-align: center;">
   <img src="https://margipandya27.github.io/MargiPandya/deep_gen/word2vec.png"
        alt="CBOW and Skip Gram"
        style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
@@ -265,35 +270,43 @@
   </figcaption>
 </figure>
 
+<h3>Continuous Bag of Words (CBOW)</h3>
+<p>
+  In CBOW, for a window size of 2, the surrounding context words <code>w(t-2)</code>, <code>w(t-1)</code>, <code>w(t+1)</code>, and <code>w(t+2)</code> are used to predict the target word <code>w(t)</code>. The input vectors are one-hot encoded representations of the vocabulary. The network aggregates these to produce a prediction via a softmax layer.
+</p>
 
-  <strong>Continuous Bag of Words</strong>
-  For window size equals to 2, the w(t-1), w(t-2) and w(t+1), w(t+2) are inputed to proabailistic neural network to predict the w(t) words. The input vector is a one hot vector of the size of the vocabulary. The final output vector is the output of the softmax. 
-  
-  <strong>Skip Gram</strong>
-  The skip gram have similar but opposite architecture as compared to the continous bag of words, skip gram predicts the rest of the words in the windows give the word w(t).
+<h3>Skip-Gram</h3>
+<p>
+  Skip-Gram works in the reverse manner. Given a center word <code>w(t)</code>, the model attempts to predict the surrounding context words in the window. This method performs well on semantic relationships and is particularly effective for rare words when trained on large corpora.
+</p>
 
-  In the original Word2Vec paper by Mikolov et al., syntactic accuracy and semantic accuracy refer to how well the learned word vectors capture two types of linguistic relationships:
+<h3>Semantic vs. Syntactic Accuracy</h3>
+<p>
+  In the original Word2Vec paper, Mikolov et al. defined two evaluation metrics:
+</p>
+<ol>
+  <li><strong>Semantic accuracy</strong>: Measures the model’s ability to capture meaning-based relationships (e.g., “Paris” is to “France” as “Berlin” is to “Germany”).</li>
+  <li><strong>Syntactic accuracy</strong>: Measures how well the vectors capture grammatical or morphological relationships (e.g., “walking” is to “walked” as “swimming” is to “swam”).</li>
+</ol>
 
-  <ol>
-    <li> Semantic accuracy measures the model's ability to capture meaning-based relationships between words (e.g., "Paris" is to "France" as "Berlin" is to "Germany"). </li>
-    <li> Syntactic accuracy measures how well the vectors capture grammatical or morphological relationships (e.g., "walking" is to "walked" as "swimming" is to "swam"). </li>
-  </ol>
+<p>
+  The authors evaluated their model on a benchmark dataset of 8,869 semantic and 10,675 syntactic analogy questions. A correct prediction means the nearest word vector exactly matches the expected answer; synonyms are not accepted.
+</p>
 
-  The authors created a benchmark consisting of 8,869 semantic and 10,675 syntactic analogy questions. A model's accuracy is the percentage of these questions it answers correctly, where a correct answer means the nearest vector matches the expected word exactly—synonyms are not accepted as correct 
-
-   <figure style="text-align: center;">
+<figure style="text-align: center;">
   <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cbow_vs_skip.png"
-       alt="CBOW vs Skip Gram"
+       alt="CBOW vs Skip Gram Comparison"
        style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
   <figcaption style="font-style: italic; margin-top: 0.5em;">
-    Figure: Comparison of architectures using models trained on the same data, with 640-dimensional word vectors. The accuracies are reported on our Semantic-Syntactic Word Relationship test set, and on the syntactic relationship test set of [20]
+    Figure: Comparison of architectures trained on the same data, with 640-dimensional word vectors. Accuracies are reported on the Semantic-Syntactic Word Relationship test set and the syntactic relationship test set from [20].
   </figcaption>
 </figure>
 
-Skip-Gram generally achieves higher overall accuracy, especially on semantic relationships, and often also on syntactic ones, particularly when trained on large corpora with high-dimensional vectors .
-
-CBOW is faster and less computationally expensive, and yields similar accuracy for frequent words and syntactic relationships, but may underperform Skip-Gram on semantic tasks and rare words .
-  
+<h3>CBOW vs. Skip-Gram Summary</h3>
+<ul>
+  <li><strong>Skip-Gram</strong> generally achieves higher accuracy—especially on semantic relationships and with rare words—when trained on large corpora and high-dimensional embeddings.</li>
+  <li><strong>CBOW</strong> is computationally more efficient and performs well for frequent words and syntactic tasks, though it may underperform Skip-Gram on semantics.</li>
+</ul>
 
 <h2>References</h2>
       <ol>
