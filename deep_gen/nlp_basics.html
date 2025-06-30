@@ -253,11 +253,20 @@
 
 
   <h2>8. Word2Vec - Word Embedding</h2>
+  As of now, we consider the token as the singular atomic block of the sentence, without consider the semantic meaning each word in a vocabulary of words would share. Natural language is not disconnected, it has some kind of a connection between the words, these connection can be used to learn the continous embedding space representation.
+  Mikolov et al. suggests two techniques to do the same, first one is continous bag of words and skip gram. Both of these methods have a three layers, input, hidden and output layer. 
+
+  <strong>Continuous Bag of Words</strong>
+  For window size equals to 2, the w(t-1), w(t-2) and w(t+1), w(t+2) are inputed to proabailistic neural network to predict the w(t) words. The input vector is a one hot vector of the size of the vocabulary. The final output vector is the output of the softmax. 
+  
+  <strong>Skip Gram</strong>
+  The skip gram have similar but opposite architecture as compared to the continous bag of words, skip gram predicts the rest of the words in the windows give the word w(t).
+  
   
   <figure style="text-align: center;">
   <img src="https://margipandya27.github.io/MargiPandya/deep_gen/word2vec.png"
        alt="CBOW and Skip Gram"
-       style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
+       style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
   <figcaption style="font-style: italic; margin-top: 0.5em;">
     Figure: Continuous Bag of Words vs Skip Gram (Image Source: Mikolov et al.)
   </figcaption>
