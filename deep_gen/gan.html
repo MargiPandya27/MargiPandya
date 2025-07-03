@@ -57,7 +57,7 @@
 
 <p>Generative Adversarial Networks (GANs) started with vanilla GANs—uncontrolled models that generate data by competing generator and discriminator networks, but without specific output control. To enable targeted generation, conditional GANs (cGANs) were developed, which use extra information like class labels to guide both the generator and discriminator. This allows cGANs to produce data with desired attributes, supporting advanced applications such as image-to-image translation and controlled synthesis</p>
 
-<h2>1. Vanilla Generative Adversarial Network</h2>
+<h2 id="vanilla">1. Vanilla Generative Adversarial Network</h2>
 <p>
 GANs (Generative Adversarial Networks) are implicit generative models: rather than explicitly computing or modeling likelihood functions, they aim to learn how to sample from the underlying data distribution. The objective is for the generator to produce samples that closely resemble the true data distribution, without ever directly estimating the probability density or likelihood
 </p>
@@ -103,7 +103,7 @@ O_2 = \min_G \, \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
 
 
 
-<h2>Training Strategy</h2>
+<h2 id="training_strategy">Training Strategy</h2>
 <p>
   If a pretrained discriminator is used initially, it might confidently classify all generated images as fake, resulting in \( \log(1 - D(G(z))) = \log(1 - 0) = 0 \), which leads to zero gradient for training the generator.
 </p>
@@ -233,7 +233,7 @@ D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
 
 
 
-<h2>2. Deep Convolution Generative Adversarial Network (DCGAN)</h2>
+<h2 id="dcgan">2. Deep Convolution Generative Adversarial Network (DCGAN)</h2>
 DCGAN bridge the gap between the unsupervised method and success of Convolutional Neural Networks stablize the training of Vanilla GANs.
 <p>Architectural Guidelines for Stable GAN Training:</p>
 
@@ -294,7 +294,7 @@ DCGAN demonstrates an interesting experiment with the latent space: when the lat
 
 
 <section>
-  <h2>3. Conditional Generative Adversarial Network (cGAN)</h2>
+  <h2 id="cgan">3. Conditional Generative Adversarial Network (cGAN)</h2>
   
   <figure style="text-align: center;">
     <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cgan.png" 
@@ -353,7 +353,7 @@ DCGAN demonstrates an interesting experiment with the latent space: when the lat
     
 
 <section>
-  <h2>4. Cycle Generative Adversarial Network (CycleGAN)</h2>
+  <h2 id="cyclegan">4. Cycle Generative Adversarial Network (CycleGAN)</h2>
 
   <p>
     <strong>CycleGAN</strong> enables image-to-image translation between two visual domains without requiring paired training examples. When trained on two unpaired image collections, CycleGAN learns to capture the domain-specific characteristics of each and translates between them. The model assumes that there is some underlying shared structure between domains — for example, both being different renderings or styles of the same scene — and seeks to learn a mapping between them.
