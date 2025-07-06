@@ -379,7 +379,7 @@ DCGAN demonstrates an interesting experiment with the latent space: when the lat
   </p>
 
   <p>
-    A key insight from CycleGAN is that <strong>adversarial loss alone is insufficient</strong> to ensure meaningful translations. The model might map multiple inputs to the same output or introduce artifacts. To solve this, CycleGAN introduces the concept of <strong>cycle consistency</strong>, which enforces that translating from one domain to another and back again should yield the original image. This is analogous to translating a sentence from English to French and then back to English — the result should closely resemble the original sentence.
+    A key insight from CycleGAN is that <strong>adversarial loss alone is insufficient</strong> to ensure meaningful translations. The model might map multiple inputs to the same output or introduce artifacts. To solve this, CycleGAN introduces the concept of <strong>cycle consistency</strong>, which enforces that translating from one domain to another and back again should yield the original image ideally. This is analogous to translating a sentence from English to French and then back to English — the result should closely resemble the original sentence.
   </p>
 
   <h3>Adversarial Loss</h3>
@@ -431,6 +431,10 @@ DCGAN demonstrates an interesting experiment with the latent space: when the lat
     \[
     \mathcal{L}_{cyc}(G, F) = \mathbb{E}_{x \sim p_{data}(x)}[\|F(G(x)) - x\|_1] + \mathbb{E}_{y \sim p_{data}(y)}[\|G(F(y)) - y\|_1]
     \]
+  </p>
+
+  <p>
+     Notice that our model can be viewed as training two “autoencoders” [20]: we learn one autoencoder F o G : X -> X jointly with another G o F : Y -> Y. However, these autoencoders each have special internal structures: they map an image to itself via an intermediate representation that is a translation of the image into another domain. Such a setup can also be seen as a special case of “adversarial autoencoders”, which use an adversarial loss to train the bottleneck layer of an autoencoder to match an arbitrary tarm get distribution. In our case, the target distribution for the X-> Xautoencoderisthat of the domain Y.
   </p>
 
   <h3>Full Objective</h3>
