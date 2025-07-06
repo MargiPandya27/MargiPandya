@@ -306,7 +306,7 @@ DCGAN demonstrates an interesting experiment with the latent space: when the lat
   </figure>
 
   <p>
-    So far, we have seen the impressive generation capabilities of GANs. However, a key limitation is the lack of control over what the GAN generates — for example, generating images of a specific class or outputs from other modalities like text.
+    So far, we have seen the impressive generation capabilities of GANs. However, a key limitation is the lack of control over what the GAN generates, for example, generating images of a specific class or outputs from other modalities like text.
   </p>
 
   <p>
@@ -320,11 +320,15 @@ DCGAN demonstrates an interesting experiment with the latent space: when the lat
 
   <p>The objective function for a conditional GAN becomes:</p>
 
+  <div style="border: 2px solid #ccc; padding: 15px; border-radius: 8px; background-color: #f9f9f9; margin: 20px 0;">
+    <div class="math">
   <p>
     \[
     \min_G \max_D V(D, G) = \mathbb{E}_{x \sim p_{\text{data}}(x)}[\log D(x|y)] + \mathbb{E}_{z \sim p_z(z)}[\log(1 - D(G(z|y)))]
     \]
   </p>
+      </div>
+    </div>
 
   <div style="display: flex; justify-content: center; gap: 2em; flex-wrap: wrap;">
   <figure style="text-align: center; flex: 1; min-width: 300px; max-width: 45%;">
