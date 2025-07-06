@@ -59,7 +59,7 @@
 
 <h2 id="vanilla">1. Vanilla Generative Adversarial Network</h2>
 <p>
-GANs (Generative Adversarial Networks) are implicit generative models: rather than explicitly computing or modeling likelihood functions, they aim to learn how to sample from the underlying data distribution. The objective is for the generator to produce samples that closely resemble the true data distribution, without ever directly estimating the probability density or likelihood
+GANs (Generative Adversarial Networks) are implicit generative models: rather than explicitly computing or modeling likelihood functions, they aim to learn how to sample from the underlying data distribution. The objective is for the generator to produce samples that closely resemble the true data distribution, without ever directly estimating the probability density or likelihood.
 </p>
 
 <figure style="text-align: center;">
@@ -91,7 +91,7 @@ O_1 = \max_D \, \mathbb{E}_{x \sim p_{\text{data}}}[\log D(x)]
 
 <h3>Generator Objective \( O_2 \)</h3>
 <p>
-  Train generator \( G \) to maximize the probability that the discriminator misclassifies generated samples as real:
+  Train generator \( G \) to minimize the probability that the discriminator correctly classifies generated samples as fake:
 </p>
 <div class="math">
 \[
