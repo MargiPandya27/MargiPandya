@@ -254,15 +254,15 @@
 
   <p><strong>TF-IDF</strong> helps identify important words across documents by balancing term frequency with how rare a term is in the corpus. It still does not capture word order or deep semantics.</p>
 
+<p>
+  So far, all the techniques treat a token as separate atomic unit of which sentences are made and mostly of them do not capture the semantic relationship that is usually present in the corpus or vocabulury. What if we could have a continuous embedding space for words wherein vector(King) - vector(Man) + vector(Woman) would result into a vector that is similar to vector(Queen) in the embedding space. This can then be used for some downstream tasks using the neural networks that capture long range dependencies for machine translation, etc. 
+</p>
 
 <h2 id="word2vec">8. Word2Vec - Word Embedding</h2>
-<p>
-  Until now, we considered tokens as singular atomic units of a sentence without capturing the semantic meaning each word might share. Natural language is inherently connected—these connections can be leveraged to learn continuous vector space representations of words.
-</p>
 
 <p>
-  <strong>Word2Vec</strong>, proposed by <strong>Mikolov et al.</strong>, introduces two techniques for learning these representations: <strong>Continuous Bag of Words (CBOW)</strong> and <strong>Skip-Gram</strong>. Both architectures use three layers: an input layer, a hidden layer, and an output layer.
-</p>
+  <strong>Word2Vec</strong>, proposed by <strong>Mikolov et al.</strong>, introduces two techniques for learning these representations: <strong>Continuous Bag of Words (CBOW)</strong> and <strong>Skip-Gram</strong>. Both architectures use three layers: an input layer, a projection layer, and an output layer. They showed that it is possible to train the models even on corpora with one trillion words (virtually all available data as of 2013), for basically unlimited size of the vocabulary.
+</p> 
 
 
 <figure style="text-align: center;">
@@ -284,9 +284,11 @@
   Skip-Gram works in the reverse manner. Given a center word <code>w(t)</code>, the model attempts to predict the surrounding context words in the window. This method performs well on semantic relationships and is particularly effective for rare words when trained on large corpora.
 </p>
 
+<p>In both these methods the hidden task is to learn the weights of the projection layer that learn the vector embedding space.</p>
+
 <h3>CBOW vs. Skip-Gram</h3>
   <p>
-    The choice of the CBOW or Skip Gram method depends on the us case and the type of application. 
+    The choice of the CBOW or Skip Gram method depends on the use case. The pros and cons are as listed below: 
   </p>
 <ul>
   <li><strong>Skip-Gram</strong> generally achieves higher accuracy, especially on semantic relationships and with rare words, when trained on large corpora and high-dimensional embeddings.</li>
