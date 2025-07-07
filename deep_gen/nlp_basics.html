@@ -284,6 +284,15 @@
   Skip-Gram works in the reverse manner. Given a center word <code>w(t)</code>, the model attempts to predict the surrounding context words in the window. This method performs well on semantic relationships and is particularly effective for rare words when trained on large corpora.
 </p>
 
+<h3>CBOW vs. Skip-Gram</h3>
+  <p>
+    The choice of the CBOW or Skip Gram method depends on the us case and the type of application. 
+  </p>
+<ul>
+  <li><strong>Skip-Gram</strong> generally achieves higher accuracy, especially on semantic relationships and with rare words, when trained on large corpora and high-dimensional embeddings.</li>
+  <li><strong>CBOW</strong> is computationally more efficient and performs well for frequent words and syntactic tasks, though it may underperform Skip-Gram on semantics.</li>
+</ul>
+
 <h3>Semantic vs. Syntactic Accuracy</h3>
 <p>
   In the original Word2Vec paper, Mikolov et al. defined two evaluation metrics:
@@ -306,26 +315,22 @@
   </figcaption>
 </figure>
 
-<h3>CBOW vs. Skip-Gram Summary</h3>
-<ul>
-  <li><strong>Skip-Gram</strong> generally achieves higher accuracy—especially on semantic relationships and with rare words—when trained on large corpora and high-dimensional embeddings.</li>
-  <li><strong>CBOW</strong> is computationally more efficient and performs well for frequent words and syntactic tasks, though it may underperform Skip-Gram on semantics.</li>
-</ul>
+
 
 <strong>Shortcomings</strong>
  <ul>
   <li>Fails to capture the global context across long sentences or paragraphs, as it considers only a limited window of surrounding words at a time.</li>
-  <li>While it performs well on morphological and syntactic relationships, it may not effectively model deeper semantic meaning or long-range dependencies.</li>
+  <li>While it performs well on morphological/ syntactic relationships, it may not effectively model deeper semantic meaning or long-range dependencies.</li>
 </ul>
 
 
 <h2 id="glove">Global Co-occurrence Statistics in GloVe</h2>
 <p>
-As discussed earlier, the Word2Vec model primarily leverages local context windows during training and does not fully utilize the global co-occurrence statistics available in the corpus. <strong>GloVe</strong> (Global Vectors for Word Representation) addresses this limitation by explicitly incorporating global co-occurrence information to learn more informative word embeddings.
+As discussed earlier, the Word2Vec model primarily leverages local context windows during training and does not fully utilize the global co-occurrence statistics available in the corpus. Global Vectors for Word Representation (<strong>GloVe</strong>) addresses this limitation by explicitly incorporating global co-occurrence information to learn more informative word embeddings.
 </p>
 
 <p>
-To evaluate the quality of these embeddings, GloVe uses an analogy task consisting of 19,544 questions, divided into two categories: <strong>semantic</strong> and <strong>syntactic</strong>.
+To evaluate the quality of these embeddings, GloVe uses an analogy task consisting of 19,544 questions, divided into two categories: <strong>semantic</strong> and <strong>syntactic</strong> analogies.
 </p>
 
 <ul>
@@ -342,7 +347,7 @@ To solve an analogy of the form <em>“a is to b as c is to ?”</em>, the model
 </p>
 
 <p>
-The model then selects the word <em>d</em> whose vector representation \( \vec{d} \) is closest to the computed vector, based on cosine similarity. An answer is counted as correct only if it matches the expected word exactly—synonyms or near matches are not accepted.
+The model then selects the word <em>d</em> whose vector representation \( \vec{d} \) is closest to the computed vector, based on cosine similarity. An answer is counted as correct only if it matches the expected word exactly.
 </p>
 
   <h3>Co-occurrence Matrix</h3>
@@ -439,7 +444,7 @@ The model then selects the word <em>d</em> whose vector representation \( \vec{d
 
 
 <p>
-  The figure illustrates different forms of the word "Rama" in Sanskrit. Traditional models like Word2Vec treat each word as a distinct entity and represent them separately in vector space. However, this does not capture the fact that such words often originate from the same root. FastText (P. Bojanowski et al.), an extension of the Skip-gram model proposed by T. Mikolov et al., addresses this limitation by incorporating subword information using character n-grams.
+  The figure illustrates different forms of the word "Rama" in Sanskrit. Traditional models like Word2Vec treat each word as a distinct entity and represent them separately in vector space. However, this does not capture the fact that such words often originate from the same root. FastText (P. Bojanowski et al.), an extension of the Skip-gram model proposed by (T. Mikolov et al.), addresses this limitation by incorporating subword information using character n-grams.
 </p>
 
 <p>
@@ -449,7 +454,7 @@ The model then selects the word <em>d</em> whose vector representation \( \vec{d
 <ol>
   <li>
     <strong>Subword representation:</strong>  
-    Words are represented as a bag of character n-grams. For example, the word <code>where</code> with <code>n = 3</code> is represented as:
+    Words are represented as a bag of character n-grams. For example, the word "<code>where</code>" with <code>n = 3</code> is represented as:
     <code>&lt;wh, whe, her, ere, re&gt;</code>, where &lt; and &gt; are special boundary symbols.
     The complete word itself (e.g., <code>&lt;where&gt;</code>) is also included in the set.
   </li>
