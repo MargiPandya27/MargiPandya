@@ -62,10 +62,38 @@
   <p></p>
 
   
-  <h2>Decoder only Transformer</h2>
+  <h2>Language Modelling</h2>
   <p>
   Authors of (Liu et al.) suspect that, for monolingual text-to-text tasks, redundant language information is re-learned by both the encoder and decoder. In the paper, they perform supervised learning for the task of summarizing Wikipedia documents. The input is the top extracted document for a given topic, concatenated with a special token and the expected summary. They propose that the task can be performed in two stages: (1) extraction of top Wikipedia documents related to a topic using methods such as Identity, TF-IDF, TextRank, SumBasic, and a "cheating" baseline; and (2) abstraction through language modeling using a decoder-only Transformer model.
 </p>
+
+  <p>
+  They prove the claim by performing a sequence transduction problem from very long input sequences (up to L = 11000) to medium output sequences (typically less than 500).
+  </p>
+
+<p>
+  The figure compares different extractive methods on the combined corpus using an input length of \(L = 500\) (medium-sized token length). Among the evaluated methods, the "cheating" strategy performs the best.
+</p>
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/extractor_eval.png" 
+       alt="Comparison of extractive strategies on corpus at L = 500" 
+       style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Performance comparison of extractive methods (e.g., Identity, TF-IDF, TextRank, SumBasic, Cheating) on the combined corpus at input length \(L = 500\). The cheating strategy outperforms all others.
+  </figcaption>
+</figure>
+
+
+
+  <figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/d-tf.png" 
+       alt="Decoder only Transformer" 
+       style="max-width: 20%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Training strategy of a GAN — the generator tries to fool the discriminator, which learns to distinguish real from generated samples. (Image Source: NPTEL Course)
+  </figcaption>
+</figure>
 
 <h3><strong>Decoder-only Transformer</strong></h3>
 
@@ -96,6 +124,30 @@
 <p>
   The final architecture is a 5-layer network (L-M-L-M-L), alternating between local attention (L) layers and memory-compressed attention (M) layers (compared to 6 identical layers in Vaswani et al. (2017)). In some experiments, a Mixture of Experts (MoE) layer (Shazeer et al., 2017) is added to increase the model’s capacity.
 </p>
+
+ <figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/abstractor_eval.png" 
+       alt="Performance comparison of D-TF, T-ED, and T-DMCA models" 
+       style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Performance of different Transformer architectures (D-TF, T-ED, T-DMCA and MoE-T-DMCA) evaluated with increasing input length. T-DMCA shows improved scalability and performance up to L = 11,000. (Image source: Liu et al., 2018)
+  </figcaption>
+</figure>
+
+<p>
+  The performance of the best models from each architecture, evaluated using the combined corpus and tf-idf extractor, is shown above. As noted in Table 4, the <i>seq2seq-attention</i> baseline performs significantly worse than Transformer-based models on this task. As seen in Figure 3, the Transformer encoder-decoder (T-ED) architecture steadily improves performance up to an input length \(L = 500{-}1000\), but fails to learn at \(L = 2000\).
+</p>
+
+<p>
+  This limitation motivated the use of the Transformer-Decoder (D-TF), which successfully trained up to \(L = 4000\) before hitting memory limits on machines with 16GB GPU RAM (NVIDIA P100). By applying the T-DMCA modifications, the model was able to scale up to \(L = 11,000\), with continued improvements in performance.
+</p>
+
+<p>
+  Additionally, incorporating a Mixture of Experts (MoE) layer enhanced model capacity at high input lengths. For instance, at \(L = 11,000\), adding 128 experts reduced log-perplexity from 2.05 to 1.93. The best-performing model used 256 experts at \(L = 7500\) and achieved a log-perplexity of 1.90. (Note: 256 experts at \(L = 11,000\) could not be run due to memory constraints.)
+</p>
+
+
+  
 
   
 <h2 id="references">References</h2>
