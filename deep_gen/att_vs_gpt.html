@@ -58,9 +58,42 @@
 
 <!-- Main Content -->
 <main style="flex: 1; padding: 20px; max-width: 1000px;">
+  <h2>Encoder-Decoder Transformer</h2>
   <p></p>
 
+  
+  <h2>Decoder only Transformer</h2>
+  <p>
+  Authors of <cite>[CITATION]</cite> suspect that, for monolingual text-to-text tasks, redundant language information is re-learned by both the encoder and decoder. In the paper, they perform supervised learning for the task of summarizing Wikipedia documents. The input is the top extracted document for a given topic, concatenated with a special token and the expected summary. They propose that the task can be performed in two stages: (1) extraction of top Wikipedia documents related to a topic using methods such as Identity, TF-IDF, TextRank, SumBasic, and a "cheating" baseline; and (2) abstraction through language modeling using a decoder-only Transformer model.
+</p>
 
+<h3><strong>Decoder-only Transformer</strong></h3>
+
+<p>
+  Let the sequence be represented as <i>(w₁, ..., wₙ₊η₊₁) = (m₁, ..., mₙ, δ, y₁, ..., yη)</i>, where <i>δ</i> is a special separator token. The model is trained to predict the next token given the previous ones:
+</p>
+
+<p style="text-align: center;">
+  <code>p(w₁, ..., wₙ₊η) = ∏<sub>j=1</sub><sup>n+η</sup> p(w<sub>j</sub> | w₁, ..., w<sub>j−1</sub>)</code>
+</p>
+
+<p>
+  The D-TF model eliminates the encoder from the original Transformer architecture, thereby reducing both parameter count and time complexity by half. The input and output sequences are merged into a single sequence using a special separator token. To predict the next token, both the input <i>m</i> and output <i>y</i> are given as input, with future tokens masked out to enable causal training.
+</p>
+
+<h3><strong>Transformer Decoder with Memory-Compressed Attention (T-DMCA)</strong></h3>
+
+<p>
+  <strong>Local Attention Block</strong>: This block involves splitting the input sequence into segments of 256 tokens, which are then fed into multi-head attention in parallel and separately.
+</p>
+
+<p>
+  <strong>Memory-Compressed Attention Block</strong>: After projecting the input tokens into query, key, and value spaces, strided convolution is applied before passing the result to multi-head attention. This reduces parameters via a compression factor. Strided convolution uses kernels of size 3 with a stride of 3. Unlike local attention, memory-compressed attention captures global information across the entire sequence, similar to the original Transformer.
+</p>
+
+<p>
+  The final architecture is a 5-layer network (L-M-L-M-L), alternating between local attention (L) layers and memory-compressed attention (M) layers (compared to 6 identical layers in Vaswani et al. (2017)). In some experiments, a Mixture of Experts (MoE) layer (Shazeer et al., 2017) is added to increase the model’s capacity.
+</p>
 
   
 <h2 id="references">References</h2>
