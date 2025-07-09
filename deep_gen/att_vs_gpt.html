@@ -78,14 +78,7 @@
 
 
 
-<figure style="text-align: center;">
-  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/d-tf.png" 
-       alt="Decoder only Transformer" 
-       style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
-   <figcaption style="font-style: italic; margin-top: 0.5em;">
-    Figure: The architecture of the self-attention layers used in the T-D and T-DMCA model. (Image Source: Liu et al.)
-  </figcaption>
-</figure>
+
 
 <h3 id="dtf"><strong>Decoder-only Transformer</strong></h3>
 
@@ -103,6 +96,17 @@
   The D-TF model eliminates the encoder from the original Transformer architecture, thereby reducing both parameter count and time complexity by half. The input and output sequences are merged into a single sequence using a special separator token. To predict the next token, both the input <i>m</i> and output <i>y</i> are given as input, with future tokens masked out to enable causal training.
 </p>
 
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/d-tf.png" 
+       alt="Decoder only Transformer" 
+       style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+   <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: The architecture of the self-attention layers used in the T-D and T-DMCA model. (Image Source: Liu et al.)
+  </figcaption>
+</figure>
+
+  
 <h3 id="tdmca"><strong>Transformer Decoder with Memory-Compressed Attention (T-DMCA)</strong></h3>
 
 <p>
