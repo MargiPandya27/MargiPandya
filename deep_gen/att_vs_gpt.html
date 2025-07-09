@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+, <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -73,7 +73,7 @@
        alt="Comparison of extractive strategies on corpus at L = 500" 
        style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
   <figcaption style="font-style: italic; margin-top: 0.5em;">
-    Figure: Performance comparison of extractive methods (e.g., Identity, TF-IDF, TextRank, SumBasic, Cheating) on the combined corpus at input length \(L = 500\). The cheating strategy outperforms all others. (Image Source: Liu et al.)
+    Figure: Performance comparison of extractive methods (e.g., Identity, TF-IDF, TextRank, SumBasic, Cheating) on the combined corpus at input length \(L = 500\). The cheating strategy outperforms all others. (Image Source: Liu et al., 2018)
   </figcaption>
 </figure>
 
@@ -103,7 +103,7 @@
        alt="Decoder only Transformer" 
        style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
    <figcaption style="font-style: italic; margin-top: 0.5em;">
-    Figure: The architecture of the self-attention layers used in the T-D and T-DMCA model. (Image Source: Liu et al.)
+    Figure: The architecture of the self-attention layers used in the T-D and T-DMCA model. (Image Source: Liu et al., 2018)
   </figcaption>
 </figure>
 
@@ -119,7 +119,7 @@
 </p>
 
 <p>
-  The final architecture is a 5-layer network (L-M-L-M-L), alternating between local attention (L) layers and memory-compressed attention (M) layers (compared to 6 identical layers in Vaswani et al. (2017)). In some experiments, a Mixture of Experts (MoE) layer (Shazeer et al., 2017) is added to increase the model’s capacity.
+  The final architecture is a 5-layer network (L-M-L-M-L), alternating between local attention (L) layers and memory-compressed attention (M) layers (compared to 6 identical layers in Vaswani et al., (2017)). In some experiments, a Mixture of Experts (MoE) layer is added to increase the model’s capacity.
 </p>
 
  <figure style="text-align: center;">
@@ -127,7 +127,7 @@
        alt="Performance comparison of D-TF, T-ED, and T-DMCA models" 
        style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
   <figcaption style="font-style: italic; margin-top: 0.5em;">
-    Figure: Performance of different Transformer architectures (D-TF, T-ED, T-DMCA and MoE-T-DMCA) evaluated with increasing input length. T-DMCA shows improved scalability and performance up to L = 11,000. (Image source: Liu et al.)
+    Figure: Performance of different Transformer architectures (D-TF, T-ED, T-DMCA and MoE-T-DMCA) evaluated with increasing input length. T-DMCA shows improved scalability and performance up to L = 11,000. (Image source: Liu et al., 2018)
   </figcaption>
 </figure>
 
