@@ -41,16 +41,8 @@
     <div class="mainnotes-sidebar">
       <h3>Contents</h3>
       <ul>
-        <li><a href="#tokenization">Tokenization</a></li>
-        <li><a href="#stemming">Stemming</a></li>
-        <li><a href="#lemmatization">Lemmatization</a></li>
-        <li><a href="#stopwords">Stopwords</a></li>
-        <li><a href="#case-sensitivity">Case Sensitivity</a></li>
-        <li><a href="#bow">Bag-of-Words (BoW)</a></li>
-        <li><a href="#tfidf">TF-IDF</a></li>
-        <li><a href="#word2vec">Word2Vec</a></li>
-        <li><a href="#glove">GloVe</a></li>
-        <li><a href="#fasttext">FastText</a></li>
+        <li><a href="#dtf">Decoder only Transformer</a></li>
+        <li><a href="#tdmca">T-DMCA</a></li>
         <li><a href="#references">References</a></li>
       </ul>
     </div>
@@ -95,7 +87,7 @@
   </figcaption>
 </figure>
 
-<h3><strong>Decoder-only Transformer</strong></h3>
+<h3 id="dtf"><strong>Decoder-only Transformer</strong></h3>
 
 <p>
   Let the sequence be represented as 
@@ -111,7 +103,7 @@
   The D-TF model eliminates the encoder from the original Transformer architecture, thereby reducing both parameter count and time complexity by half. The input and output sequences are merged into a single sequence using a special separator token. To predict the next token, both the input <i>m</i> and output <i>y</i> are given as input, with future tokens masked out to enable causal training.
 </p>
 
-<h3><strong>Transformer Decoder with Memory-Compressed Attention (T-DMCA)</strong></h3>
+<h3 id="tdmca"><strong>Transformer Decoder with Memory-Compressed Attention (T-DMCA)</strong></h3>
 
 <p>
   <strong>Local Attention Block</strong>: This block involves splitting the input sequence into segments of 256 tokens, which are then fed into multi-head attention in parallel and separately.
