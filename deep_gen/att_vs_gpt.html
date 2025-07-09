@@ -43,6 +43,7 @@
       <ul>
         <li><a href="#dtf">Decoder only Transformer</a></li>
         <li><a href="#tdmca">T-DMCA</a></li>
+        <li><a href="#sparse_tf">Sparse Transformer</a></li>
         <li><a href="#references">References</a></li>
       </ul>
     </div>
@@ -142,6 +143,10 @@
   Additionally, incorporating a Mixture of Experts (MoE) layer enhanced model capacity at high input lengths. For instance, at \(L = 11,000\), adding 128 experts reduced log-perplexity from 2.05 to 1.93. The best-performing model used 256 experts at \(L = 7500\) and achieved a log-perplexity of 1.90. (Note: 256 experts at \(L = 11,000\) could not be run due to memory constraints.)
 </p>
 
+
+<h2>Generating Long Sequences</h2>
+
+  <h3 id="sparse_tf"><strong>Sparse Transformer</strong></h3>
 
   
 
