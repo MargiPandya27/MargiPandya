@@ -64,19 +64,21 @@
   
   <h2>Decoder only Transformer</h2>
   <p>
-  Authors of <cite>[CITATION]</cite> suspect that, for monolingual text-to-text tasks, redundant language information is re-learned by both the encoder and decoder. In the paper, they perform supervised learning for the task of summarizing Wikipedia documents. The input is the top extracted document for a given topic, concatenated with a special token and the expected summary. They propose that the task can be performed in two stages: (1) extraction of top Wikipedia documents related to a topic using methods such as Identity, TF-IDF, TextRank, SumBasic, and a "cheating" baseline; and (2) abstraction through language modeling using a decoder-only Transformer model.
+  Authors of (Liu et al.) suspect that, for monolingual text-to-text tasks, redundant language information is re-learned by both the encoder and decoder. In the paper, they perform supervised learning for the task of summarizing Wikipedia documents. The input is the top extracted document for a given topic, concatenated with a special token and the expected summary. They propose that the task can be performed in two stages: (1) extraction of top Wikipedia documents related to a topic using methods such as Identity, TF-IDF, TextRank, SumBasic, and a "cheating" baseline; and (2) abstraction through language modeling using a decoder-only Transformer model.
 </p>
 
 <h3><strong>Decoder-only Transformer</strong></h3>
 
 <p>
-  Let the sequence be represented as <i>(w₁, ..., wₙ₊η₊₁) = (m₁, ..., mₙ, δ, y₁, ..., yη)</i>, where <i>δ</i> is a special separator token. The model is trained to predict the next token given the previous ones:
+  Let the sequence be represented as 
+  \( (w_1, \ldots, w_{n+\eta+1}) = (m_1, \ldots, m_n, \delta, y_1, \ldots, y_\eta) \),
+  where \( \delta \) is a special separator token. The model is trained to predict the next token given the previous ones:
 </p>
 
 <p style="text-align: center;">
-  <code>p(w₁, ..., wₙ₊η) = ∏<sub>j=1</sub><sup>n+η</sup> p(w<sub>j</sub> | w₁, ..., w<sub>j−1</sub>)</code>
+  \( p(w_1, \ldots, w_{n+\eta}) = \prod_{j=1}^{n+\eta} p(w_j \mid w_1, \ldots, w_{j-1}) \)
 </p>
-
+  
 <p>
   The D-TF model eliminates the encoder from the original Transformer architecture, thereby reducing both parameter count and time complexity by half. The input and output sequences are merged into a single sequence using a special separator token. To predict the next token, both the input <i>m</i> and output <i>y</i> are given as input, with future tokens masked out to enable causal training.
 </p>
@@ -98,6 +100,7 @@
   
 <h2 id="references">References</h2>
       <ol>
+        <li>Liu et al., Generating Wikipedia by Summarizing Long Sequences, ICLR, 2018.</li>
         
       </ol>
 
