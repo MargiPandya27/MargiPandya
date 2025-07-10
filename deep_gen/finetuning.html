@@ -41,11 +41,8 @@
     <div class="mainnotes-sidebar">
      <h3>Contents</h3>
       <ul>
-        <li><a href="#vanilla">Vanilla Generative Adversarial Network</a></li>
-        <li><a href="#training_strategy">Vanilla GAN-Training Strategy</a></li>
-        <li><a href="#dcgan">DCGAN</a></li>
-        <li><a href="#cgan">cGAN</a></li>
-        <li><a href="#cyclegan">CycleGAN</a></li>
+        <li><a href="#lora">LoRA</a></li>
+        <li><a href="#lora_ablation">LoRA: Ablation</a></li>
         <li><a href="#references">References</a></li>
       </ul>
     </div>
@@ -59,7 +56,7 @@
     Instead, we can leverage the knowledge gained during pre-training and update only the parameters necessary for a specific downstream application.
   </p>
 
-  <h2>LoRA</h2>
+  <h2 id="lora">LoRA</h2>
   <p>
     LoRA (Low-Rank Adaptation) is a fine-tuning method used to adapt a pre-trained model. Instead of updating all model parameters, LoRA indirectly trains some dense layers by optimizing low-rank decomposition matrices of the layer updates, while keeping the pre-trained weights frozen.
   </p>
@@ -127,6 +124,8 @@
   <p>
     To illustrate this, the authors applied LoRA on a vanilla Transformer. In the original Transformer architecture, there are four weight matrices in the self-attention module and two in the MLP module. For simplicity and parameter-efficiency, they considered adapting only the attention weights and froze the MLP blocks.
   </p>
+
+  <h2 id="lora_ablation">LoRA: Ablation</h2>
 
   <h3>1. Which weight matrices in the Transformer should we apply LoRA to?</h3>
   <p>
@@ -208,7 +207,7 @@
   
     <h2 id="references">References</h2>
       <ol>
-        <li></li>
+          <li>Hu, Edward J., et al. (2022). LoRA: Low-Rank Adaptation of Large Language Models. arXiv preprint arXiv:2106.09685. https://arxiv.org/abs/2106.09685</li>
       </ol>
 
      </main>
