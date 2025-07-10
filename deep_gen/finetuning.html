@@ -108,6 +108,100 @@
     For inference latency, switching to a different downstream task simply involves replacing A·B with A′·B′ for that specific task. The original model weights remain untouched, allowing for efficient multi-task adaptation.
   </p>
 
+<h2>LoRA for GPT-3</h2>
+
+  <p>
+    The authors of the paper have shown comparisons for various LLMs like RoBERTa, DeBERTa, and GPT-2. For GPT-3, they observed state-of-the-art (SOTA) level performance on three datasets — <strong>WikiSQL</strong>, <strong>MNLI-m</strong>, and <strong>SAMSum</strong>. However, there was a performance drop when more than 256 special tokens were used in prefix embeddings, as shown in the figure.
+  </p>
+
+  <p>
+    Apart from this, LoRA performs an in-depth ablation study backed by principles in Linear Algebra. It answers key questions such as:
+  </p>
+
+  <ol>
+    <li>Given a parameter budget constraint, which subset of weight matrices in a pre-trained Transformer should we adapt to maximize downstream performance?</li>
+    <li>Is the “optimal” adaptation matrix <strong>ΔW</strong> really rank-deficient? If so, what is a good rank to use in practice?</li>
+    <li>What is the connection between <strong>ΔW</strong> and <strong>W</strong>? Does <strong>ΔW</strong> highly correlate with <strong>W</strong>? How large is <strong>ΔW</strong> compared to <strong>W</strong>?</li>
+  </ol>
+
+  <p>
+    To illustrate this, the authors applied LoRA on a vanilla Transformer. In the original Transformer architecture, there are four weight matrices in the self-attention module and two in the MLP module. For simplicity and parameter-efficiency, they considered adapting only the attention weights and froze the MLP blocks.
+  </p>
+
+  <h3>1. Which weight matrices in the Transformer should we apply LoRA to?</h3>
+  <p>
+    They assume a parameter budget and determine the rank depending on how many weight matrices are updated. Notably, updating only the <strong>W<sub>q</sub></strong> and <strong>W<sub>v</sub></strong> weights with a rank of 4 gives comparable performance and captures sufficient information in <strong>ΔW</strong>. This is preferable to updating a single weight matrix with a higher rank.
+  </p>
+
+  <h3>2. What is the optimal rank <em>r</em> for LoRA?</h3>
+  <p>
+    This section validates the initial claim that <strong>ΔW</strong> has a low intrinsic rank. Surprisingly, a rank as small as 1 suffices to adapt both <strong>W<sub>q</sub></strong> and <strong>W<sub>v</sub></strong> on these datasets, while training <strong>W<sub>q</sub></strong> alone requires a larger rank. However, this finding is task-dependent. For example, in machine translation tasks, if the pre-trained model has not seen a particular language, a higher rank may be needed for effective adaptation.
+  </p>
+
+  <h3><strong>Subspace Similarity Between Different Ranks</strong></h3>
+  <p>
+    Using Singular Value Decomposition (SVD) on matrix A with ranks 8 and 64, they obtain the right singular unitary matrices <strong>U<sub>A<sub>r=8</sub></sub></strong> and <strong>U<sub>A<sub>r=64</sub></sub></strong>. They then compute the Frobenius norm to determine how much of the subspace spanned by the top <em>i</em> singular vectors of <strong>U<sub>A<sub>r=8</sub></sub></strong> is contained within that of <strong>U<sub>A<sub>r=64</sub></sub></strong>.
+  </p>
+
+  <p style="font-family: monospace; background-color: #f4f4f4; padding: 10px;">
+    φ(A<sub>r=8</sub>, A<sub>r=64</sub>, i, j) = || U<sub>i</sub><sup>T</sup> · U<sub>j</sub> ||<sub>F</sub><sup>2</sup> / min(i, j)
+  </p>
+
+  <p>
+    Here, φ ∈ [0, 1]. A value of 0 indicates complete separation between the subspaces, while 1 indicates full overlap. This analysis was performed for the 48th layer (out of 96) due to space constraints.
+  </p>
+
+  <h3><strong>Subspace Similarity Between Different Random Seeds</strong></h3>
+  <p>
+    As mentioned earlier, the A matrix is initialized using a normal distribution. The authors conducted ablation studies using different random seeds to initialize A with rank 64. Since <strong>ΔW<sub>q</sub></strong> has a higher intrinsic rank than <strong>ΔW<sub>v</sub></strong>, its SVD shows higher singular values and stronger structure.
+  </p>
+
+  <h3><strong>How Does the Adaptation Matrix ΔW Compare to W?</strong></h3>
+  <p>
+    This is one of the most important insights. It explores how <strong>ΔW</strong> changes during the adaptation of a pre-trained model. Specifically:
+  </p>
+
+  <ul>
+    <li>Is <strong>ΔW</strong> highly correlated with <strong>W</strong>?</li>
+    <li>Is <strong>ΔW</strong> mostly contained in the top singular directions of <strong>W</strong>?</li>
+    <li>How large is <strong>ΔW</strong> compared to the directions in <strong>W</strong>?</li>
+  </ul>
+
+  <p>
+    To investigate this, the authors perform SVD on <strong>ΔW</strong> and compute the Frobenius norm of ||U<sup>T</sup>W<sub>q</sub>V||<sub>F</sub>, and similarly for <strong>W<sub>q</sub></strong>. Then, a ratio is calculated to measure similarity.
+  </p>
+
+  <h4>Key Findings:</h4>
+  <ol>
+    <li>
+      <strong>ΔW<sub>q</sub></strong> is highly correlated with <strong>W<sub>q</sub></strong>. As rank increases, the correlation decreases, indicating that lower-rank updates tend to target specific parameters relevant to the downstream task.
+    </li>
+    <li>
+      Instead of duplicating the dominant directions of <strong>W</strong>, the adaptation primarily amplifies directions not emphasized during pre-training — offering an efficient fine-tuning approach.
+    </li>
+  </ol>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+  
+
+
+  
+
+  
+  
+
+  
 
   
 
