@@ -144,9 +144,22 @@
 </p>
 
 
-<h2>Generating Long Sequences</h2>
+<h2>Language Generation</h2>
 
   <h3 id="sparse_tf"><strong>Sparse Transformer</strong></h3>
+
+  <p>Problem with Transformer: Consider for text, image or audio dataset, task is to use the previous continuous inputs to generate a categorical distribution over v dimensional probability vector using softmax function to get the next token from the vocabulury, where v is the size of the vocabulary. 
+  p(x) =
+ i=1
+ p(xix1
+ xi 1; ) During the training the task is to optimize parameters that maximze the liklihood of data. Now, the problem arises when using the encoder-decoder or decoder only transformer, is the self-attention block, here, the computations grows with the size of the sequence with n^2. It is necessary to increase the context window of the Large language models due to increase in the performance. Hecne it is essential to make changes to the original transformer so that it becomes scalable to train for huge corpus of data and boost the efficiency. </p>
+
+
+  <h3><strong>Factorized Self-attention</strong></h3>
+
+  <p>The authors here perform interesting experiments with a 128-layer network, trained on CIFAR-10 with full attention. The observations include: (a) Early layers  learned local patterns (like nearby pixels, like in a CNN). (b) Some middle layers learned row and column attention (like splitting the image grid). (c) Later layers showed sparse or global patterns, where only specific parts were attended to. This motivates the point of deliberatley adding some sparsity while preserving the model's performance. Like CNN, have local connectivity which eventenually capture the global picture that through connection between the layers, sparse transformer use factorized attention achieve the same concept.</p>
+
+  <p>Factorized attention, the heart of the sparse transformer, they introduced two types of attentions. </p>
 
   
 
