@@ -285,7 +285,7 @@ O(n² / √n) = O(n · √n)
   <li><code>A(i)</code> = attention pattern (like strided or fixed)</li>
 </ul>
 
-<p><strong>Pros</strong>strong>: Very efficient; each block is simple.<br>
+<p><strong>Pros</strong>: Very efficient; each block is simple.<br>
 <strong>Cons</strong>: One block only sees one pattern at a time.</p>
 
 <p><strong>Merged Attention Head</strong>: Instead of rotating attention heads, we combine all attention patterns into one merged head. Each token attends to the union of all sparse sets.</p>
@@ -294,15 +294,15 @@ O(n² / √n) = O(n · √n)
 
 <p>Look at everything that all the sparse heads would have attended to using one combined attention operation.</p>
 
-<p><strong>Pros</strong>strong>: Gets richer information per block.<br>
-<strong>Cons</strong>strong>: Slightly more computation since each head attends to more positions.</p>
+<p><strong>Pros</strong>: Gets richer information per block.<br>
+<strong>Cons</strong>: Slightly more computation since each head attends to more positions.</p>
 
 <p><strong> Multi-Head Attention (Standard Transformer Style)</strong>: This is inspired by traditional method from Vaswani et al. (2017). In multi-head attention, the model uses <code>nh</code> parallel attention heads, where each head attends to a different subset of the input using its own sparse pattern, denoted as <code>A(i)</code>. These attention operations are computed in parallel, and their outputs are then concatenated along the feature dimension to form the final output of the attention layer.</p>
 
 <pre><code>attention(X) = Wp · concat(attend(X, A(i))) for i = 1 to nh</code></pre>
 
 <p><strong>Pros</strong>: Allows parallelism and flexibility.<br>
-<strong>Cons</strong>strong>: May use more GPU memory when computed in parallel.</p>
+<strong>Cons</strong>: May use more GPU memory when computed in parallel.</p>
 
 
 <p><strong>2. Scaling to Hundreds of Layers</strong>: Training very deep transformers can be difficult due to vanishing or exploding gradients. To handle this, the Sparse Transformer uses 
@@ -351,15 +351,10 @@ Backward Pass:
 </p>
 
 <p><strong>5. Mixed-Precision Training</strong>
-  Sparse Transformer uses <strong>mixed-precision training</strong> to accelerate training and reduce memory usage:
+  Sparse Transformer uses <strong>mixed-precision training</strong> to accelerate training and reduce memory usage.
 </p>
 
-<ul>
-  <li><strong>Weights</strong> are stored in full 32-bit (single-precision).</li>
-  <li><strong>Activations and gradients</strong> are computed in 16-bit (half-precision) using Tensor Cores.</li>
-  <li><strong>Dynamic loss scaling</strong> is used to avoid numerical underflow.</li>
-  <li>During sampling, key-query dot products are cast to full-precision to avoid overflow.</li>
-</ul>
+
   
 
 <h2 id="references">References</h2>
