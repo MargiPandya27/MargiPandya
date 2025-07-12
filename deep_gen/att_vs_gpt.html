@@ -268,7 +268,7 @@ O(n² / √n) = O(n · √n)
 
   
 
-<p><strong>1. Factorized Attention Heads</strong>: This is the simplest approach. The transformer has many residual blocks: Block 0, Block 1, Block 2, etc. Use every attention types alternately in every block. So, if you have <code>p = 2</code> attention types (e.g., strided and fixed), then:</p>
+<p><strong>1. Factorized Attention Heads</strong>:  The transformer has many residual blocks: Block 0, Block 1, Block 2, etc. Use every attention types alternately in every block. So, if you have <code>p = 2</code> attention types (e.g., strided and fixed), then:</p>
 
 <ul>
   <li>Block 0 → use attention type <code>A(0 mod 2) = A(0)</code> → strided</li>
@@ -285,28 +285,24 @@ O(n² / √n) = O(n · √n)
   <li><code>A(i)</code> = attention pattern (like strided or fixed)</li>
 </ul>
 
-<p>Pros: Very efficient; each block is simple.<br>
-Cons: One block only sees one pattern at a time.</p>
+<p><strong>Pros</strong>strong>: Very efficient; each block is simple.<br>
+<strong>Cons</strong>: One block only sees one pattern at a time.</p>
 
-<h3>2. Merged Attention Head</h3>
-
-<p>Instead of rotating attention heads, we combine all attention patterns into one merged head. Each token attends to the union of all sparse sets.</p>
+<p><strong>Merged Attention Head</strong>: Instead of rotating attention heads, we combine all attention patterns into one merged head. Each token attends to the union of all sparse sets.</p>
 
 <pre><code>attention(X) = Wp · attend(X, ⋃ A(m)), for m = 1 to p</code></pre>
 
 <p>Look at everything that all the sparse heads would have attended to using one combined attention operation.</p>
 
-<p>Pros: Gets richer information per block.<br>
-Cons: Slightly more computation since each head attends to more positions.</p>
+<p><strong>Pros</strong>strong>: Gets richer information per block.<br>
+<strong>Cons</strong>strong>: Slightly more computation since each head attends to more positions.</p>
 
-<h3>3. Multi-Head Attention (Standard Transformer Style)</h3>
-
-<p>This is inspired by traditional method from Vaswani et al. (2017). In multi-head attention, the model uses <code>nh</code> parallel attention heads, where each head attends to a different subset of the input using its own sparse pattern, denoted as <code>A(i)</code>. These attention operations are computed in parallel, and their outputs are then concatenated along the feature dimension to form the final output of the attention layer.</p>
+<p><strong> Multi-Head Attention (Standard Transformer Style)</strong>: This is inspired by traditional method from Vaswani et al. (2017). In multi-head attention, the model uses <code>nh</code> parallel attention heads, where each head attends to a different subset of the input using its own sparse pattern, denoted as <code>A(i)</code>. These attention operations are computed in parallel, and their outputs are then concatenated along the feature dimension to form the final output of the attention layer.</p>
 
 <pre><code>attention(X) = Wp · concat(attend(X, A(i))) for i = 1 to nh</code></pre>
 
-<p>Pros: Allows parallelism and flexibility.<br>
-Cons: May use more GPU memory when computed in parallel.</p>
+<p><strong>Pros</strong>: Allows parallelism and flexibility.<br>
+<strong>Cons</strong>strong>: May use more GPU memory when computed in parallel.</p>
 
 
 <p><strong>2. Scaling to Hundreds of Layers</strong>: Training very deep transformers can be difficult due to vanishing or exploding gradients. To handle this, the Sparse Transformer uses 
