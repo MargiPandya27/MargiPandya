@@ -43,7 +43,10 @@
       <ul>
         <li><a href="#dtf">Decoder only Transformer</a></li>
         <li><a href="#tdmca">T-DMCA</a></li>
+        <li><a href="#factorized_att">Factorized Attention</a></li>
+        <li><a href="#factorized_att_2d">Factorized Attention for 2D data</a></li>
         <li><a href="#sparse_tf">Sparse Transformer</a></li>
+        <li><a href="#sparse_tf_res">Sparse Transformer-Results</a></li>
         <li><a href="#references">References</a></li>
       </ul>
     </div>
@@ -164,7 +167,7 @@ p(x) = ∏<sub>i=1</sub><sup>n</sup> p(xᵢ | x₁, ..., xᵢ₋₁; θ)
   Therefore, modifications to the original Transformer architecture are needed to make it scalable and efficient on massive datasets.
 </p>
 
-<h3><strong>Factorized Attention</strong></h3>
+<h2 id="factorized_att">Factorized Self-Attention</h2>
 
 <p>
   The authors experimented with a 128-layer full-attention Transformer trained on CIFAR-10. They observed the following:
@@ -190,7 +193,7 @@ p(x) = ∏<sub>i=1</sub><sup>n</sup> p(xᵢ | x₁, ..., xᵢ₋₁; θ)
   These findings motivated the idea of introducing <strong>deliberate sparsity</strong> in attention while maintaining performance, this is similar to CNNs which build global understanding from local connectivity.
 </p>
 
-<h3><strong>Factorized Self-Attention</strong></h3>
+
 
 <p>
   In a dense Transformer, each token (e.g., image patch or word) is projected into queries, keys, and values using weight matrices. Each output is a weighted sum of the values, with weights based on the similarity between the query and keys. In full self-attention, every token <code>xᵢ</code> attends to all previous tokens <code>{x₁, x₂, ..., xᵢ}</code> (autoregressive masking):
@@ -208,7 +211,7 @@ x₁ → x₂ → x₃ → ... → xₙ
   <strong>Sparse Transformer:</strong> Instead of full attention, the Sparse Transformer uses <code>p</code> separate attention heads. Each head attends only to a subset of tokens — similar to how CNN filters cover a local region. Over multiple layers, these sparse heads can still pass information globally. For any output token <code>i</code> and any input token <code>j</code>, there exists a path of attention through intermediate tokens of at most <code>p+1</code> steps to connect <code>j</code> to <code>i</code>.
 </p>
 
-<h4><strong>Computational Complexity</strong></h4>
+<h3><strong>Computational Complexity</strong></h3>
 
 <p>
   In sparse attention:
@@ -232,9 +235,9 @@ O(n² / √n) = O(n · √n)
   This significantly reduces compute cost for long sequences (e.g., <code>n = 16,384</code>).
 </p>
 
-<h3>2. Two-dimensional Factorized Attention</h3>
+<h3 id="factorized_att_2d">2. Two-dimensional Factorized Attention</h3>
 
-<h4>Strided Attention</h4>
+<h3>Strided Attention</h3>
 
 <p>
   For structured data like images or music — where nearby pixels or notes are most relevant — we can use <strong>strided attention</strong> to focus on local patterns.
@@ -250,7 +253,7 @@ O(n² / √n) = O(n · √n)
   This approach aligns well with structured data formats and allows efficient sparse attention.
 </p>
 
-<h4>Fixed Attention</h4>
+<h3>Fixed Attention</h3>
 
 <p>
   For unstructured data like text — where context can shift rapidly and skipping words can cause errors — strided attention may fail to capture dependencies.
@@ -272,7 +275,7 @@ O(n² / √n) = O(n · √n)
   Note: This increases compute by a factor of <code>c</code> compared to strided attention — a tradeoff for more reliable information flow in non-periodic data like language.
 </p>
 
-<h2><strong>Sparse Transformer</strong></h2>
+<h2 id="sparse_tf"><strong>Sparse Transformer</strong></h2>
 
 <p>Let’s see how factorized attention is used in Sparse Transformers. Below are the key architectural changes compared to the original Transformer:</p>
 
@@ -371,7 +374,7 @@ Backward Pass:
 </p>
 
 
-<h3>Results</h3>
+<h2 id = "sparse_tf_res">Results</h2>
 
    <figure style="text-align: center;">
   <img src="https://margipandya27.github.io/MargiPandya/deep_gen/sparse_tf_eval.png" 
