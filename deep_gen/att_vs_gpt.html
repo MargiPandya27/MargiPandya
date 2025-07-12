@@ -235,7 +235,7 @@ O(n² / √n) = O(n · √n)
   This significantly reduces compute cost for long sequences (e.g., <code>n = 16,384</code>).
 </p>
 
-<h3 id="factorized_att_2d">2. Two-dimensional Factorized Attention</h3>
+<h2 id="factorized_att_2d">Two-dimensional Factorized Attention</h2>
 
 <h3>Strided Attention</h3>
 
@@ -275,14 +275,14 @@ O(n² / √n) = O(n · √n)
   Note: This increases compute by a factor of <code>c</code> compared to strided attention — a tradeoff for more reliable information flow in non-periodic data like language.
 </p>
 
-<h2 id="sparse_tf"><strong>Sparse Transformer</strong></h2>
+<h2 id="sparse_tf">Sparse Transformer</h2>
 
 <p>Let’s see how factorized attention is used in Sparse Transformers. Below are the key architectural changes compared to the original Transformer:</p>
 
   <figure style="text-align: center;">
   <img src="https://margipandya27.github.io/MargiPandya/deep_gen/sparse_tf_archi.png" 
        alt="Sparse TF Architecture" 
-       style="max-width: 45%; height: auto; display: block; margin: 0 auto;">
+       style="max-width: 35%; height: auto; display: block; margin: 0 auto;">
    <figcaption style="font-style: italic; margin-top: 0.5em;">
     Figure: Sparse Transformer (Image Source: Child at al. (2019))
   </figcaption>
