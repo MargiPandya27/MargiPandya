@@ -178,7 +178,7 @@ p(x) = ∏<sub>i=1</sub><sup>n</sup> p(xᵢ | x₁, ..., xᵢ₋₁; θ)
        alt="Sparsity" 
        style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
    <figcaption style="font-style: italic; margin-top: 0.5em;">
-    Figure: Learned attention patterns from a 128-layer network on CIFAR-10 trained with full attention. White highlights denote attention weights for a head while generating a given pixel, and black denotes the autoregressive mask. Layers are able to learn a variety of specialized sparse structures, which may explain their ability to adapt to different domains. (Image Source: Child at al. (2019))
+    Figure: Learned attention patterns from a 128-layer network on CIFAR-10 trained with full attention. White highlights denote attention weights for a head while generating a given pixel, and black denotes the autoregressive mask. Layers are able to learn a variety of specialized sparse structures, which may explain their ability to adapt to different domains. (Image Source: Child et al. (2019))
   </figcaption>
 </figure>
 
@@ -279,14 +279,15 @@ O(n² / √n) = O(n · √n)
 
 <p>Let’s see how factorized attention is used in Sparse Transformers. Below are the key architectural changes compared to the original Transformer:</p>
 
-  <figure style="text-align: center;">
+ <figure style="text-align: center;">
   <img src="https://margipandya27.github.io/MargiPandya/deep_gen/sparse_tf_archi.png" 
-       alt="Sparse TF Architecture" 
-       style="max-width: 35%; height: auto; display: block; margin: 0 auto;">
-   <figcaption style="font-style: italic; margin-top: 0.5em;">
-    Figure: Sparse Transformer (Image Source: Child at al. (2019))
+       alt="Sparse Transformer Architecture (Child et al., 2019)" 
+       style="width: 100%; max-width: 500px; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Sparse Transformer (Image Source: Child et al., 2019)
   </figcaption>
 </figure>
+
 
 
 <p><strong>1. Factorized Attention Heads</strong>:  The transformer has many residual blocks: Block 0, Block 1, Block 2, etc. Use every attention types alternately in every block. So, if you have <code>p = 2</code> attention types (e.g., strided and fixed), then:</p>
@@ -381,7 +382,7 @@ Backward Pass:
        alt="Sparse TF Evaluation" 
        style="max-width: 75%; height: auto; display: block; margin: 0 auto;">
    <figcaption style="font-style: italic; margin-top: 0.5em;">
-    Figure: Sparse Transformer Evalution using bits per byte for images, text and sound generation (Image Source: Child at al. (2019)).
+    Figure: Sparse Transformer Evalution using bits per byte for images, text and sound generation (Image Source: Child et al. (2019)).
   </figcaption>
 </figure>
 
