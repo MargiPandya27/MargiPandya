@@ -155,14 +155,324 @@
  xi 1; ) During the training the task is to optimize parameters that maximze the liklihood of data. Now, the problem arises when using the encoder-decoder or decoder only transformer, is the self-attention block, here, the computations grows with the size of the sequence with n^2. It is necessary to increase the context window of the Large language models due to increase in the performance. Hecne it is essential to make changes to the original transformer so that it becomes scalable to train for huge corpus of data and boost the efficiency. </p>
 
 
-  <h3><strong>Factorized Self-attention</strong></h3>
+  <h3><strong>Factorized attention</strong></h3>
 
   <p>The authors here perform interesting experiments with a 128-layer network, trained on CIFAR-10 with full attention. The observations include: (a) Early layers  learned local patterns (like nearby pixels, like in a CNN). (b) Some middle layers learned row and column attention (like splitting the image grid). (c) Later layers showed sparse or global patterns, where only specific parts were attended to. This motivates the point of deliberatley adding some sparsity while preserving the model's performance. Like CNN, have local connectivity which eventenually capture the global picture that through connection between the layers, sparse transformer use factorized attention achieve the same concept.</p>
 
   <p>Factorized attention, the heart of the sparse transformer, they introduced two types of attentions. </p>
 
-  
+  <h3>Factorized Self-Attention</h3>
 
+  <p>For a dense transformer, the tokens (image patches) are projected to query, key and value weight matrics. Each output is a weighted sum of values based on how similar its query is to the keys of other inputs. In full self-attention, every token (or pixel) looks at all previous positions, like:
+
+nginx
+Copy
+Edit
+x1 → x2 → x3 → ... → xn
+That means every xi computes:
+
+𝑆
+𝑖
+=
+𝑗
+∣
+𝑗
+≤
+𝑖
+Si=j∣j≤i
+This is called autoregressive masking.</p>
+
+<p>However, they propse that is the tokens are 16,384 then according to O(n^2) complexity of the full attention transformer, it computations would increase to 256M. Isntead they propse a architecture with sparse attention, there are p separate attention heads that would attend to a subset of key tokens and not the entire token at a time. Like CNN, they would attend to a subset of pixels and eventually attain global attention in the later layers. For i-j token pair, where i being the output token and j is the input token, here exists a path of length ≤ p+1 connecting them through attention heads.</p>
+
+<p>Let's see the drop in the complexity using this, Every token attends to only n/p other tokens (instead of n).
+
+So computing attention per token is O(n/p).
+
+For n tokens:
+→ total compute per head = O(n × n/p) = O(n² / p). This is less than O(n²) if p > 1. 
+For p = √n (common choice)
+Then:
+
+𝑂
+(
+𝑛
+2
+𝑛
+)
+=
+𝑂
+(
+𝑛
+⋅
+𝑛
+)
+O( 
+n
+​
+ 
+n 
+2
+ 
+​
+ )=O(n⋅ 
+n
+​
+ )
+This is the Sparse Transformer complexity, much faster than dense attention for large n = 16,384.</p>
+
+  <h3>2. Two-dimensional factorized attention</h3>
+
+  <h3>Strided Attention</h3>
+
+  For structured data like images and music where the nearby pixels and notes are most useful for predicting the next pixels, we can use local strided attention in the maximization function. 
+  A_i^(1) = {i−l, ..., i−1}   → local context
+A_i^(2) = {j | j mod l = 0} → strided attention
+
+ <h3>Fixed attention</h3>
+
+  <p>For data without any periodic structure like text, where omitting a few tokens might change the context of the sentence. Here, fixed attention comes handy, if the stride is 128 and c = 8, then all future positions greater than 128 can attend to positions 120-128, all positions greater than 256 can attend to 248-256, and so forth. The c=8, can be the summary of the particular token window.  it should be noted that
+ this increases the computational cost of this method by c in comparison to the strided attention.</p>
+
+
+<h2>Sparse Transformer<h2>
+
+  Let's see how the factorized attention are used in the sparse attention. 
+
+  Architectural changes to the original transformer:
+
+  1. Factorized attention heads: This is the simplest approach.
+
+Imagine your Transformer has many residual blocks: Block 0, Block 1, Block 2, etc.
+
+You rotate through attention types every block.
+
+So if you have p = 2 attention types (e.g., strided and fixed), then:
+
+Block 0 → use attention type A(0 mod 2) = A(0) → strided
+
+Block 1 → use A(1 mod 2) = A(1) → fixed
+
+Block 2 → back to strided, and so on...
+
+🔁 Formula:
+𝑎
+𝑡
+𝑡
+𝑒
+𝑛
+𝑡
+𝑖
+𝑜
+𝑛
+(
+𝑋
+)
+=
+𝑊
+𝑝
+∗
+𝑎
+𝑡
+𝑡
+𝑒
+𝑛
+𝑑
+(
+𝑋
+,
+𝐴
+(
+𝑟
+𝑚
+𝑜
+𝑑
+𝑝
+)
+)
+attention(X)=Wp∗attend(X,A(rmodp))
+Where:
+
+r = current residual block number
+
+p = number of attention types (e.g., 2)
+
+A(i) = the attention pattern (like strided or fixed)
+
+🔹 Why it's good: Very efficient; each block is simple.
+
+🔹 Tradeoff: One block only sees one pattern at a time.
+
+2. Merged Attention Head
+Instead of splitting into multiple heads, we combine all patterns into one merged head.
+
+So each token attends to the union of multiple sparse sets.
+
+🔁 Formula:
+𝑎
+𝑡
+𝑡
+𝑒
+𝑛
+𝑡
+𝑖
+𝑜
+𝑛
+(
+𝑋
+)
+=
+𝑊
+𝑝
+∗
+𝑎
+𝑡
+𝑡
+𝑒
+𝑛
+𝑑
+(
+𝑋
+,
+⋃
+𝐴
+(
+𝑚
+)
+)
+𝑓
+𝑜
+𝑟
+𝑚
+=
+1
+𝑡
+𝑜
+𝑝
+attention(X)=Wp∗attend(X,⋃A(m))form=1top
+This means:
+
+Look at everything that all the sparse heads would have attended to.
+
+Use one attention calculation instead of many.
+
+🔹 Why it's good: Gets richer information per block.
+
+🔹 Tradeoff: Slightly more computation, since each head attends to more positions.
+
+3. Multi-Head Attention (standard way)
+This is the regular Transformer method (from Vaswani et al., 2017):
+
+Have nh attention heads.
+
+Each head can use its own sparse pattern.
+
+Compute them in parallel, then concatenate their outputs.
+
+🔁 Formula:
+𝑎
+𝑡
+𝑡
+𝑒
+𝑛
+𝑡
+𝑖
+𝑜
+𝑛
+(
+𝑋
+)
+=
+𝑊
+𝑝
+∗
+𝑐
+𝑜
+𝑛
+𝑐
+𝑎
+𝑡
+(
+𝑎
+𝑡
+𝑡
+𝑒
+𝑛
+𝑑
+(
+𝑋
+,
+𝐴
+(
+𝑖
+)
+)
+)
+𝑓
+𝑜
+𝑟
+𝑖
+𝑖
+𝑛
+1...
+𝑛
+ℎ
+attention(X)=Wp∗concat(attend(X,A(i)))foriin1...nh
+Each head i has its own A(i) sparse pattern.
+
+Also:
+
+Inside each head, weight matrices (Wq, Wk, Wv) are smaller to keep total parameters the same.
+
+So the model size doesn’t increase with more heads.
+
+🔹 Why it's good: Parallelism, flexibility.
+
+🔹 Tradeoff: May require more GPU memory if done in parallel.
+
+
+  2. Scaling to hundreds of layers: Training deep neural networks becomes hard to train due to vanishing and exploding gradients, to prevent this ResNet style pre-activation residual block for attention and feed-forward layer is used.  To prevent outputs from exploding or vanishing, they scale some weight matrices by: 1 / sqrt(2N) Where N = number of layers. This keeps the magnitude of activations under control as the network gets deeper.
+
+  3. Modeling diverse data types: Transformer without positional embedding are location agnostic. For the case of the sparse transformer, it is even more essential to have postional embedding.  We added either nemb = ddata or nemb = dattn embed
+dings to each input location, where ddata refers to the num
+ber of dimensions of the data, and dattn is the number of
+ dimensions of the factorized attention. If xi is the one-hot
+ encoded ith element in the sequence, and o(j)
+ i
+ j 
+represents
+ the one-hot encoded position of xi in the jth dimension
+ (1 
+nemb), then:
+ embed(XWe) = xiWe+
+ nemb
+ j=1
+ o(j)
+ i Wj  xi X
+For images, we used data embeddings, where ddata = 3 for the row, column, and channel location of each input byte. For text and audio, we used two-dimensional attention embeddings, where dattn = 2 and the index corresponds to
+ each position’s row and column index in a matrix of width equal to the stride
+
+4. Saving memory by recomputing attention weights: During the forward pass, you don’t store all the intermediate outputs (like attention scores). During the backward pass, you recompute them on the fly when needed for gradients.
+  Forward Pass:
+  Run Layer 1 → Save output (Checkpoint)
+  Run Layer 2 → throw away output
+  Run Layer 3 → Save output (Checkpoint)
+  Run Layer 4 → throw away output
+  Run Layer 5 → throw away output
+  Run Layer 6 → Save final output
+
+Backward Pass:
+  To backprop through Layers 2–3:
+    → Recompute Layer 2 & 3 using the Layer 1 checkpoint
+
+  To backprop through Layers 4–6:
+    → Recompute Layer 4 & 5 using the Layer 3 checkpoint
+
+  Dropout is random, so if you recompute something later, you’d get different results unless you carefully fix the randomness.
+
+To avoid this complexity, they skip dropout inside attention layers, and apply it only at the residual output (after attention/FFN blocks).
+
+
+6. Mixed-precision training: 
   
 <h2 id="references">References</h2>
       <ol>
