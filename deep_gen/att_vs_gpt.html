@@ -145,15 +145,10 @@
 
 <h2>Language Generation</h2>
 
-<h3 id="sparse_tf"><strong>Sparse Transformer</strong></h3>
 
 <p>
   <strong>Problem with Transformer:</strong> Consider tasks like language modeling on text, image, or audio data.
-  The goal is to use previous inputs to generate a categorical distribution over a vocabulary of size <em>v</em> using the softmax function, i.e., to predict the next token in the sequence.
-</p>
-
-<p>
-  The joint probability of a sequence <code>x = x₁, x₂, ..., xₙ</code> is modeled as:
+  The goal is to use previous inputs to generate a categorical distribution over a vocabulary of size <em>v</em> using the softmax function, i.e., to predict the next token in the sequence. The joint probability of a sequence <code>x = x₁, x₂, ..., xₙ</code> is modeled as:
 </p>
 
 <pre>
@@ -161,11 +156,7 @@ p(x) = ∏<sub>i=1</sub><sup>n</sup> p(xᵢ | x₁, ..., xᵢ₋₁; θ)
 </pre>
 
 <p>
-  During training, we optimize the parameters <code>θ</code> to maximize the likelihood of the data.
-</p>
-
-<p>
-  However, the problem arises when using standard Transformers (encoder-decoder or decoder-only) because the self-attention block has a computational complexity of <strong>O(n²)</strong>, where <code>n</code> is the sequence length.
+  During training, we optimize the parameters <code>θ</code> to maximize the likelihood of the data. However, the problem arises when using standard Transformers (encoder-decoder or decoder-only) because the self-attention block has a computational complexity of <strong>O(n²)</strong>, where <code>n</code> is the sequence length.
 </p>
 
 <p>
@@ -186,17 +177,13 @@ p(x) = ∏<sub>i=1</sub><sup>n</sup> p(xᵢ | x₁, ..., xᵢ₋₁; θ)
 </ul>
 
 <p>
-  These findings motivated the idea of introducing <strong>deliberate sparsity</strong> in attention while maintaining performance — similar to CNNs which build global understanding from local connectivity.
+  These findings motivated the idea of introducing <strong>deliberate sparsity</strong> in attention while maintaining performance, this is similar to CNNs which build global understanding from local connectivity.
 </p>
 
 <h3><strong>Factorized Self-Attention</strong></h3>
 
 <p>
-  In a dense Transformer, each token (e.g., image patch or word) is projected into queries, keys, and values using weight matrices. Each output is a weighted sum of the values, with weights based on the similarity between the query and keys.
-</p>
-
-<p>
-  In full self-attention, every token <code>xᵢ</code> attends to all previous tokens <code>{x₁, x₂, ..., xᵢ}</code> (autoregressive masking):
+  In a dense Transformer, each token (e.g., image patch or word) is projected into queries, keys, and values using weight matrices. Each output is a weighted sum of the values, with weights based on the similarity between the query and keys. In full self-attention, every token <code>xᵢ</code> attends to all previous tokens <code>{x₁, x₂, ..., xᵢ}</code> (autoregressive masking):
 </p>
 
 <pre>
@@ -208,11 +195,7 @@ x₁ → x₂ → x₃ → ... → xₙ
 </p>
 
 <p>
-  <strong>Sparse Transformer:</strong> Instead of full attention, the Sparse Transformer uses <code>p</code> separate attention heads. Each head attends only to a subset of tokens — similar to how CNN filters cover a local region.
-</p>
-
-<p>
-  Over multiple layers, these sparse heads can still pass information globally. For any output token <code>i</code> and any input token <code>j</code>, there exists a path of attention through intermediate tokens of at most <code>p+1</code> steps to connect <code>j</code> to <code>i</code>.
+  <strong>Sparse Transformer:</strong> Instead of full attention, the Sparse Transformer uses <code>p</code> separate attention heads. Each head attends only to a subset of tokens — similar to how CNN filters cover a local region. Over multiple layers, these sparse heads can still pass information globally. For any output token <code>i</code> and any input token <code>j</code>, there exists a path of attention through intermediate tokens of at most <code>p+1</code> steps to connect <code>j</code> to <code>i</code>.
 </p>
 
 <h4><strong>Computational Complexity</strong></h4>
@@ -228,11 +211,7 @@ x₁ → x₂ → x₃ → ... → xₙ
 </ul>
 
 <p>
-  This is cheaper than full attention as long as <code>p &gt; 1</code>.
-</p>
-
-<p>
-  If we choose <code>p = √n</code> (a common choice), then:
+  This is cheaper than full attention as long as <code>p &gt; 1</code>. If we choose <code>p = √n</code> (a common choice), then:
 </p>
 
 <pre><code>
