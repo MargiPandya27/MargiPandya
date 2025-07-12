@@ -170,6 +170,16 @@ p(x) = ∏<sub>i=1</sub><sup>n</sup> p(xᵢ | x₁, ..., xᵢ₋₁; θ)
   The authors experimented with a 128-layer full-attention Transformer trained on CIFAR-10. They observed the following:
 </p>
 
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/sparse_tf_exp.png" 
+       alt="Sparsity" 
+       style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+   <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Learned attention patterns from a 128-layer network on CIFAR-10 trained with full attention. White highlights denote attention weights for a head while generating a given pixel, and black denotes the autoregressive mask. Layers are able to learn a variety of specialized sparse structures, which may explain their ability to adapt to different domains. (Image Source: Child at al. (2019))
+  </figcaption>
+</figure>
+
+
 <ul>
   <li>Early layers learned local patterns (like neighboring pixels — similar to CNNs).</li>
   <li>Mid layers developed patterns like row and column attention — factorizing attention along 2D structure.</li>
@@ -266,7 +276,15 @@ O(n² / √n) = O(n · √n)
 
 <p>Let’s see how factorized attention is used in Sparse Transformers. Below are the key architectural changes compared to the original Transformer:</p>
 
-  
+  <figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/sparse_tf_archi.png" 
+       alt="Sparse TF Architecture" 
+       style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+   <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Sparse Transformer (Image Source: Child at al. (2019))
+  </figcaption>
+</figure>
+
 
 <p><strong>1. Factorized Attention Heads</strong>:  The transformer has many residual blocks: Block 0, Block 1, Block 2, etc. Use every attention types alternately in every block. So, if you have <code>p = 2</code> attention types (e.g., strided and fixed), then:</p>
 
@@ -353,11 +371,23 @@ Backward Pass:
 </p>
 
 
+<h3>Results</h3>
+
+   <figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/sparse_tf_eval.png" 
+       alt="Sparse TF Evaluation" 
+       style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+   <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Sparse Transformer Evalution using bits per byte for images, text and sound generation (Image Source: Child at al. (2019)).
+  </figcaption>
+</figure>
+
   
 
 <h2 id="references">References</h2>
 <ol>
-  <li>Vaswani et al. (2017), <em>Attention Is All You Need</em>, NeurIPS.</li>
+  <li>Child at al. (2019). Generating long sequences with sparse transformers. In Advances in Neural Information Processing Systems (NeurIPS).</li>
+  <li>Vaswani et al. (2017), <em>Attention Is All You Need</em>. In Advances in Neural Information Processing Systems NeurIPS.</li>
   <li>Liu et al. (2018), <em>Generating Wikipedia by Summarizing Long Sequences</em>, ICLR.</li>
 </ol>
 
