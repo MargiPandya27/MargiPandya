@@ -202,16 +202,17 @@ L = L<sub>fine-tuning</sub>(C) + λ · L<sub>pre-training</sub>(C)
   1. Transferring more Transformer layers during fine-tuning incrementally improves performance, suggesting that deeper contextual representations are beneficial.  
   2. Ablation studies show that retaining the auxiliary language modeling objective during fine-tuning stabilizes training and helps performance, especially on larger downstream datasets. Smaller datasets benefit less from the auxiliary objective.
 </p>
-
-
   
 <h2 id="gpt2">GPT-2</h2>
 
   <p>GPT-2 is a 1.5B parameter model that was proposed to be able to solve multiple tasks in zero-shot setting. They propose that the in general the task of language modelling is problem of conditional probability estimation p(output|input) for a single task. Now, in order to extend this to a multi-task learning, it should not only be conditioned on the input but also the task for the same input. The contemporary architectures proposes architectural changes to model to cater to various tasks.</p>
 
+
+<!-- <h3></h3>
+ -->
+
+  
 <h2>Language Generation</h2>
-
-
 <p>
   <strong>Problem with Transformer:</strong> Consider tasks like language modeling on text, image, or audio data.
   The goal is to use previous inputs to generate a categorical distribution over a vocabulary of size <em>v</em> using the softmax function, i.e., to predict the next token in the sequence. The joint probability of a sequence <code>x = x₁, x₂, ..., xₙ</code> is modeled as:
@@ -342,10 +343,11 @@ O(n² / √n) = O(n · √n)
 
 <p>Let’s see how factorized attention is used in Sparse Transformers. Below are the key architectural changes compared to the original Transformer:</p>
 
-<figure style="text-align: center;">
-  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/sparse_tf_archi.png" 
-       alt="Sparse Transformer Architecture (Child et al., 2019)" 
-       style="max-width: 35%; height: auto; display: block; margin: 0 auto;">
+<figure style="text-align: center; display: block;">
+  <img 
+    src="https://margipandya27.github.io/MargiPandya/deep_gen/sparse_tf_archi.png" 
+    alt="Sparse Transformer Architecture (Child et al., 2019)" 
+    style="max-width: 35%; height: auto; display: block; margin: 0 auto;">
   <figcaption style="font-style: italic; margin-top: 0.5em;">
     Figure: Sparse Transformer (Image Source: Child et al., 2019)
   </figcaption>
