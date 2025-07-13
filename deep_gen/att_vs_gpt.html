@@ -143,6 +143,70 @@
   Additionally, incorporating a Mixture of Experts (MoE) layer enhanced model capacity at high input lengths. For instance, at \(L = 11,000\), adding 128 experts reduced log-perplexity from 2.05 to 1.93. The best-performing model used 256 experts at \(L = 7500\) and achieved a log-perplexity of 1.90. (Note: 256 experts at \(L = 11,000\) could not be run due to memory constraints.)
 </p>
 
+<h2 id="gpt">Generative Pre-Training (GPT)</h2>
+
+<p>
+  One estimate suggests that text data — including web pages, social media posts, emails, and more — could total <strong>100–200&nbsp;terabytes</strong>, according to Educating Silicon. However, this is just a fraction of the data generated daily (measured in zettabytes, ZB). Unsupervised, unannotated corpora can be used to learn rich representations, which are then fine-tuned on smaller labeled datasets for specific tasks. Word embeddings trained on large unlabeled corpora already demonstrate this principle; future work aims to extend these embeddings to capture higher-level semantics and richer context.
+</p>
+
+<p>
+  <strong>GPT</strong> proposes a semi-supervised technique that combines unsupervised pre-training of a neural network using a <strong>language modeling objective</strong> with supervised fine-tuning on task-specific labeled data.
+</p>
+
+<h3>Unsupervised Pre-Training</h3>
+<p>
+  For pre-training, the authors use a decoder-only Transformer, trained to predict each token in sequence using the same autoregressive objective described earlier.
+</p>
+
+<h3>Supervised Fine-Tuning</h3>
+<p>
+  Given a labeled dataset <em>C</em> of input–label pairs <code>(x₁, x₂, …, xₘ; y)</code>, the fine-tuning objective is:
+</p>
+<pre><code>
+L<sub>fine-tuning</sub>(C) = ∑<sub>(x,y)∈C</sub> log P(y | x₁, x₂, …, xₘ)
+</code></pre>
+<p>
+  In practice, they also retain the auxiliary language modeling objective to improve generalization and convergence speed:
+</p>
+<pre><code>
+L = L<sub>fine-tuning</sub>(C) + λ · L<sub>pre-training</sub>(C)
+</code></pre>
+<p>
+  Only the final linear layer’s weights (<code>W<sub>y</sub></code>) are initialized anew for each task; all other parameters come from pre-training.
+</p>
+
+<h3>Application to Language Understanding Tasks</h3>
+<p>
+  GPT is evaluated on four types of tasks: natural language inference, question answering, semantic similarity, and text classification. Rather than redesigning the architecture for each task, they simply concatenate task-specific inputs and delimiters to the pre-trained model’s input sequence.
+</p>
+
+<ul>
+  <li>
+    <strong>Classification:</strong> The input sequence is passed directly through the model, and the final hidden state of a special classification token is fed to a linear layer.
+  </li>
+  <li>
+    <strong>Textual Entailment:</strong> Concatenate the premise <em>p</em> and hypothesis <em>h</em> with a delimiter token (e.g., <code>[SEP]</code>) in between.
+  </li>
+  <li>
+    <strong>Semantic Similarity:</strong> Process both sentence orderings independently (with a delimiter), producing two vectors <em>h₁</em> and <em>h₂</em>; sum them element-wise before the final linear layer.
+  </li>
+  <li>
+    <strong>Question Answering:</strong> For each candidate answer <em>a<sub>k</sub></em>, concatenate <code>[context] ; [question] ; [SEP] ; a<sub>k</sub></code>, run each through the model, and normalize scores with softmax.
+  </li>
+</ul>
+
+<h3>Key Takeaways</h3>
+<p>
+  1. Transferring more Transformer layers during fine-tuning incrementally improves performance, suggesting that deeper contextual representations are beneficial.  
+  2. Ablation studies show that retaining the auxiliary language modeling objective during fine-tuning stabilizes training and helps performance, especially on larger downstream datasets. Smaller datasets benefit less from the auxiliary objective.
+</p>
+
+
+  
+<h2 id="gpt2">GPT-2</h2>
+
+  <p>GPT-2 is a 1.5B parameter model that was proposed to be able to solve multiple tasks in zero-shot setting. They propose that the in general the task of language modelling is problem of conditional probability estimation p(output|input) for a single task. Now, in order to extend this to a multi-task learning, it should not only be conditioned on the input but also the task for the same input. The contemporary architectures proposes architectural changes to model to cater to various tasks.</p>
+
 <h2>Language Generation</h2>
 
 
@@ -388,7 +452,8 @@ Backward Pass:
 
 <h2 id="references">References</h2>
 <ol>
-  <li>Child at al. (2019). Generating long sequences with sparse transformers. In Advances in Neural Information Processing Systems (NeurIPS).</li>
+   <li>Radford et al (2018). <em>Improving Language Understanding by Generative Pre-Training</em>. OpenAI.</li>
+  <li>Child et al. (2019). Generating long sequences with sparse transformers. In Advances in Neural Information Processing Systems (NeurIPS).</li>
   <li>Vaswani et al. (2017), <em>Attention Is All You Need</em>. In Advances in Neural Information Processing Systems (NeurIPS).</li>
   <li>Liu et al. (2018), <em>Generating Wikipedia by Summarizing Long Sequences</em>, International Conference on Learning Representations (ICLR).</li>
 </ol>
