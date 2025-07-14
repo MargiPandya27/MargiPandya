@@ -205,11 +205,21 @@ L = L<sub>fine-tuning</sub>(C) + λ · L<sub>pre-training</sub>(C)
   
 <h2 id="gpt2">GPT-2</h2>
 
-  <p>GPT-2 is a 1.5B parameter model that was proposed to be able to solve multiple tasks in zero-shot setting. They propose that the in general the task of language modelling is problem of conditional probability estimation p(output|input) for a single task. Now, in order to extend this to a multi-task learning, it should not only be conditioned on the input but also the task for the same input. The contemporary architectures proposes architectural changes to model to cater to various tasks.</p>
+<p>
+  GPT-2 is an extension of the original GPT model. While GPT was a smaller version, GPT-2 is a 1.5B parameter model designed to improve the zero-shot capabilities of large language models, which can later be fine-tuned for specific tasks.
+</p>
 
+<p>
+  GPT-2 was proposed to handle multiple tasks in a zero-shot setting. The authors suggest that, in general, the task of language modeling can be framed as a conditional probability estimation problem: <code>p(output | input)</code> for a single task. To extend this to multi-task learning, the model must be conditioned not only on the input but also on the task associated with that input. In contrast to contemporary approaches that require architectural changes to accommodate different tasks, GPT-2 uses a unified architecture for all.
+</p>
 
-<!-- <h3></h3>
- -->
+<p>
+  <strong>Training Details:</strong> The authors emphasize the importance of using a large and diverse corpus of unsupervised data scraped from the web, covering a wide range of domains and contexts. While common datasets like the Common Crawl suffer from quality issues, they created a new web-scraped dataset focused on quality. To do this, they scraped web pages linked from Reddit posts that received at least 3 karma points—used as a heuristic to indicate the link’s value (e.g., educational, interesting, or entertaining).
+</p>
+
+<p>
+  The resulting dataset, called <strong>WebText</strong>, excluded Wikipedia and, after preprocessing
+
 
   
 <h2>Language Generation</h2>
