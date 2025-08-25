@@ -1,4 +1,4 @@
-# Margi Pandya - Portfolio Website
+# Portfolio 
 
 Personal portfolio website showcasing research in Computer Vision, Natural Language Processing, and Multimodal Learning.
 
