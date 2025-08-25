@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Margi Pandya - Portfolio</title>
+  <link rel="stylesheet" href="https://bowenc0221.github.io/assets/css/main.css">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <div class="masthead__menu">
+        <nav id="site-nav" class="greedy-nav">
+          <button><div class="navicon"></div></button>
+          <ul class="visible-links">
+            <li class="masthead__menu-item masthead__menu-item--lg">
+              <a href="https://margipandya27.github.io/MargiPandya/">Margi Pandya</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/projects.html">Projects</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/notes.html">Blogs</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/publications.html">Publications</a>
+            </li>
+          </ul>
+          <ul class="hidden-links hidden"></ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+<div class="page-content" style="display: flex; flex-direction: row; max-width: 1300px; margin: 0 auto; padding: 20px;">
+  <!-- Sidebar -->
+  <div class="sidebar sticky" style="width: 300px; padding: 20px;">
+    <div class="mainnotes-sidebar">
+      <h3>Contents</h3>
+      <ul>
+        <li><a href="#tokenization">Tokenization</a></li>
+        <li><a href="#stemming">Stemming</a></li>
+        <li><a href="#lemmatization">Lemmatization</a></li>
+        <li><a href="#stopwords">Stopwords</a></li>
+        <li><a href="#case-sensitivity">Case Sensitivity</a></li>
+        <li><a href="#bow">Bag-of-Words (BoW)</a></li>
+        <li><a href="#tfidf">TF-IDF</a></li>
+        <li><a href="#word2vec">Word2Vec</a></li>
+        <li><a href="#glove">GloVe</a></li>
+        <li><a href="#fasttext">FastText</a></li>
+        <li><a href="#references">References</a></li>
+      </ul>
+    </div>
+  </div>
+
+<!-- Main Content -->
+<main style="flex: 1; padding: 20px; max-width: 1000px;">
+  <h1>NLP Preprocessing Concepts</h1>
+
+  <h2 id="tokenization">1. Tokenization</h2>
+  <p>Tokenization is the process of breaking down text into smaller units called tokens.</p>
+
+  <h3>Types of Tokenization:</h3>
+  <ul>
+    <li><strong>Character Tokenization:</strong><br>
+      “Project A is done.” ⇒ ‘P’, ‘r’, ‘o’, ‘j’, ‘e’, ‘c’, ‘t’, ‘ ’, ‘A’, ...
+    </li>
+    <li><strong>Word Tokenization:</strong><br>
+      “Project A is done.” ⇒ ‘Project’, ‘A’, ‘is’, ‘done’, ‘.’
+    </li>
+    <li><strong>Sentence Tokenization:</strong><br>
+      “Project A is done. We will start Project B tomorrow.”<br>
+      ⇒ ‘Project A is done.’, ‘We will start Project B tomorrow.’
+    </li>
+  </ul>
+  <p><strong>Common libraries:</strong> <code>re</code>, <code>nltk</code>, <code>spacy</code></p>
+
+  <h2 id="stemming">2. Stemming</h2>
+  <p>Stemming reduces words to their base or root form (sometimes not a real word):</p>
+  <ul>
+    <li>meeting, meets, met ⇒ meet</li>
+    <li>connected, connecting ⇒ connect</li>
+    <li>history, historical ⇒ histori (incorrect root)</li>
+  </ul>
+
+  <h2 id="lemmatization">3. Lemmatization</h2>
+  <p>Lemmatization also reduces words to their base form but ensures the result is a valid word:</p>
+  <ul>
+    <li>connected, connecting ⇒ connect</li>
+    <li>was, were ⇒ be</li>
+    <li>history, historical ⇒ history (preserves meaning)</li>
+  </ul>
+
+  <h2 id="stopwords">4. Stopwords</h2>
+  <p>Stopwords are common words that do not add significant meaning to text (e.g., “the”, “is”, “an”, “we”).</p>
+  <p>Example sentence before and after removing stopwords:</p>
+  <ul>
+    <li>Original: “We have completed the project successfully.”</li>
+    <li>After stopword removal: “completed project successfully”</li>
+  </ul>
+
+  <h2 id="case-sensitivity">5. Case Sensitivity</h2>
+  <p>Text like “Email” and “email” are the same for humans but not for machines.</p>
+  <p><strong>Lowercasing:</strong> “Project EMAIL” ⇒ “project email”</p>
+
+  <h2 id="bow">6. Bag-of-Words (BoW)</h2>
+  <p>BoW represents documents as a collection of word frequencies without considering order or grammar.</p>
+
+  <h3>Example Emails (Documents):</h3>
+  <ul>
+    <li>Doc1: “The project report was submitted.”</li>
+    <li>Doc2: “She submitted the final report.”</li>
+    <li>Doc3: “We reviewed the project and the report.”</li>
+  </ul>
+
+  <h3>Binary BoW:</h3>
+  <table border="1">
+    <tr>
+      <th></th>
+      <th>project</th>
+      <th>report</th>
+      <th>submitted</th>
+    </tr>
+    <tr>
+      <td>Doc1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>Doc2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>Doc3</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+  </table>
+
+  <h3>Numerical BoW (word counts):</h3>
+  <table border="1">
+    <tr>
+      <th></th>
+      <th>project</th>
+      <th>report</th>
+      <th>submitted</th>
+    </tr>
+    <tr>
+      <td>Doc1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>Doc2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>Doc3</td>
+      <td>1</td>
+      <td>2</td>
+      <td>0</td>
+    </tr>
+  </table>
+
+  <p><strong>Note:</strong> BoW does not capture word meaning or order.</p>
+
+  <h2 id="tfidf">7. Term Frequency-Inverse Document Frequency (TF-IDF)</h2>
+
+  <h3>TF (Term Frequency):</h3>
+  <table border="1">
+    <tr>
+      <th></th>
+      <th>project</th>
+      <th>report</th>
+      <th>submitted</th>
+    </tr>
+    <tr>
+      <td>Doc1</td>
+      <td>1/3</td>
+      <td>1/3</td>
+      <td>1/3</td>
+    </tr>
+    <tr>
+      <td>Doc2</td>
+      <td>0</td>
+      <td>1/2</td>
+      <td>1/2</td>
+    </tr>
+    <tr>
+      <td>Doc3</td>
+      <td>1/3</td>
+      <td>2/3</td>
+      <td>0</td>
+    </tr>
+  </table>
+
+  <h3>IDF (Inverse Document Frequency):</h3>
+  <table border="1">
+    <tr>
+      <th>Term</th>
+      <th>IDF</th>
+    </tr>
+    <tr>
+      <td>project</td>
+      <td>log(3/2)</td>
+    </tr>
+    <tr>
+      <td>report</td>
+      <td>log(3/3) = 0</td>
+    </tr>
+    <tr>
+      <td>submitted</td>
+      <td>log(3/2)</td>
+    </tr>
+  </table>
+
+  <h3>TF-IDF Scores:</h3>
+  <table border="1">
+    <tr>
+      <th></th>
+      <th>project</th>
+      <th>report</th>
+      <th>submitted</th>
+    </tr>
+    <tr>
+      <td>Doc1</td>
+      <td>1/3 × log(3/2)</td>
+      <td>0</td>
+      <td>1/3 × log(3/2)</td>
+    </tr>
+    <tr>
+      <td>Doc2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1/2 × log(3/2)</td>
+    </tr>
+    <tr>
+      <td>Doc3</td>
+      <td>1/3 × log(3/2)</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </table>
+
+  <p><strong>TF-IDF</strong> helps identify important words across documents by balancing term frequency with how rare a term is in the corpus. It still does not capture word order or deep semantics.</p>
+
+<p>
+  So far, all the techniques treat a token as separate atomic unit of which sentences are made and mostly of them do not capture the semantic relationship that is usually present in the corpus or vocabulury. What if we could have a continuous embedding space for words wherein vector(King) - vector(Man) + vector(Woman) would result into a vector that is similar to vector(Queen) in the embedding space. This can then be used for some downstream tasks using the neural networks that capture long range dependencies for machine translation, etc. 
+</p>
+
+<h2 id="word2vec">8. Word2Vec - Word Embedding</h2>
+
+<p>
+  <strong>Word2Vec</strong>, proposed by <strong>Mikolov et al.</strong>, introduces two techniques for learning these representations: <strong>Continuous Bag of Words (CBOW)</strong> and <strong>Skip-Gram</strong>. Both architectures use three layers: an input layer, a projection layer, and an output layer. They showed that it is possible to train the models even on corpora with one trillion words (virtually all available data as of 2013), for basically unlimited size of the vocabulary.
+</p> 
+
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/word2vec.png"
+       alt="CBOW and Skip Gram"
+       style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em; text-align: center;">
+    Figure: Continuous Bag of Words vs Skip Gram (Image Source: Mikolov et al.)
+  </figcaption>
+</figure>
+
+<h3>Continuous Bag of Words (CBOW)</h3>
+<p>
+  In CBOW, for a window size of 2, the surrounding context words <code>w(t-2)</code>, <code>w(t-1)</code>, <code>w(t+1)</code>, and <code>w(t+2)</code> are used to predict the target word <code>w(t)</code>. The input vectors are one-hot encoded representations of the vocabulary. The network aggregates these to produce a prediction via a softmax layer.
+</p>
+
+<h3>Skip-Gram</h3>
+<p>
+  Skip-Gram works in the reverse manner. Given a center word <code>w(t)</code>, the model attempts to predict the surrounding context words in the window. This method performs well on semantic relationships and is particularly effective for rare words when trained on large corpora.
+</p>
+
+<p>In both these methods the hidden task is to learn the weights of the projection layer that learn the vector embedding space.</p>
+
+<h3>CBOW vs. Skip-Gram</h3>
+  <p>
+    The choice of the CBOW or Skip Gram method depends on the use case. The pros and cons are as listed below: 
+  </p>
+<ul>
+  <li><strong>Skip-Gram</strong> generally achieves higher accuracy, especially on semantic relationships and with rare words, when trained on large corpora and high-dimensional embeddings.</li>
+  <li><strong>CBOW</strong> is computationally more efficient and performs well for frequent words and syntactic tasks, though it may underperform Skip-Gram on semantics.</li>
+</ul>
+
+<h3>Semantic vs. Syntactic Accuracy</h3>
+<p>
+  In the original Word2Vec paper, Mikolov et al. defined two evaluation metrics:
+</p>
+<ol>
+  <li><strong>Semantic accuracy</strong>: Measures the model’s ability to capture meaning-based relationships (e.g., “Paris” is to “France” as “Berlin” is to “Germany”).</li>
+  <li><strong>Syntactic accuracy</strong>: Measures how well the vectors capture grammatical or morphological relationships (e.g., “walking” is to “walked” as “swimming” is to “swam”).</li>
+</ol>
+
+<p>
+  The authors evaluated their model on a benchmark dataset of 8,869 semantic and 10,675 syntactic analogy questions. A correct prediction means the nearest word vector exactly matches the expected answer; synonyms are not accepted.
+</p>
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cbow_vs_skip.png"
+       alt="CBOW vs Skip Gram Comparison"
+       style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Comparison of architectures trained on the same data, and accuracies are reported on the Semantic-Syntactic Word Relationship test set and the syntactic relationship test. (Image Source: Mikolov et al.)
+  </figcaption>
+</figure>
+
+
+
+<strong>Shortcomings</strong>
+ <ul>
+  <li>Fails to capture the global context across long sentences or paragraphs, as it considers only a limited window of surrounding words at a time.</li>
+  <li>While it performs well on morphological/ syntactic relationships, it may not effectively model deeper semantic meaning or long-range dependencies.</li>
+</ul>
+
+
+<h2 id="glove">Global Co-occurrence Statistics in GloVe</h2>
+<p>
+As discussed earlier, the Word2Vec model primarily leverages local context windows during training and does not fully utilize the global co-occurrence statistics available in the corpus. Global Vectors for Word Representation (<strong>GloVe</strong>) addresses this limitation by explicitly incorporating global co-occurrence information to learn more informative word embeddings.
+</p>
+
+<p>
+To evaluate the quality of these embeddings, GloVe uses an analogy task consisting of 19,544 questions, divided into two categories: <strong>semantic</strong> and <strong>syntactic</strong> analogies.
+</p>
+
+<ul>
+  <li><strong>Semantic analogies</strong> capture relationships between named entities, such as: <em>"Athens is to Greece as Berlin is to ?"</em></li>
+  <li><strong>Syntactic analogies</strong> reflect grammatical or morphological patterns, such as: <em>"Dance is to dancing as fly is to ?"</em></li>
+</ul>
+
+<p>
+To solve an analogy of the form <em>“a is to b as c is to ?”</em>, the model computes a target word vector using the following expression:
+</p>
+
+<p style="text-align: center;">
+  \( \vec{d} = \vec{b} - \vec{a} + \vec{c} \)
+</p>
+
+<p>
+The model then selects the word <em>d</em> whose vector representation \( \vec{d} \) is closest to the computed vector, based on cosine similarity. An answer is counted as correct only if it matches the expected word exactly.
+</p>
+
+  <h3>Co-occurrence Matrix</h3>
+  <p>Let <strong>X</strong> be the word-word co-occurrence matrix.</p>
+  <ul>
+    <li>\( X_{ij} \) is the number of times word <em>j</em> appears in the context of word <em>i</em>.</li>
+    <li>\( X_i = \sum_k X_{ik} \) is the total number of words that appear in the context of word <em>i</em>.</li>
+    <li>The co-occurrence probability is defined as: <br>
+      \[
+      P_{ij} = \frac{X_{ij}}{X_i}
+      \]
+    </li>
+  </ul>
+
+  <h3>Insight through Co-occurrence Ratios</h3>
+  <p>To understand relationships between words, the model examines ratios of co-occurrence probabilities.</p>
+  <p>For example, let \( i = \text{ice} \), \( j = \text{steam} \), and let \( k \) be a context word. Then compute:</p>
+  \[
+  \frac{P(k | \text{ice})}{P(k | \text{steam})}
+  \]
+  <ul>
+    <li>If \( k = \text{solid} \), the ratio is high (strongly related to ice).</li>
+    <li>If \( k = \text{gas} \), the ratio is low (more related to steam).</li>
+    <li>If \( k = \text{water} \) or \( \text{fashion} \), the ratio is near 1 (equally or neutrally related).</li>
+  </ul>
+  <p>This shows that ratios are more informative than raw probabilities for distinguishing semantic relationships.</p>
+
+  <h3>Embedding Objective</h3>
+  <p>GloVe aims to find word vectors \( w_i \) and context word vectors \( \tilde{w}_k \) such that:</p>
+  \[
+  F(w_i - w_j, \tilde{w}_k) = \frac{P_{ik}}{P_{jk}}
+  \]
+  <p>This is simplified by assuming \( F \) is a dot product:</p>
+  \[
+  (w_i - w_j)^T \tilde{w}_k = \log \left( \frac{P_{ik}}{P_{jk}} \right)
+  \]
+  <p>Which leads to:</p>
+  \[
+  w_i^T \tilde{w}_k = \log(P_{ik}) = \log(X_{ik}) - \log(X_i)
+  \]
+  <p>To maintain symmetry between word and context roles, biases are introduced:</p>
+  \[
+  w_i^T \tilde{w}_k + b_i + \tilde{b}_k = \log(X_{ik})
+  \]
+  <p>To avoid issues with \( \log(0) \), the expression is modified to:</p>
+  \[
+  \log(1 + X_{ik})
+  \]
+
+  <h3>GloVe Cost Function (Training Objective)</h3>
+  <p>The model minimizes a weighted least squares loss:</p>
+  \[
+  J = \sum_{i,j=1}^V f(X_{ij}) \left( w_i^T \tilde{w}_j + b_i + \tilde{b}_j - \log(X_{ij}) \right)^2
+  \]
+  <p>Where:</p>
+  <ul>
+    <li>\( V \) is the vocabulary size</li>
+    <li>\( f(X_{ij}) \) is a weighting function that:
+      <ul>
+        <li>Reduces the influence of rare (noisy) co-occurrences</li>
+        <li>Reduces the influence of very frequent (uninformative) co-occurrences</li>
+        <li>Ensures \( f(0) = 0 \) for sparsity</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3>Weighting Function</h3>
+  <p>A practical choice for the weighting function is:</p>
+  \[
+  f(x) =
+  \begin{cases}
+    \left( \frac{x}{x_{\text{max}}} \right)^\alpha & \text{if } x < x_{\text{max}} \\
+    1 & \text{otherwise}
+  \end{cases}
+  \]
+  <p>With:</p>
+  <ul>
+    <li>\( x_{\text{max}} = 100 \)</li>
+    <li>\( \alpha = \frac{3}{4} \)</li>
+  </ul>
+  <p>This function balances the model effectively and has strong empirical support.</p>
+
+
+<h2 id="fasttext">FastText</h2>
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/Ram.png" alt="Sanskrit declensions of the word 'Rama'"
+       style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Sanskrit noun declensions of the word "Rama" in singular (एकवचन), dual (द्विवचन), and plural (बहुवचन) forms across all eight grammatical cases (विभक्तियाँ). (Image source: Internet)
+  </figcaption>
+</figure>
+
+
+
+<p>
+  The figure illustrates different forms of the word "Rama" in Sanskrit. Traditional models like Word2Vec treat each word as a distinct entity and represent them separately in vector space. However, this does not capture the fact that such words often originate from the same root. FastText (P. Bojanowski et al.), an extension of the Skip-gram model proposed by (T. Mikolov et al.), addresses this limitation by incorporating subword information using character n-grams.
+</p>
+
+<p>
+  FastText introduces two main innovations:
+</p>
+
+<ol>
+  <li>
+    <strong>Subword representation:</strong>  
+    Words are represented as a bag of character n-grams. For example, the word "<code>where</code>" with <code>n = 3</code> is represented as:
+    <code>&lt;wh, whe, her, ere, re&gt;</code>, where &lt; and &gt; are special boundary symbols.
+    The complete word itself (e.g., <code>&lt;where&gt;</code>) is also included in the set.
+  </li>
+
+  <li>
+    <strong>Scoring function:</strong>  
+    The scoring function for a word-context pair uses the sum of the word’s subword vector representations:
+    <br>
+    <span style="font-family: 'Courier New', monospace;">
+      \( s(w, c) = \sum_{g \in G_w} \mathbf{z}_g^\top \mathbf{v}_c \)
+    </span><br>
+    where \( G_w \) is the set of n-grams for word \( w \), \( \mathbf{z}_g \) is the vector for n-gram \( g \), and \( \mathbf{v}_c \) is the context word vector.
+    <br>
+    In practice, \( n \) is chosen such that \( 3 \leq n \leq 6 \).
+  </li>
+</ol>
+
+<p>
+  The objective function of the original continuous Skip-gram model is to maximize the log-likelihood of context words given a center word:
+</p>
+
+<p style="font-family: 'Courier New', monospace;">
+  \( \sum_{t=1}^{T} \sum_{c \in C_t} \log p(w_c \mid w_t) \)
+</p>
+
+<p>
+  FastText optimizes this objective using negative sampling (also from Mikolov et al.), reframing the task as a set of independent binary classification problems:
+</p>
+
+<p style="font-family: 'Courier New', monospace;">
+  \( \sum_{t=1}^{T} \sum_{c \in C_t} \left[ \ell(s(w_t, w_c)) + \sum_{n \in N_{t,c}} \ell(-s(w_t, n)) \right] \)
+</p>
+
+<p>
+  Here:
+</p>
+<ul>
+  <li>\( C_t \): the context window around the center word \( w_t \)</li>
+  <li>\( N_{t,c} \): a set of negatively sampled words from the vocabulary</li>
+  <li>\( \ell(x) = \log(1 + e^{-x}) \): the logistic loss function</li>
+</ul>
+
+<p>
+  This approach allows FastText to better represent rare and morphologically complex words by sharing representations across similar subword units.
+</p>
+
+
+
+  
+  
+<h2 id="references">References</h2>
+      <ol>
+        <li>T. Mikolov et al., “Efficient estimation of word representations in vector space,” arXiv preprint arXiv:1301.3781, Jan. 2013.</li>
+        <li>P. Bojanowski et al., “Enriching word vectors with subword information,” Transactions of the Association for Computational Linguistics, vol. 5, pp. 135–146, 2017.</li>
+        <li>J. Pennington et al., “GloVe: Global vectors for word representation,” in Proc. Conf. Empirical Methods in Natural Language Processing (EMNLP), Doha, Qatar, 2014, pp. 1532–1543.</li>
+        <li>CodeEmporium, “Word2Vec, GloVe, FastText – EXPLAINED!,” YouTube, Feb. 10, 2021. [Online]. Available: https://www.youtube.com/watch?v=ERibwqs9p38</li>  
+        <li>Krish Naik, Live NLP Playlist, YouTube playlist, 18 videos, 2022. [Online]. Available: https://www.youtube.com/playlist?list=PLZoTAELRMXVNNrHSKv36Lr3_156yCo6Nn</li>
+      </ol>
+
+
+
+  
+</main>
+
+
+<footer class="page__meta">
+                    <!-- Any additional metadata or footer information goes here -->
+                </footer>
+            </div>
+        </article>
+    </div>
+
+    <div class="page__footer">
+        <footer>
+            <!-- Your footer content goes here -->
+            <p>@2025 Margi Pandya</p>
+        </footer>
+    </div>
+</body>
+</html>

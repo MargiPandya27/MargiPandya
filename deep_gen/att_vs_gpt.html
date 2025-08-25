@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Margi Pandya - Portfolio</title>
+  <link rel="stylesheet" href="https://bowenc0221.github.io/assets/css/main.css">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <div class="masthead__menu">
+        <nav id="site-nav" class="greedy-nav">
+          <button><div class="navicon"></div></button>
+          <ul class="visible-links">
+           <li class="masthead__menu-item masthead__menu-item--lg">
+              <a href="https://margipandya27.github.io/MargiPandya/">Margi Pandya</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/projects.html">Projects</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/notes.html">Blogs</a>
+            </li> 
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/publications.html">Publications</a>
+            </li>
+          </ul>
+          <ul class="hidden-links hidden"></ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+<div class="page-content" style="display: flex; flex-direction: row; max-width: 1300px; margin: 0 auto; padding: 20px;">
+  <!-- Sidebar -->
+  <div class="sidebar sticky" style="width: 300px; padding: 20px;">
+    <div class="mainnotes-sidebar">
+      <h3>Contents</h3>
+      <ul>
+        <li><a href="#dtf">Decoder only Transformer</a></li>
+        <li><a href="#tdmca">T-DMCA</a></li>
+        <li><a href="#gpt">GPT</a></li>
+        <li><a href="#gpt2">GPT-2</a></li>
+        <li><a href="#factorized_att">Factorized Attention</a></li>
+        <li><a href="#factorized_att_2d">Factorized Attention for 2D data</a></li>
+        <li><a href="#sparse_tf">Sparse Transformer</a></li>
+        <li><a href="#sparse_tf_res">Sparse Transformer-Results</a></li>
+        <li><a href="#references">References</a></li>
+      </ul>
+    </div>
+  </div>
+
+<!-- Main Content -->
+<main style="flex: 1; padding: 20px; max-width: 1000px;">
+<!--   <h2>Encoder-Decoder Transformer</h2>
+  <p></p> -->
+
+  
+  <h2>Language Modelling</h2>
+  <p>
+  Authors of (Liu et al., 2018) suspect that, for monolingual text-to-text tasks, redundant language information is re-learned by both the encoder and decoder. In the paper, they perform supervised learning for the task of summarizing Wikipedia documents. The input is the top extracted document for a given topic, concatenated with a special token and the expected summary. They propose that the task can be performed in two stages: (1) extraction of top Wikipedia documents related to a topic using methods such as Identity, TF-IDF, TextRank, SumBasic, and a "cheating" baseline; and (2) abstraction through language modeling using a decoder-only Transformer model.
+</p>
+
+  <p>
+  They prove the claim by performing a sequence transduction problem from very long input sequences (up to \(L = 11000\)) to medium output sequences (typically less than 500).
+  </p>
+
+<p>
+  The figure compares different extractive methods on the combined corpus using an input length of \(L = 500\) (medium-sized token length). Among the evaluated methods, the "cheating" strategy performs the best.
+</p>
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/extractor_eval.png" 
+       alt="Comparison of extractive strategies on corpus at L = 500" 
+       style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Performance comparison of extractive methods (e.g., Identity, TF-IDF, TextRank, SumBasic, Cheating) on the combined corpus at input length \(L = 500\). The cheating strategy outperforms all others. (Image Source: Liu et al., 2018)
+  </figcaption>
+</figure>
+
+
+<h3 id="dtf"><strong>Decoder-only Transformer</strong></h3>
+
+<p>
+  Let the sequence be represented as 
+  \( (w_1, \ldots, w_{n+\eta+1}) = (m_1, \ldots, m_n, \delta, y_1, \ldots, y_\eta) \),
+  where \( \delta \) is a special separator token. The model is trained to predict the next token given the previous ones:
+</p>
+
+<p style="text-align: center;">
+  \( p(w_1, \ldots, w_{n+\eta}) = \prod_{j=1}^{n+\eta} p(w_j \mid w_1, \ldots, w_{j-1}) \)
+</p>
+  
+<p>
+  The D-TF model eliminates the encoder from the original Transformer architecture, thereby reducing both parameter count and time complexity by half. The input and output sequences are merged into a single sequence using a special separator token. To predict the next token, both the input <i>m</i> and output <i>y</i> are given as input, with future tokens masked out to enable causal training.
+</p>
+
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/d-tf.png" 
+       alt="Decoder only Transformer" 
+       style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+   <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: The architecture of the self-attention layers used in the T-D and T-DMCA model. (Image Source: Liu et al., 2018)
+  </figcaption>
+</figure>
+
+  
+<h3 id="tdmca"><strong>Transformer Decoder with Memory-Compressed Attention (T-DMCA)</strong></h3>
+
+<p>
+  <strong>Local Attention Block</strong>: This block involves splitting the input sequence into segments of 256 tokens, which are then fed into multi-head attention in parallel and separately.
+</p>
+
+<p>
+  <strong>Memory-Compressed Attention Block</strong>: After projecting the input tokens into query, key, and value spaces, strided convolution is applied before passing the result to multi-head attention. This reduces parameters via a compression factor. Strided convolution uses kernels of size 3 with a stride of 3. Unlike local attention, memory-compressed attention captures global information across the entire sequence, similar to the original Transformer.
+</p>
+
+<p>
+  The final architecture is a 5-layer network (L-M-L-M-L), alternating between local attention (L) layers and memory-compressed attention (M) layers (compared to 6 identical layers in Vaswani et al., (2017)). In some experiments, a Mixture of Experts (MoE) layer is added to increase the model’s capacity.
+</p>
+
+ <figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/abstractor_eval.png" 
+       alt="Performance comparison of D-TF, T-ED, and T-DMCA models" 
+       style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Performance of different Transformer architectures (D-TF, T-ED, T-DMCA and MoE-T-DMCA) evaluated with increasing input length. T-DMCA shows improved scalability and performance up to L = 11,000. (Image source: Liu et al., 2018)
+  </figcaption>
+</figure>
+
+<p>
+  The performance of the best models from each architecture, evaluated using the combined corpus and tf-idf extractor, is shown above. As noted in Table 4, the <i>seq2seq-attention</i> baseline performs significantly worse than Transformer-based models on this task. As seen in Figure, the Transformer encoder-decoder (T-ED) architecture steadily improves performance up to an input length \(L = 500{-}1000\), but fails to learn at \(L = 2000\).
+</p>
+
+<p>
+  This limitation motivated the use of the Transformer-Decoder (D-TF), which successfully trained up to \(L = 4000\) before hitting memory limits on machines with 16GB GPU RAM (NVIDIA P100). By applying the T-DMCA modifications, the model was able to scale up to \(L = 11,000\), with continued improvements in performance.
+</p>
+
+<p>
+  Additionally, incorporating a Mixture of Experts (MoE) layer enhanced model capacity at high input lengths. For instance, at \(L = 11,000\), adding 128 experts reduced log-perplexity from 2.05 to 1.93. The best-performing model used 256 experts at \(L = 7500\) and achieved a log-perplexity of 1.90. (Note: 256 experts at \(L = 11,000\) could not be run due to memory constraints.)
+</p>
+
+<h2 id="gpt">Generative Pre-Training (GPT)</h2>
+
+<p>
+  One estimate suggests that text data — including web pages, social media posts, emails, and more — could total <strong>100–200&nbsp;terabytes</strong>, according to Educating Silicon. However, this is just a fraction of the data generated daily (measured in zettabytes, ZB). Unsupervised, unannotated corpora can be used to learn rich representations, which are then fine-tuned on smaller labeled datasets for specific tasks. Word embeddings trained on large unlabeled corpora already demonstrate this principle; future work aims to extend these embeddings to capture higher-level semantics and richer context.
+</p>
+
+<p>
+  <strong>GPT</strong> proposes a semi-supervised technique that combines unsupervised pre-training of a neural network using a <strong>language modeling objective</strong> with supervised fine-tuning on task-specific labeled data.
+</p>
+
+<h3>Unsupervised Pre-Training</h3>
+<p>
+  For pre-training, the authors use a decoder-only Transformer, trained to predict each token in sequence using the same autoregressive objective described earlier.
+</p>
+
+<h3>Supervised Fine-Tuning</h3>
+<p>
+  Given a labeled dataset <em>C</em> of input–label pairs <code>(x₁, x₂, …, xₘ; y)</code>, the fine-tuning objective is:
+</p>
+<pre><code>
+L<sub>fine-tuning</sub>(C) = ∑<sub>(x,y)∈C</sub> log P(y | x₁, x₂, …, xₘ)
+</code></pre>
+<p>
+  In practice, they also retain the auxiliary language modeling objective to improve generalization and convergence speed:
+</p>
+<pre><code>
+L = L<sub>fine-tuning</sub>(C) + λ · L<sub>pre-training</sub>(C)
+</code></pre>
+<p>
+  Only the final linear layer’s weights (<code>W<sub>y</sub></code>) are initialized anew for each task; all other parameters come from pre-training.
+</p>
+
+<h3>Application to Language Understanding Tasks</h3>
+<p>
+  GPT is evaluated on four types of tasks: natural language inference, question answering, semantic similarity, and text classification. Rather than redesigning the architecture for each task, they simply concatenate task-specific inputs and delimiters to the pre-trained model’s input sequence.
+</p>
+
+<ul>
+  <li>
+    <strong>Classification:</strong> The input sequence is passed directly through the model, and the final hidden state of a special classification token is fed to a linear layer.
+  </li>
+  <li>
+    <strong>Textual Entailment:</strong> Concatenate the premise <em>p</em> and hypothesis <em>h</em> with a delimiter token (e.g., <code>[SEP]</code>) in between.
+  </li>
+  <li>
+    <strong>Semantic Similarity:</strong> Process both sentence orderings independently (with a delimiter), producing two vectors <em>h₁</em> and <em>h₂</em>; sum them element-wise before the final linear layer.
+  </li>
+  <li>
+    <strong>Question Answering:</strong> For each candidate answer <em>a<sub>k</sub></em>, concatenate <code>[context] ; [question] ; [SEP] ; a<sub>k</sub></code>, run each through the model, and normalize scores with softmax.
+  </li>
+</ul>
+
+<h3>Key Takeaways</h3>
+<p>
+  1. Transferring more Transformer layers during fine-tuning incrementally improves performance, suggesting that deeper contextual representations are beneficial.  
+  2. Ablation studies show that retaining the auxiliary language modeling objective during fine-tuning stabilizes training and helps performance, especially on larger downstream datasets. Smaller datasets benefit less from the auxiliary objective.
+</p>
+  
+<h2 id="gpt2">GPT-2</h2>
+
+<p>
+  GPT-2 is an extension of the original GPT, which was a smaller model. GPT-2 is a 1.5B parameter model designed to enhance the zero-shot capabilities of large language models that can later be fine-tuned for specific tasks. The core idea is to treat language modeling as a conditional probability estimation problem, <code>p(output | input)</code>, for a given task. To generalize this to a multi-task setting, the model should be conditioned not just on the input but also on the task description. Unlike previous approaches that made architectural changes for different tasks, GPT-2 uses a single unified architecture and relies on scaling and training on diverse data.
+</p>
+
+<p>
+  <strong>Training Details:</strong> To train GPT-2, the authors used a massive corpus of web text from various domains and contexts. While datasets like Common Crawl are often used, they suffer from quality issues. To address this, the authors created a new dataset called <em>WebText</em>, which emphasizes quality over quantity. They scraped all outbound links from Reddit posts that received at least 3 karma points, treating karma as a proxy for human approval or relevance. The WebText dataset does not include Wikipedia, and after preprocessing and filtering, it contains 8 million documents totaling 40 GB of text.
+</p>
+
+<p>
+  Four models were pre-trained on WebText with varying parameter sizes. The largest, with 1.5 billion parameters, is known as GPT-2. These models were then fine-tuned on downstream tasks such as reading comprehension, summarization, and question answering. GPT-2 achieved state-of-the-art performance in several tasks and performed comparably well on machine translation without task-specific architectural changes.
+</p>
+
+
+
+  
+<h2>Language Generation</h2>
+<p>
+  <strong>Problem with Transformer:</strong> Consider tasks like language modeling on text, image, or audio data.
+  The goal is to use previous inputs to generate a categorical distribution over a vocabulary of size <em>v</em> using the softmax function, i.e., to predict the next token in the sequence. The joint probability of a sequence <code>x = x₁, x₂, ..., xₙ</code> is modeled as:
+</p>
+
+<pre>
+p(x) = ∏<sub>i=1</sub><sup>n</sup> p(xᵢ | x₁, ..., xᵢ₋₁; θ)
+</pre>
+
+<p>
+  During training, we optimize the parameters <code>θ</code> to maximize the likelihood of the data. However, the problem arises when using standard Transformers (encoder-decoder or decoder-only) because the self-attention block has a computational complexity of <strong>O(n²)</strong>, where <code>n</code> is the sequence length.
+</p>
+
+<p>
+  To improve performance, large language models require a larger context window — meaning longer sequences — which makes this O(n²) cost prohibitive.
+  Therefore, modifications to the original Transformer architecture are needed to make it scalable and efficient on massive datasets.
+</p>
+
+<h2 id="factorized_att">Factorized Self-Attention</h2>
+
+<p>
+  The authors experimented with a 128-layer full-attention Transformer trained on CIFAR-10. They observed the following:
+</p>
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/sparse_tf_exp.png" 
+       alt="Sparsity" 
+       style="max-width: 60%; height: auto; display: block; margin: 0 auto;">
+   <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Learned attention patterns from a 128-layer network on CIFAR-10 trained with full attention. White highlights denote attention weights for a head while generating a given pixel, and black denotes the autoregressive mask. Layers are able to learn a variety of specialized sparse structures, which may explain their ability to adapt to different domains. (Image Source: Child et al. (2019))
+  </figcaption>
+</figure>
+
+
+<ul>
+  <li>Early layers learned local patterns (like neighboring pixels — similar to CNNs).</li>
+  <li>Mid layers developed patterns like row and column attention — factorizing attention along 2D structure.</li>
+  <li>Later layers showed sparse or even global attention patterns, often in data-dependent ways.</li>
+</ul>
+
+<p>
+  These findings motivated the idea of introducing <strong>deliberate sparsity</strong> in attention while maintaining performance, this is similar to CNNs which build global understanding from local connectivity.
+</p>
+
+
+
+<p>
+  In a dense Transformer, each token (e.g., image patch or word) is projected into queries, keys, and values using weight matrices. Each output is a weighted sum of the values, with weights based on the similarity between the query and keys. In full self-attention, every token <code>xᵢ</code> attends to all previous tokens <code>{x₁, x₂, ..., xᵢ}</code> (autoregressive masking):
+</p>
+
+<pre>
+x₁ → x₂ → x₃ → ... → xₙ
+</pre>
+
+<p>
+  This requires <strong>O(n²)</strong> computations. For <code>n = 16,384</code>, that leads to over <strong>256 million</strong> attention computations.
+</p>
+
+<p>
+  <strong>Sparse Transformer:</strong> Instead of full attention, the Sparse Transformer uses <code>p</code> separate attention heads. Each head attends only to a subset of tokens — similar to how CNN filters cover a local region. Over multiple layers, these sparse heads can still pass information globally. For any output token <code>i</code> and any input token <code>j</code>, there exists a path of attention through intermediate tokens of at most <code>p+1</code> steps to connect <code>j</code> to <code>i</code>.
+</p>
+
+<h3><strong>Computational Complexity</strong></h3>
+
+<p>
+  In sparse attention:
+</p>
+
+<ul>
+  <li>Each token attends to only <code>n/p</code> tokens instead of <code>n</code>.</li>
+  <li>So, per-token computation is <code>O(n/p)</code>.</li>
+  <li>Across <code>n</code> tokens: <code>O(n × n/p) = O(n² / p)</code>.</li>
+</ul>
+
+<p>
+  This is cheaper than full attention as long as <code>p &gt; 1</code>. If we choose <code>p = √n</code> (a common choice), then:
+</p>
+
+<pre><code>
+O(n² / √n) = O(n · √n)
+</code></pre>
+
+<p>
+  This significantly reduces compute cost for long sequences (e.g., <code>n = 16,384</code>).
+</p>
+
+<h2 id="factorized_att_2d">Two-dimensional Factorized Attention</h2>
+
+<h3>Strided Attention</h3>
+
+<p>
+  For structured data like images or music — where nearby pixels or notes are most relevant — we can use <strong>strided attention</strong> to focus on local patterns.
+  This involves two attention heads:
+</p>
+
+<ul>
+  <li><code>A<sup>(1)</sup><sub>i</sub> = {i−l, ..., i−1}</code> &rarr; attends to recent <code>l</code> tokens (local context)</li>
+  <li><code>A<sup>(2)</sup><sub>i</sub> = {j | j mod l = 0}</code> &rarr; attends to every <code>l</code>th token (strided/global context)</li>
+</ul>
+
+<p>
+  This approach aligns well with structured data formats and allows efficient sparse attention.
+</p>
+
+<h3>Fixed Attention</h3>
+
+<p>
+  For unstructured data like text — where context can shift rapidly and skipping words can cause errors — strided attention may fail to capture dependencies.
+  Instead, <strong>fixed attention</strong> allows specific summary blocks to be attended by future tokens.
+</p>
+
+<p>
+  For example, if stride <code>l = 128</code> and block size <code>c = 8</code>:
+</p>
+
+<ul>
+  <li>Positions after 128 attend to tokens 120–128</li>
+  <li>Positions after 256 attend to tokens 248–256</li>
+  <li>And so on...</li>
+</ul>
+
+<p>
+  This allows each block of <code>c</code> tokens to act as a summary for a window, and subsequent tokens can attend to these summaries for long-term dependencies.
+  Note: This increases compute by a factor of <code>c</code> compared to strided attention — a tradeoff for more reliable information flow in non-periodic data like language.
+</p>
+
+<h2 id="sparse_tf">Sparse Transformer</h2>
+
+<p>Let’s see how factorized attention is used in Sparse Transformers. Below are the key architectural changes compared to the original Transformer:</p>
+
+<figure style="text-align: center; display: block;">
+  <img 
+    src="https://margipandya27.github.io/MargiPandya/deep_gen/sparse_tf_archi.png" 
+    alt="Sparse Transformer Architecture (Child et al., 2019)" 
+    style="max-width: 35%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Sparse Transformer (Image Source: Child et al., 2019)
+  </figcaption>
+</figure>
+
+
+
+
+<p><strong>1. Factorized Attention Heads</strong>:  The transformer has many residual blocks: Block 0, Block 1, Block 2, etc. Use every attention types alternately in every block. So, if you have <code>p = 2</code> attention types (e.g., strided and fixed), then:</p>
+
+<ul>
+  <li>Block 0 → use attention type <code>A(0 mod 2) = A(0)</code> → strided</li>
+  <li>Block 1 → use attention type <code>A(1 mod 2) = A(1)</code> → fixed</li>
+  <li>Block 2 → back to strided, and so on...</li>
+</ul>
+
+<p>Mathematically, it can be represented as:</p>
+<pre><code>attention(X) = Wp · attend(X, A(r mod p))</code></pre>
+
+<ul>
+  <li><code>r</code> = current residual block number</li>
+  <li><code>p</code> = number of attention types (e.g., 2)</li>
+  <li><code>A(i)</code> = attention pattern (like strided or fixed)</li>
+</ul>
+
+<p><strong>Pros</strong>: Very efficient; each block is simple.<br>
+<strong>Cons</strong>: One block only sees one pattern at a time.</p>
+
+<p><strong>Merged Attention Head</strong>: Instead of rotating attention heads, we combine all attention patterns into one merged head. Each token attends to the union of all sparse sets.</p>
+
+<pre><code>attention(X) = Wp · attend(X, ⋃ A(m)), for m = 1 to p</code></pre>
+
+<p>Look at everything that all the sparse heads would have attended to using one combined attention operation.</p>
+
+<p><strong>Pros</strong>: Gets richer information per block.<br>
+<strong>Cons</strong>: Slightly more computation since each head attends to more positions.</p>
+
+<p><strong> Multi-Head Attention (Standard Transformer Style)</strong>: This is inspired by traditional method from Vaswani et al. (2017). In multi-head attention, the model uses <code>nh</code> parallel attention heads, where each head attends to a different subset of the input using its own sparse pattern, denoted as <code>A(i)</code>. These attention operations are computed in parallel, and their outputs are then concatenated along the feature dimension to form the final output of the attention layer.</p>
+
+<pre><code>attention(X) = Wp · concat(attend(X, A(i))) for i = 1 to nh</code></pre>
+
+<p><strong>Pros</strong>: Allows parallelism and flexibility.<br>
+<strong>Cons</strong>: May use more GPU memory when computed in parallel.</p>
+
+
+<p><strong>2. Scaling to Hundreds of Layers</strong>: Training very deep transformers can be difficult due to vanishing or exploding gradients. To handle this, the Sparse Transformer uses 
+  <strong>ResNet-style pre-activation residual blocks</strong> around both the attention and feed-forward layers.
+</p>
+<p>
+  To keep activations stable as the number of layers increases, they scale certain weight matrices by <pre><code>1 / √(2N)</code></pre>
+
+  <p>
+  where <code>N</code> is the number of layers. This helps ensure that outputs neither vanish nor explode as they propagate through the network.
+</p>
+
+<p><strong>3. Modeling Diverse Data Types</strong>: Transformers are location-agnostic by default, so positional embeddings are essential—especially for sparse attention patterns. The model adds <code>n<sub>emb</sub> = d<sub>data</sub></code> or <code>n<sub>emb</sub> = d<sub>attn</sub></code> learned embeddings to each input, depending on whether it's data- or attention-structure based:
+</p>
+
+<pre><code>embed(XWe) = x<sub>i</sub>W<sub>e</sub> + Σ<sub>j=1 to n<sub>emb</sub></sub> o<sub>i</sub><sup>(j)</sup> · W<sub>j</sub></code></pre>
+
+<ul>
+  <li><strong>For images</strong>: <code>d<sub>data</sub> = 3</code> → row, column, and channel of each byte.</li>
+  <li><strong>For text/audio</strong>: <code>d<sub>attn</sub> = 2</code> → row and column index (assuming 2D layout with stride).</li>
+</ul>
+
+<p><strong>4. Saving Memory by Recomputing Attention Weights</strong>: Self-attention layers consume a lot of memory, especially for long sequences. To reduce memory usage, Sparse Transformers use <strong>gradient checkpointing</strong>.
+</p>
+
+<p>During the forward pass, the model saves only a few intermediate activations, known as checkpoints, while discarding the rest to reduce memory usage. Then, during the backward pass, the model recomputes the discarded layers on-the-fly as needed to calculate gradients.</p>
+
+  <p>For Example:</p>
+
+<pre><code>Forward Pass:
+  Layer 1 → Save
+  Layer 2 → Discard
+  Layer 3 → Save
+  Layer 4 → Discard
+  Layer 5 → Discard
+  Layer 6 → Save final output
+
+Backward Pass:
+  To backprop through Layers 2–3 → Recompute using Layer 1 checkpoint
+  To backprop through Layers 4–5 → Recompute using Layer 3 checkpoint
+</code></pre>
+
+<p>
+  Since dropout involves randomness, recomputing outputs could yield different results unless random seeds are controlled. To avoid this complexity, the authors apply dropout only at the end of residual blocks—not inside attention layers.
+</p>
+
+<p><strong>5. Mixed-Precision Training</strong>: Sparse Transformer uses <strong>mixed-precision training</strong> to accelerate training and reduce memory usage.
+</p>
+
+
+<h2 id = "sparse_tf_res">Results</h2>
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/sparse_tf_eval.png" 
+       alt="Sparse TF Evaluation" 
+       style="max-width: 75%; height: auto; display: block; margin: 0 auto;">
+   <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Sparse Transformer Evalution using bits per byte for images, text and sound generation (Image Source: Child et al. (2019)).
+  </figcaption>
+</figure>
+
+<p> The Sparse Transformer achieved state-of-the-art results across all modalities. A few key observations include that, for language generation, performance improves significantly when the context window is large, as shown in Table 3. As discussed in the previous section, the choice of sparse attention pattern depends on the nature of the dataset. Strided attention performs well on structured datasets such as images or music, while it is less effective for unstructured data like text, where fixed attention is more suitable. </p>
+
+<h2 id="references">References</h2>
+<ol>
+  <li>Radford et al (2019). <em>Language models are unsupervised multitask learners</em>. OpenAI.</li>
+  <li>Radford et al (2018). <em>Improving Language Understanding by Generative Pre-Training</em>. OpenAI.</li>
+  <li>Child et al. (2019). <em>Generating long sequences with sparse transformers</em>. In Advances in Neural Information Processing Systems (NeurIPS).</li>
+  <li>Vaswani et al. (2017), <em>Attention Is All You Need</em>. In Advances in Neural Information Processing Systems (NeurIPS).</li>
+  <li>Liu et al. (2018), <em>Generating Wikipedia by Summarizing Long Sequences</em>, International Conference on Learning Representations (ICLR).</li>
+</ol>
+
+
+</main>
+
+
+<footer class="page__meta">
+                    <!-- Any additional metadata or footer information goes here -->
+                </footer>
+            </div>
+        </article>
+    </div>
+
+    <div class="page__footer">
+        <footer>
+            <!-- Your footer content goes here -->
+            <p>@2025 Margi Pandya</p>
+        </footer>
+    </div>
+</body>
+</html>
+

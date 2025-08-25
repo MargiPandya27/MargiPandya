@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Margi Pandya - Portfolio</title>
+  <link rel="stylesheet" href="https://bowenc0221.github.io/assets/css/main.css">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Improved heading styles -->
+<!-- Add inside <head> once -->
+<style>
+  pre.code-block {
+    position: relative;
+    background-color: #2d2d2d;
+    color: #f8f8f2;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 14px;
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+  }
+
+  button.copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #444;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  button.copy-btn:hover {
+    background-color: #666;
+  }
+</style>
+
+<script>
+  function copyToClipboard(codeId) {
+    const text = document.getElementById(codeId).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      alert("✅ Code copied to clipboard!");
+    });
+  }
+</script>
+
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <div class="masthead__menu">
+        <nav id="site-nav" class="greedy-nav">
+          <button><div class="navicon"></div></button>
+          <ul class="visible-links">
+            <li class="masthead__menu-item masthead__menu-item--lg">
+              <a href="https://margipandya27.github.io/MargiPandya/">Margi Pandya</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/projects.html">Projects</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/notes.html">Blogs</a>
+            </li>
+         
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/publications.html">Publications</a>
+            </li>
+          </ul>
+          <ul class="hidden-links hidden"></ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-content" style="display: flex; flex-direction: row; max-width: 1300px; margin: 0 auto; padding: 20px;">
+    <!-- Sidebar -->
+    <div class="sidebar sticky" style="width: 300px; padding: 20px;">
+      <div class="mainnotes-sidebar">
+        <h3>Main Notes</h3>
+        <ul>
+          <li><a href="https://margipandya27.github.io/MargiPandya/deep_gen/vae.html">Deep Generative Models</a></li>
+          <li><a href="agents.html">Agents</a></li>
+          <li><a href="https://margipandya27.github.io/MargiPandya/rag/naive_rag.html">RAGs</a></li>
+          <!-- Add more links as needed -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main style="flex: 1; padding: 20px; max-width: 1000px;">
+      <script>
+        function copyToClipboard(codeId) {
+          const text = document.getElementById(codeId).innerText;
+          navigator.clipboard.writeText(text).then(() => {
+            alert("Code copied to clipboard!");
+          });
+        }
+      </script>
+
+      <h2>Introduction to RAG</h2>
+      <p style="text-align: justify;">
+        Large Language Models (LLMs), or any kind of foundational models, are typically trained on static datasets. Retraining these models every time new data becomes available on the internet is not feasible. While domain-specific fine-tuning can be beneficial for particular use cases, it is not a scalable or timely solution for keeping up with continuously evolving information.
+      </p>
+      <p style="text-align: justify;">
+        For example, if you ask ChatGPT to list papers on "Multi-Agent Systems for Autonomous Driving," it might return publications available up to 2023 or 2024. While useful, what if you're looking for research published just a few minutes ago? In rapidly evolving fields like Machine Learning and Deep Learning, hundreds—if not thousands—of papers are published daily. Continuously retraining LLMs to keep up with this influx is simply impractical.
+      </p>
+      <p style="text-align: justify;">
+        This is where techniques like <strong>Retrieval-Augmented Generation (RAG)</strong>, <strong>Prompt Engineering</strong>, and <strong>Fine-Tuning</strong> become invaluable. These approaches help dynamically ground the responses of foundational models based on the user’s query and the latest available information. Each method has its strengths and limitations, and the appropriate choice depends on the specific application and context.
+      </p>
+
+      <h2>Alternative Approaches to RAG</h2>
+     <h3>Prompt Engineering</h3>
+      <p style="text-align: justify;">
+        Prompt engineering refers to crafting inputs (prompts) in a way that effectively elicits the desired response from large language models (LLMs) such as those by OpenAI or Meta. These models demonstrate zero-shot and few-shot reasoning capabilities when prompted correctly.
+      </p>
+      <ul>
+        <li><strong>Advantages:</strong> Simple to use. No additional training or fine-tuning is required. Effective with sufficiently large models.</li>
+        <li><strong>Disadvantages:</strong> Responses are limited by the model's pre-trained capabilities. Less reliable for domain-specific or nuanced queries.</li>
+      </ul>
+      
+      <h3>Fine-tuning</h3>
+      <p style="text-align: justify;">
+        Fine-tuning involves taking a pre-trained LLM and further training it on a smaller, domain-specific dataset. This helps the model specialize in tasks or behavior relevant to a particular application.
+      </p>
+      <ul>
+        <li><strong>Advantages:</strong> Tailors the model to specific domains or applications. Improves performance on narrow tasks.</li>
+        <li><strong>Disadvantages:</strong> Requires additional training and computational resources. May reduce the model's generalization ability.</li>
+      </ul>
+
+   <p style="text-align: justify;"> Relying on only one method when working with LLMs often does not yield the best results. Fine-tuned models may stop performing well beyond a certain point, in which case using RAG to ground the model in context can be helpful. RAG can also be combined with chain-of-thought prompting to create agentic RAG systems. </p>
+
+
+      <h2>What is RAG?</h2>
+      <p style="text-align: justify;">
+        RAG can be thought of as an intelligent pre-processing layer for LLMs. Instead of feeding a model an enormous corpus of documents from diverse sources (e.g., web pages, PDFs), RAG selectively retrieves and supplies only the <strong>most relevant chunks</strong> of documents as context, along with the user’s query. The model then generates a grounded response based on this curated input.
+      </p>
+     <p style="text-align: justify;">
+        At a high level, a typical RAG system consists of three core components:
+      </p>
+      <ul>
+        <li><strong>Indexing</strong></li>
+        <li><strong>Retrieval</strong></li>
+        <li><strong>Generation</strong></li>
+      </ul>
+
+      <h3>1. Indexing</h3>
+      <p style="text-align: justify;">
+        Indexing involves breaking down source documents into smaller chunks that fit within the context window of the embedding model. Each chunk is then passed through an embedding model that converts it into a vector representation, capturing the semantic meaning of the text. These vectors are stored in a <strong>vector database</strong>, where semantically similar chunks are placed close together in vector space.
+      </p>
+
+      <h3>2. Retrieval</h3>
+      <p style="text-align: justify;">
+        When a user submits a query, it is also embedded into a vector using the same embedding model. The system then searches for the most semantically relevant document chunks in the vector database.
+      </p>
+      <p style="text-align: justify;">
+        A basic approach is using <strong>k-Nearest Neighbors (k-NN)</strong>, which measures cosine similarity between the query vector and vectors in the database. However, this approach has a time complexity of <code>O(N)</code>, which becomes inefficient as the number of stored vectors grows.
+      </p>
+      <p style="text-align: justify;">
+        To overcome this, more scalable methods like <strong>Approximate Nearest Neighbor (ANN)</strong> algorithms are used. A popular technique is the <strong>Hierarchical Navigable Small World (HNSW)</strong> graph. HNSW is built on graph and skip-list principles and significantly reduces search time to <code>O(log(N))</code>, making real-time retrieval more efficient.
+      </p>
+
+      <h3>3. Generation</h3>
+      <p style="text-align: justify;">
+        The final step is generating a meaningful response using the retrieved context. This stage consists of two key components:
+      </p>
+      <ul>
+        <li><strong>Choice of LLM</strong>: The selected model depends on factors such as context window size, speed, cost, and domain specialization.</li>
+      </ul>
+      <p style="text-align: justify;">
+        The table below compares several popular large language models (LLMs) used in RAG pipelines. Each model is evaluated based on its type (open-source or commercial), strengths, and limitations. 
+        Open-source models such as LLaMA 2 and Mistral are often preferred for local deployment or cost-effective experimentation, while commercial models like GPT-4 and Claude typically offer stronger reasoning capabilities and more reliable output at a higher cost.
+      </p>
+      <p style="text-align: justify;">
+        Choosing the right LLM depends on your application needs—whether you prioritize reasoning quality, response time, token limits, or infrastructure control.
+      </p>
+
+      
+
+
+      <h3>Comparison of LLMs</h3>
+      <table border="1" cellpadding="6">
+        <thead>
+          <tr>
+            <th>LLM</th>
+            <th>Type</th>
+            <th>Strengths</th>
+            <th>Weaknesses</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>LLaMA 2</td>
+            <td>Open-source</td>
+            <td>Locally deployable, no API costs, highly customizable</td>
+            <td>Requires setup, GPU-intensive</td>
+          </tr>
+          <tr>
+            <td>Mistral</td>
+            <td>Open-source</td>
+            <td>Lightweight, fast, suitable for edge devices</td>
+            <td>Limited support for long-context inputs</td>
+          </tr>
+          <tr>
+            <td>Falcon</td>
+            <td>Open-source</td>
+            <td>Highly scalable, permissive licensing</td>
+            <td>Inconsistent output formatting</td>
+          </tr>
+          <tr>
+            <td>Claude</td>
+            <td>Closed-source</td>
+            <td>Excellent reasoning capabilities, safe output generation</td>
+            <td>Slower performance, less control over formatting</td>
+          </tr>
+          <tr>
+            <td>GPT-4</td>
+            <td>Closed-source</td>
+            <td>High-quality responses, strong reasoning</td>
+            <td>Limited API availability, higher cost</td>
+          </tr>
+          <tr>
+            <td>Gemini Flash series</td>
+            <td>Closed-source</td>
+            <td>Fast, consistent formatting, large context support</td>
+            <td>Requires API key and service integration</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="text-align: justify;">
+        The context window size determines how much input text (in tokens) the model can process at once. Larger context windows allow the LLM to reason over longer documents or conversations without losing track of earlier information.
+      </p>
+      <p style="text-align: justify;">
+        For example, GPT-4o and Gemini models support up to 128K tokens, making them well-suited for use cases like multi-document summarization, long conversations, or complex RAG pipelines. In contrast, smaller models like GPT-3 and Mistral may require aggressive chunking of inputs.
+      </p>
+
+
+      <h4>Context Window Sizes</h4>
+      <table border="1" cellpadding="6">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Context Window Size</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>GPT-3</td>
+            <td>2,049 tokens</td>
+          </tr>
+          <tr>
+            <td>GPT-4o</td>
+            <td>128K tokens</td>
+          </tr>
+          <tr>
+            <td>LLaMA 3</td>
+            <td>32K tokens</td>
+          </tr>
+          <tr>
+            <td>Gemini</td>
+            <td>128K tokens</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <blockquote style="background-color: #f5f5f5; padding: 10px; border-left: 4px solid #888;">
+      <strong>Takeaway:</strong> Use open-source models when you need more control, the ability to fine-tune, and cost-efficiency. Commercial models with accessible APIs may be more convenient for quick deployment.
+    </blockquote>
+
+
+
+     <h2>All-in-One RAG Pipeline (LangChain + HuggingFace)</h2>
+THis is the most simplest form of RAG implementation using LangChain and HuggingFace.
+<div style="position: relative;">
+  <button class="copy-btn" onclick="copyToClipboard('combined-code')">📋 Copy</button>
+  <pre id="combined-code" class="code-block"><code>
+# 1. Load documents
+from langchain_community.document_loaders import TextLoader, PyPDFLoader
+
+# Load from .txt
+txt_loader = TextLoader("ADD PATH FOR YOUR FILE")
+txt_docs = txt_loader.load()
+
+# Load from PDF
+pdf_loader = PyPDFLoader("ADD PATH FOR YOUR FILE")
+pdf_docs = pdf_loader.load()
+
+# Combine all documents
+docs = txt_docs + pdf_docs
+
+# 2. Chunk the text
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+raw_texts = [doc.page_content for doc in docs]
+
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=1000,
+    chunk_overlap=100
+)
+texts = text_splitter.create_documents(raw_texts)
+
+# 3. Generate embeddings
+from langchain.embeddings import HuggingFaceEmbeddings
+
+embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+
+# 4. Create vector store
+from langchain_community.vectorstores import FAISS
+
+db = FAISS.from_documents(texts, embedding)
+retriever = db.as_retriever()
+
+# 5. Retrieve relevant documents and prepare prompt
+query = "What are the related works that have been done on this?"
+retrieved_docs = retriever.get_relevant_documents(query)
+context = "\n\n".join([doc.page_content for doc in retrieved_docs])
+
+prompt = f"""
+You are reading a research paper. The following is extracted content from the abstract and related work sections:
+
+{context}
+
+Please summarize the related work section of the paper, highlighting prior approaches, key methodologies, and how this paper builds upon or differs from them.
+"""
+
+# 6. Generate a response using your preferred model
+# Replace this with actual LLM call (OpenAI, HuggingFace, etc.)
+print(prompt)
+# print(response)  # Uncomment after adding model integration
+  </code></pre>
+      <p>
+        References:  
+        <ul>
+        <li><a href="https://medium.com/@dinabavli/rag-basics-basic-implementation-of-retrieval-augmented-generation-rag-e80e0791159d" target="_blank">Medium article on RAG basics</a><br></li>
+        <li><a href="https://www.youtube.com/playlist?list=PLfaIDFEXuae2LXbO1_PKyVJiQ23ZztA0x" target="_blank">RAG YouTube playlist</a><br></li>
+        <li><a href="https://github.com/langchain-ai/rag-from-scratch" target="_blank">LangChain RAG from scratch GitHub</a></li>
+        </ul>
+      </p>
+    </main>
+  </div>
+
+  <footer class="page__meta"></footer>
+
+  <div class="page__footer">
+    <footer>
+      <p>@2025 Margi Pandya</p>
+    </footer>
+  </div>
+</body>
+</html>

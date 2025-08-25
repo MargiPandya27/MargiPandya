@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Margi Pandya - Portfolio</title>
+  <link rel="stylesheet" href="https://bowenc0221.github.io/assets/css/main.css">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <div class="masthead__menu">
+        <nav id="site-nav" class="greedy-nav">
+          <button><div class="navicon"></div></button>
+          <ul class="visible-links">
+            <li class="masthead__menu-item masthead__menu-item--lg">
+              <a href="https://margipandya27.github.io/MargiPandya/">Margi Pandya</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/projects.html">Projects</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/notes.html">Blogs</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/publications.html">Publications</a>
+            </li>
+          </ul>
+          <ul class="hidden-links hidden"></ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+<div class="page-content" style="display: flex; flex-direction: row; max-width: 1300px; margin: 0 auto; padding: 20px;">
+  <!-- Sidebar -->
+  <div class="sidebar sticky" style="width: 300px; padding: 20px;">
+    <div class="mainnotes-sidebar">
+      <h3>Main Notes</h3>
+      <ul>
+          <li><a href="https://margipandya27.github.io/MargiPandya/deep_gen/vae.html">Deep Generative Models</a></li>
+          <li><a href="agents.html">Agents</a></li>
+          <li><a href="https://margipandya27.github.io/MargiPandya/rag/naive_rag.html">RAGs</a></li>
+          <!-- Add more links as needed -->
+      </ul>
+    </div>
+  </div>
+
+<!-- Main Content -->
+<main style="flex: 1; padding: 20px; max-width: 1000px;">
+
+  <!-- Title Section -->
+  <h1>Retrieval-Augmented Generation (RAG) System for Academic Research Papers</h1>
+  <figure class="rag-figure">
+    <img src="rag.png" alt="Alternative text for the image">
+    <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
+  </figure>
+
+
+  <!-- Overview Section -->
+<section class="overview">
+
+    <p style="text-align: justify;">
+    In the naive RAG, we saw different sections of RAG like indexing, retrieval and generation. However, this is not the end of the world—we can see how these basic modules in the naive RAG can be tweaked to cater to a real-world application that is more robust.
+    </p>
+
+  <h2>Overview</h2>
+
+   <p style="text-align: justify;">
+   Research papers are often written with a single audience in mind, but real-world readers have different goals and backgrounds. In this work, we develop a system that generates role-aware summaries, adapting the tone and content of a paper’s summary to suit the reader’s perspective. Our approach identifies the intent behind a user’s query and routes it to a summarization strategy that balances factual accuracy with contextual relevance. 
+   The system is designed to be modular such that it can process user queries through one of three distinct pathways: corpus-level summarization, document-specific summarization, and metadata extraction.
+   </p>  
+
+  <p style="text-align: justify;">
+    Each route has a similar basic pipeline (preprocessing, semantic indexing, and response generation), but operates on different data sources and task scopes. Figure 1 provides a high-level overview of our end-to-end pipeline, which we describe in detail in the rest of this section.
+  </p>
+
+  <p style="text-align: justify;">
+    At its core, our system combines dense vector retrieval with generative language modeling. When given a query \( q \) and a corpus of documents or papers \( D \), it generates a summary \( y \) as follows:
+  </p>
+
+  <p style="text-align: center;">
+    \( y^* = \arg\max_y \; P(y \mid q, R(q, D); \theta) \quad \text{(1)} \)
+  </p>
+
+  <p style="text-align: justify;">
+    Here, \( R(q, D) \) is the set of document chunks retrieved in response to the query \( q \), and \( \theta \) represents all the parameters of the generative language model used.
+  </p>
+ 
+</section>
+
+<section class="dataset-knowledge">
+  <h2>Dataset and Knowledge Base</h2>
+
+  <p style="text-align: justify;">
+    To support flexible and accurate query answering, the system combines a <strong>large-scale academic corpus</strong> with <strong>dynamic user inputs</strong>. For the background knowledge base, the entire arXiv Dataset for Summarization</a> from Hugging Face [1] sounds to be a good choice, which contains thousands of arXiv papers paired with their abstracts. This corpus spans a wide range of scientific fields, providing the system with a strong foundation of factual, domain-specific knowledge.
+  </p>
+
+  <p style="text-align: justify;">
+    In addition to this static corpus, users can also upload any number of their own PDF documents—whether they’re unpublished papers, project reports, or drafts. Once uploaded, the system automatically processes these documents and builds a custom <strong>vector database on the fly</strong>. This enables fast semantic retrieval across both public and user-specific content, ensuring that responses are grounded in the most relevant and personalized information available.
+  </p>
+
+</section>
+
+<section class="semantic-routing">
+  <h2>Semantic Routing</h2>
+  <p style="text-align: justify;">
+  Semantic Routing is necessary because, based on the query type provided, it is essential to route the query to the correct module. A key limitation in the initial system was its tendency to treat all queries the same. Regardless of user intent, the pipeline followed a uniform path, often producing mismatched, incoherent, or irrelevant summaries. To address this, a semantic routing layer was introduced that recognizes the type of question being asked and dynamically routes it to the most appropriate processing module.
+  </p>
+  <p style="text-align: justify;">The current implementation supports three distinct routing paths:</p>
+
+  <ul>
+    <li>
+      <strong>Corpus Query Routing:</strong> These are broad, open-ended queries (e.g., "What are recent trends in transformer-based vision models?") that require synthesis across multiple papers. For such queries, a multi-document RAG pipeline is applied that retrieves relevant chunks from the entire corpus and generates a role-conditioned summary using a large language model. This route excels at cross-document exploration and thematic synthesis.
+    </li>
+
+    <li>
+      <strong>Document-Specific Query Routing:</strong> When queries reference specific uploaded documents (e.g., "Summarize the results section of paper 3 for a policymaker"), retrieval scope is restricted to those documents. This approach improves factual alignment and reduces hallucinations by providing the LLM with a focused context window tailored to the user's intent.
+    </li>
+
+    <li>
+      <strong>Metadata Query Routing:</strong> These are targeted queries about bibliographic or structural information from specific papers (e.g., "Who are the authors of NeRF: 'Representing Scenes as Neural Radiance Fields for View Synthesis'?"). A metadata module handles these queries through section-aware PDF parsing and rule-based heuristics to extract fields like title, authors, venue, and publication year. The parsed metadata is stored in a structured index for quick access.
+    </li>
+    
+  </ul>
+
+   <p style="text-align: justify;">
+    Routing decisions employ a hybrid strategy that combines heuristic intent detection with semantic similarity scoring. Given a query embedding \( z_q \) and a set of prototype intent vectors \( \{z_c\}_{c \in C} \), the selected route \( c^* \) is defined as:
+  </p>
+  
+  <p style="text-align: center;">
+    \( c^* = \arg\max_{c \in C} \cos(z_q, z_c) \)
+  </p>
+
+  
+  <p style="text-align: justify;">
+    where \( c^* \) is the set of routing classes and \( \cos(\cdot, \cdot) \) denotes cosine similarity. This lightweight formulation enables the system to handle diverse queries while maintaining interpretability and modularity.
+  </p>
+
+<section class="corpus-document-modules">
+  <h2>Corpus- and Document-level Modules</h2>
+
+  <h3>Document Pre-processing and Semantic Chunking</h3>
+  <p style="text-align: justify;">
+    Using the notations from Equation 1, let \( D = \{d_1, d_2, ..., d_N\} \) be a corpus of \( N \) documents or research papers. Each document \( d_i \) is split into sections, which are further divided into paragraphs. Most papers in \( D \) contain standard sections like abstract, introduction, methodology, results, and conclusion. These sections vary in their format and content—for example, methods and results typically contain more numerical and mathematical content than the introduction and conclusion.
+  </p>
+
+  <p style="text-align: justify;">
+    Each document is segmented into text chunks \( x_{ij} \):
+  </p>
+
+  <p style="text-align: center;">
+    \( d_i \rightarrow \{x_{i1}, x_{i2}, ..., x_{iT} \} \)
+  </p>
+
+  <p style="text-align: justify;">
+    Each \( x_{ij} \) represents an overlapping chunk of text (usually a paragraph or logical subsection) extracted from document \( d_i \), designed to capture a self-contained scientific argument, result, or claim. The following chunking constraints are applied:
+  </p>
+
+  <ul>
+    <li>Chunks align with sentence boundaries where possible, using natural language parsing tools.</li>
+    <li>Chunks maintain a 10% overlap as a buffer to ensure coherence and self-containment.</li>
+    <li>The token length of each chunk is limited by a maximum threshold \( T_{\text{max}} \), where \( \text{len}(x_{ij}) \leq T_{\text{max}} \). In this implementation, \( T_{\text{max}} \) is set to 1000 tokens.</li>
+  </ul>
+
+  <h3>Dense Embedding and Retrieval Module</h3>
+  <p style="text-align: justify;">
+    After segmentation, each chunk \( x \in D \) is converted into a dense vector using a sentence-level transformer model. <strong>SciBERT</strong> (a BERT-based model trained specifically on scientific text) [2] is used to capture technical language and domain-specific concepts common in research papers. SciBERT outperforms general-purpose models on this scientific content.
+  </p>
+
+  <p style="text-align: justify;">
+    The embedding function \( f_{\phi} \), where \( \phi \) represents the SciBERT encoder parameters, is defined such that for any text chunk \( x \) and user query \( q \), the vector representations are:
+  </p>
+
+  <p style="text-align: center;">
+    \( z_x = f_{\phi}(x), \quad z_q = f_{\phi}(q) \)
+  </p>
+
+  <p style="text-align: justify;">
+    Since both vectors exist in the same semantic space, similarity is measured using cosine distance. The most relevant content is retrieved by selecting the top-\( k \) chunks based on this similarity:
+  </p>
+
+  <p style="text-align: center;">
+    \( R(q, D) = \text{top-}k \{ x \in D : \cos(z_q, z_x) \} \quad \text{(2)} \)
+  </p>
+
+  <p style="text-align: center;">
+    \( \cos(a, b) = \frac{a \cdot b}{\|a\| \|b\|} \quad \text{(3)} \)
+  </p>
+
+  <p style="text-align: justify;">
+    The <strong>HNSW</strong> (Hierarchical Navigable Small World) [3] indexing strategy from the <strong>FAISS</strong> (Facebook AI Similarity Search) library [4] is implemented to store and search all \( z_x \) vectors. Unlike the previous flat indexing approach using brute-force search across the entire embedding space, HNSW creates a multi-layer graph where nodes represent embeddings and edges connect semantically similar points. This structure enables more efficient approximate nearest neighbor (ANN) search, particularly when handling multiple documents.
+  </p>
+
+  <p style="text-align: justify;">
+    After retrieving the top-\( k \) most relevant chunks, these are passed to the generation module, where they are combined with the user's query and prompt instructions to produce a role-aware response using a large language model (LLM).
+  </p>
+</section>
+
+<section class="metadata-module">
+  <h2>Metadata Module</h2>
+
+  <h3>Pre-processing</h3>
+  <p style="text-align: justify;">
+    In addition to answering content-based questions, the system also supports queries targeting structured metadata. These include questions such as “Who are the authors of this paper?” or “What year was it published?”—queries that do not require deep semantic reasoning but depend on accurate extraction of key bibliographic fields from the uploaded document.
+  </p>
+  <p style="text-align: justify;">
+    The metadata pipeline begins with document-level pre-processing, where uploaded PDFs are parsed using layout-aware text extraction methods. This stage removes LaTeX artifacts, isolates header and footer regions, and prepares the raw text for field-based extraction.
+  </p>
+
+  <h3>Metadata Formatting</h3>
+  <p style="text-align: justify;">
+    Next, structured fields are extracted from each document \( d_i \) to form its metadata record \( M_i \). Each record is defined as:
+  </p>
+
+  <p style="text-align: center;">
+    \( M_i = \{ \text{title}_i, \text{authors}_i, \text{venue}_i, \text{year}_i \} \)
+  </p>
+
+  <p style="text-align: justify;">
+    To populate \( M_i \), regular expression-based heuristics are combined with simple formatting logic. Titles are typically identified by detecting bold, center-aligned text blocks near the top of the document. Authors are parsed using keyword patterns (e.g., affiliations, “and” conjunctions, email addresses), while the venue and year are extracted from footnote regions or known templates.
+  </p>
+
+  <h3>Metadata Indexing and Query Resolution</h3>
+  <p style="text-align: justify;">
+    Once structured, metadata entries are stored in a key-value format and indexed using FAISS to allow semantic matching when queries are less exact. Given a metadata query \( q \), such as “Who wrote paper?”, the system performs the following steps:
+  </p>
+
+  <ul>
+    <li>Embed the query using a lightweight sentence encoder: \( z_q = f_\phi(q) \)</li>
+    <li>Retrieve the top matching metadata record \( M_i \) using cosine similarity:</li>
+  </ul>
+
+  <p style="text-align: center;">
+    \( M^* = \arg\max_{M_i} \cos(z_q, z_{M_i}) \)
+  </p>
+
+  <ul>
+    <li>Extract the relevant field from \( M^* \), based on a simple query-to-slot mapping function:</li>
+  </ul>
+
+  <p style="text-align: center;">
+    \( f(q) \in  \{ \text{title}_i, \text{authors}_i, \text{venue}_i, \text{year}_i \}  \)
+  </p>
+
+  <p style="text-align: justify;">
+    The metadata routing path is designed for speed and accuracy. Although a language model is used to generate the final response in the next step, it is grounded in structured metadata that has already been extracted. This helps reduce hallucinations and keeps the model focused on phrasing rather than fact-finding, making the system both lightweight and reliable.
+  </p>
+</section>
+
+<section class="generative-modeling">
+  <h2>Generative Language Modeling and Role-based Conditioning</h2>
+
+  <p style="text-align: justify;">
+    After retrieving relevant context chunks using semantic similarity search, the next stage of the pipeline is language generation; this phase acts on the outputs of all three previous modules (corpus, metadata, and user-uploaded PDFs). A large language model (LLM) is used that has been conditioned on both retrieved evidence and user-specific instructions.
+  </p>
+
+  <p style="text-align: justify;">
+    Using the set of top-\(k\) retrieved segments \( R(q, D) = \{x_1, x_2, \ldots, x_k\} \) from the previous step, a single, concatenated prompt \( c \) is generated, which acts as input to a generative transformer model. Currently, Google’s Gemini 2.0 Flash (for this project the LLM model was not fine-tuned, then Gemini made a good sense) is used, as it supports longer contexts, has proven zero-shot summarization capabilities, and follows instructions well—aligning with the goal of role-based conditioning.
+  </p>
+
+  <p style="text-align: justify;">
+  The final decoding objective, as shown in Equation 1, is approximated by constructing a prompt <code>c</code>
+  from the retrieved chunks \( R(q, D) \) and decoding with a generative language model.
+</p>
+
+<p style="text-align: justify;">
+  The model autoregressively generates the output sequence
+  \( y = \{y_1, y_2, \ldots, y_T\} \)
+  by maximizing its conditional log-likelihood:
+</p>
+
+<p style="text-align: center;">
+  \( P(y \mid c; \theta) = \prod_{t=1}^{T} P(y_t \mid y_{\lt t}, c; \theta) \)
+</p>
+
+
+<p style="text-align: justify;">
+  where \( \theta \) are the model parameters, \( y_{\lt t} \) represents all the tokens generated up to time \( t \),
+  and \( c \) includes both the retrieved context and any additional instructions or context we provide
+  to facilitate role-based conditioning.
+</p>
+
+<p style="text-align: justify;">
+  The context vector \( c \) is of the form:
+</p>
+
+<pre><code>c = [INSTRUCTION: "Summarize this paper..."] + [RETRIEVED_CONTEXT]</code></pre>
+
+  <p style="text-align: justify;">
+    This approach does not modify the underlying model weights; instead, it acts as a form of soft conditioning, similar to prefix- or prompt-tuning approaches used in parameter-efficient fine-tuning methods.
+  </p>
+
+  <h2>Applications</h2>
+  <p style="text-align: justify;">
+    A variety of role-based prompt templates have been designed, allowing users to shape how information is presented in the final outcome. Some examples include:
+  </p>
+
+  <ul>
+    <li><strong>Corpus module:</strong> "Explain interpretable machine learning to a policymaker."</li>
+    <li><strong>PDF-based module:</strong> "Summarize this uploaded report for a product manager who needs to decide whether to deploy this system."</li>
+    <li><strong>Metadata module:</strong> "Provide a quick citation-style summary including the paper’s title, authors, venue, and year for a researcher updating their bibliography."</li>
+  </ul>
+</section>
+
+<h2>Acknowledgement</h2>
+<p style="text-align: justify;">
+  Special thanks to <a href="https://www.linkedin.com/in/avantibhandarkar/" target="_blank">Avanti B.</a> for diligently documenting everything during the project. Your notes were incredibly helpful as I worked on writing this documentation.
+</p>
+
+<h2>References</h2>
+      <ol>
+        <li>Cohan, Arman, et al. “A Discourse-Aware Attention Model for Abstractive Summarization of Long Documents.” NAACL HLT Short Papers (June 2018). Available at Hugging Face: ccdv/arxiv-summarization (accessed May 2025)</li>
+        <li>Beltagy, Iz, Kyle Lo, and Arman Cohan. "SciBERT: A pretrained language model for scientific text." arXiv preprint arXiv:1903.10676 (2019).</li>
+        <li>Malkov, Yu. A., and D. A. Yashunin. “Efficient and Robust Approximate Nearest Neighbor Search Using Hierarchical Navigable Small World Graphs.” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 42, no. 4, Apr. 2020, pp. 824–36. IEEE.</li>
+        <li>Johnson, Jeff, Matthijs Douze, and Hervé Jégou. “Billion-Scale Similarity Search with GPUs.” IEEE Transactions on Big Data, vol. 7, no. 3, July 2021, pp. 535–47. IEEE.</li>  
+      </ol>
+
+</main>
+
+<footer class="page__meta">
+  <!-- Any additional metadata or footer information goes here -->
+</footer>
+
+<div class="page__footer">
+  <footer>
+    <!-- Your footer content goes here -->
+    <p>@2025 Margi Pandya</p>
+  </footer>
+</div>
+
+</body>
+</html>

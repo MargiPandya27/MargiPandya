@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Margi Pandya - Portfolio</title>
+  <link rel="stylesheet" href="https://bowenc0221.github.io/assets/css/main.css">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <div class="masthead__menu">
+        <nav id="site-nav" class="greedy-nav">
+          <button><div class="navicon"></div></button>
+          <ul class="visible-links">
+            <li class="masthead__menu-item masthead__menu-item--lg">
+              <a href="https://margipandya27.github.io/MargiPandya/">Margi Pandya</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/projects.html">Projects</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/notes.html">Blogs</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/publications.html">Publications</a>
+            </li>
+          </ul>
+          <ul class="hidden-links hidden"></ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+<div class="page-content" style="display: flex; flex-direction: row; max-width: 1300px; margin: 0 auto; padding: 20px;">
+  <!-- Sidebar -->
+  <div class="sidebar sticky" style="width: 300px; padding: 20px;">
+    <div class="mainnotes-sidebar">
+     <h3>Contents</h3>
+      <ul>
+        <li><a href="#lora">LoRA</a></li>
+        <li><a href="#lora_ablation">LoRA: Ablation</a></li>
+        <li><a href="#references">References</a></li>
+      </ul>
+    </div>
+  </div>
+
+
+ <!-- Main Content -->
+<main style="flex: 1; padding: 20px; max-width: 1000px;">
+  <p>
+    Large language models like GPT, RoBERTa, and LLaMA are trained on fairly general datasets, not on any specific downstream task or application. As larger models are trained every few months, it is not plausible to retrain the entire model on custom datasets. For example, GPT-3 has 175 billion trainable parameters, and training it requires significant time and computation. 
+    Instead, we can leverage the knowledge gained during pre-training and update only the parameters necessary for a specific downstream application.
+  </p>
+
+  <h2 id="lora">LoRA</h2>
+  <p>
+    LoRA (Low-Rank Adaptation) is a fine-tuning method used to adapt a pre-trained model. Instead of updating all model parameters, LoRA indirectly trains some dense layers by optimizing low-rank decomposition matrices of the layer updates, while keeping the pre-trained weights frozen.
+  </p>
+
+  <h3><strong>Problem Statement</strong></h3>
+  <p>
+    For simplicity, the authors consider the task of language modeling. In this task, conditional probabilities are used to predict the next token — a vector of size <em>v</em> — and then a softmax function maps it to a word in the vocabulary. Here is the objective function:
+  </p>
+
+  <p style="font-family: monospace; background-color: #f4f4f4; padding: 10px;">
+    max<sub>W</sub> &sum;<sub>(x,y)&in;Z</sub> &sum;<sub>t=1</sub><sup>|y|</sup> log(P<sub>W</sub>(y<sub>t</sub> | x, y&lt;t))
+  </p>
+
+  <p>
+    When fine-tuning for each downstream task, we would typically have to learn a new set of parameters <strong>ΔW</strong> of the same size as the original model (e.g., 175B parameters for GPT-3). Storing and training such large matrices is not feasible for non-commercial compute environments. 
+    LoRA proposes that in practice, the update <strong>ΔW</strong> often lies in a much lower-dimensional space. This allows us to approximate <strong>ΔW</strong> using low-rank decomposition, making it both memory- and compute-efficient.
+  </p>
+
+  <h3><strong>Method</strong></h3>
+  <p>
+    Dense layers in transformers typically have full-rank weight matrices. However, when adapting to a downstream task, the update matrix <strong>ΔW</strong> tends to have lower intrinsic rank. 
+    Thus, for a pre-trained weight matrix W<sub>0</sub> &isin; ℝ<sup>d×k</sup>, we constrain its update using a low-rank decomposition:
+  </p>
+
+  <p style="font-family: monospace; background-color: #f4f4f4; padding: 10px;">
+    W<sub>0</sub> + ΔW = W<sub>0</sub> + B·A  
+  </p>
+
+  <p>
+    where B &isin; ℝ<sup>d×r</sup>, A &isin; ℝ<sup>r×k</sup>, and the rank r ≪ min(d, k).
+  </p>
+
+  <p>
+    During training, the original weights W<sub>0</sub> are frozen, and only A and B are updated via backpropagation. Initially, A is randomly initialized using a Gaussian distribution, and B is initialized to zero.
+  </p>
+
+  <p>
+    The same input is passed through both W<sub>0</sub> and ΔW. The contribution of ΔW is scaled using a hyperparameter α (alpha).
+  </p>
+
+  <p>
+    As the rank r increases, the adaptation becomes closer to full fine-tuning of the model. In the limit, when r equals the rank of W<sub>0</sub>, the low-rank decomposition becomes equivalent to standard fine-tuning.
+  </p>
+
+  <p>
+    For inference latency, switching to a different downstream task simply involves replacing A·B with A′·B′ for that specific task. The original model weights remain untouched, allowing for efficient multi-task adaptation.
+  </p>
+
+<h2>LoRA for GPT-3</h2>
+
+  <p>
+    The authors of the paper have shown comparisons for various LLMs like RoBERTa, DeBERTa, and GPT-2. For GPT-3, they observed state-of-the-art (SOTA) level performance on three datasets — <strong>WikiSQL</strong>, <strong>MNLI-m</strong>, and <strong>SAMSum</strong>. However, there was a performance drop when more than 256 special tokens were used in prefix embeddings, as shown in the figure.
+  </p>
+
+  <p>
+    Apart from this, LoRA performs an in-depth ablation study backed by principles in Linear Algebra. It answers key questions such as:
+  </p>
+
+  <ol>
+    <li>Given a parameter budget constraint, which subset of weight matrices in a pre-trained Transformer should we adapt to maximize downstream performance?</li>
+    <li>Is the “optimal” adaptation matrix <strong>ΔW</strong> really rank-deficient? If so, what is a good rank to use in practice?</li>
+    <li>What is the connection between <strong>ΔW</strong> and <strong>W</strong>? Does <strong>ΔW</strong> highly correlate with <strong>W</strong>? How large is <strong>ΔW</strong> compared to <strong>W</strong>?</li>
+  </ol>
+
+  <p>
+    To illustrate this, the authors applied LoRA on a vanilla Transformer. In the original Transformer architecture, there are four weight matrices in the self-attention module and two in the MLP module. For simplicity and parameter-efficiency, they considered adapting only the attention weights and froze the MLP blocks.
+  </p>
+
+  <h2 id="lora_ablation">LoRA: Ablation</h2>
+
+  <h3>1. Which weight matrices in the Transformer should we apply LoRA to?</h3>
+  <p>
+    They assume a parameter budget and determine the rank depending on how many weight matrices are updated. Notably, updating only the <strong>W<sub>q</sub></strong> and <strong>W<sub>v</sub></strong> weights with a rank of 4 gives comparable performance and captures sufficient information in <strong>ΔW</strong>. This is preferable to updating a single weight matrix with a higher rank.
+  </p>
+
+  <h3>2. What is the optimal rank <em>r</em> for LoRA?</h3>
+  <p>
+    This section validates the initial claim that <strong>ΔW</strong> has a low intrinsic rank. Surprisingly, a rank as small as 1 suffices to adapt both <strong>W<sub>q</sub></strong> and <strong>W<sub>v</sub></strong> on these datasets, while training <strong>W<sub>q</sub></strong> alone requires a larger rank. However, this finding is task-dependent. For example, in machine translation tasks, if the pre-trained model has not seen a particular language, a higher rank may be needed for effective adaptation.
+  </p>
+
+  <h3><strong>Subspace Similarity Between Different Ranks</strong></h3>
+  <p>
+    Using Singular Value Decomposition (SVD) on matrix A with ranks 8 and 64, they obtain the right singular unitary matrices <strong>U<sub>A<sub>r=8</sub></sub></strong> and <strong>U<sub>A<sub>r=64</sub></sub></strong>. They then compute the Frobenius norm to determine how much of the subspace spanned by the top <em>i</em> singular vectors of <strong>U<sub>A<sub>r=8</sub></sub></strong> is contained within that of <strong>U<sub>A<sub>r=64</sub></sub></strong>.
+  </p>
+
+  <p style="font-family: monospace; background-color: #f4f4f4; padding: 10px;">
+    φ(A<sub>r=8</sub>, A<sub>r=64</sub>, i, j) = || U<sub>i</sub><sup>T</sup> · U<sub>j</sub> ||<sub>F</sub><sup>2</sup> / min(i, j)
+  </p>
+
+  <p>
+    Here, φ ∈ [0, 1]. A value of 0 indicates complete separation between the subspaces, while 1 indicates full overlap. This analysis was performed for the 48th layer (out of 96) due to space constraints.
+  </p>
+
+  <h3><strong>Subspace Similarity Between Different Random Seeds</strong></h3>
+  <p>
+    As mentioned earlier, the A matrix is initialized using a normal distribution. The authors conducted ablation studies using different random seeds to initialize A with rank 64. Since <strong>ΔW<sub>q</sub></strong> has a higher intrinsic rank than <strong>ΔW<sub>v</sub></strong>, its SVD shows higher singular values and stronger structure.
+  </p>
+
+  <h3><strong>How Does the Adaptation Matrix ΔW Compare to W?</strong></h3>
+  <p>
+    This is one of the most important insights. It explores how <strong>ΔW</strong> changes during the adaptation of a pre-trained model. Specifically:
+  </p>
+
+  <ul>
+    <li>Is <strong>ΔW</strong> highly correlated with <strong>W</strong>?</li>
+    <li>Is <strong>ΔW</strong> mostly contained in the top singular directions of <strong>W</strong>?</li>
+    <li>How large is <strong>ΔW</strong> compared to the directions in <strong>W</strong>?</li>
+  </ul>
+
+  <p>
+    To investigate this, the authors perform SVD on <strong>ΔW</strong> and compute the Frobenius norm of ||U<sup>T</sup>W<sub>q</sub>V||<sub>F</sub>, and similarly for <strong>W<sub>q</sub></strong>. Then, a ratio is calculated to measure similarity.
+  </p>
+
+  <h4>Key Findings:</h4>
+  <ol>
+    <li>
+      <strong>ΔW<sub>q</sub></strong> is highly correlated with <strong>W<sub>q</sub></strong>. As rank increases, the correlation decreases, indicating that lower-rank updates tend to target specific parameters relevant to the downstream task.
+    </li>
+    <li>
+      Instead of duplicating the dominant directions of <strong>W</strong>, the adaptation primarily amplifies directions not emphasized during pre-training — offering an efficient fine-tuning approach.
+    </li>
+  </ol>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+  
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+    <h2 id="references">References</h2>
+      <ol>
+          <li>Hu, Edward J., et al. (2022). LoRA: Low-Rank Adaptation of Large Language Models. arXiv preprint arXiv:2106.09685. https://arxiv.org/abs/2106.09685</li>
+      </ol>
+
+     </main>
+
+
+<footer class="page__meta">
+                    <!-- Any additional metadata or footer information goes here -->
+                </footer>
+            </div>
+        </article>
+    </div>
+
+    <div class="page__footer">
+        <footer>
+            <!-- Your footer content goes here -->
+            <p>@2025 Margi Pandya</p>
+        </footer>
+    </div>
+</body>
+</html>

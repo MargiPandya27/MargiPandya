@@ -1,0 +1,31 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.mainnotes-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 220px;
+  height: 100%;
+  background-color: #f8f8f8;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.mainnotes-sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.mainnotes-sidebar li {
+  margin: 10px 0;
+}
+
+.content {
+  margin-left: 240px;
+  padding: 20px;
+}
+
+
