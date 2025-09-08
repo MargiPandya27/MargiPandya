@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Margi Pandya - Portfolio</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <div class="masthead__menu">
+        <nav id="site-nav" class="greedy-nav">
+          <button><div class="navicon"></div></button>
+          <ul class="visible-links">
+            <li class="masthead__menu-item masthead__menu-item--lg">
+              <a href="https://margipandya27.github.io/MargiPandya/">Margi Pandya</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/projects.html">Projects</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/notes.html">Blogs</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/publications.html">Publications</a>
+            </li>
+          </ul>
+          <ul class="hidden-links hidden"></ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+<div class="page-content" style="display: flex; flex-direction: row; max-width: 1300px; margin: 0 auto; padding: 20px;">
+  <!-- Sidebar -->
+  <div class="sidebar sticky" style="width: 300px; padding: 20px;">
+    <div class="mainnotes-sidebar">
+       <h3>Contents</h3>
+      <ul>
+        <li><a href="#generative_models">Generative Models</a></li>
+        <li><a href="#implicit_vs_explicit">Implicit vs Explict Generative Models</a></li>
+        <li><a href="#vae">Variational Autoencoder</a></li>
+        <li><a href="#elbo">Likelihood Estimator & ELBO Derivation</a></li>
+        <li><a href="#final_loss">Final / Overall Loss Function (ELBO)</a></li>
+        <li><a href="#reparameterization_trick">Reparameterization Trick</a></li>
+        <li><a href="#References">References</a></li>
+      </ul>
+    </div>
+  </div>
+
+
+  <!-- Main Content -->
+    <main style="flex: 1; padding: 20px; max-width: 1000px;">
+
+  <h2 id="generative_models">Generative Models</h2>
+
+<p>
+  Generative models aim to learn the underlying distribution of each class unlike the discriminative models. The objective is to estimate the probability of generating an image from the joint distribution \( p(x, y) \), particularly when \( y = 1 \) or \( y = -1 \).
+</p>
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/dis_vs_gen.png"
+       alt="Dis_vs_Gen"
+       style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em; max-width: 70%; margin-left: auto; margin-right: auto;">
+    Figure: Discriminative vs Generative Models.
+  </figcaption>
+</figure>
+
+      
+<h2 id="implicit_vs_explicit">Implicit vs Explicit Generative Models</h2>
+
+<ul>
+  <li><strong>Implicit Generative Models</strong>
+    <ul>
+      <li>Give up estimating the explicit form of \( p(x) \)</li>
+      <li>Aim only to sample images from the model; no explicit likelihood assignment</li>
+      <li>Capable of generating high-quality samples</li>
+      <li>Support fast sampling speeds</li>
+    </ul>
+  </li>
+  <li><strong>Explicit Generative Models</strong>
+    <ul>
+      <li>Write an explicit function \( p(x) = f(x, \theta) \)</li>
+      <li><strong>Input:</strong> Image \( x \)</li>
+      <li><strong>Output:</strong> Likelihood value for image</li>
+      <li><strong>Parameter:</strong> Weights \( \theta \)</li>
+      <li>Assign explicit likelihoods to images</li>
+      <li>Enables tasks like outlier detection</li>
+      <li>Often compromises image quality or sampling speed</li>
+    </ul>
+  </li>
+</ul>
+
+<p>
+  Explicit models struggle with low fidelity in generated images and often underperform compared to implicit models.
+</p>
+  
+<h2 id="vae">Variational Autoencoder (VAE)</h2>
+<p>
+  A Variational Autoencoder is a type of generative model that learns a latent representation of data and can be used to generate similar data samples. While VAEs were originally used for images, changing the decoder enables them to generate text or other data types.
+</p>
+
+<h3>Main Motivation</h3>
+<p>
+  Given a training dataset of faces, a neural network can be trained to model the distribution of the latent (hidden) semantic features that describe those faces. Once trained, we can sample new latent features and decode them to generate similar, realistic faces.
+</p>
+<p>
+  For the dataset \( X \), the goal is to maximize the likelihood of the data under the model: \( p(X) \). By marginalizing over latent variables \( z \), we write:
+</p>
+<div class="math">
+  \[
+  p(X) = \prod_{i=1}^m p(x^{(i)}) = \prod_{i=1}^m \int p(x^{(i)}, z) dz
+  \]
+</div>
+<p>
+  For a single data point:
+</p>
+<div class="math">
+  \[
+  p(x) = \int p(x, z) dz
+  \]
+</div>
+<p>
+  Computing this integral exactly is intractable. Thus, we use sampling-based techniques that focus on the regions of \( z \) that significantly contribute to the probability mass of \( p(x, z) \).
+</p>
+
+<h3>Sampling Techniques</h3>
+
+<h4>1. Monte Carlo Sampling</h4>
+<p>
+  Most values of \( z \) contribute negligibly to \( p(x, z) \), so instead of averaging over all possible \( z \), we approximate the integral using samples:
+</p>
+<div class="math">
+  \[
+  p(x) \approx \frac{1}{k} \sum_{i=1}^{k} p(x, z^{(i)}), \quad z^{(i)} \sim \text{Uniform}
+  \]
+</div>
+
+<h4>2. Importance Sampling</h4>
+<p>
+  Rather than sampling \( z \) uniformly, we sample from a distribution \( q(z) \) that is closer to the posterior. This improves the efficiency of the estimate:
+</p>
+<div class="math">
+  \[
+  p(x) = \int \frac{p(x, z)}{q(z)} q(z) dz = \mathbb{E}_{z \sim q(z)}\left[\frac{p(x, z)}{q(z)}\right]
+  \]
+  Approximating this expectation with \( k \) samples:
+  \[
+  p(x) \approx \frac{1}{k} \sum_{i=1}^{k} \frac{p(x, z^{(i)})}{q(z^{(i)})}, \quad z^{(i)} \sim q(z)
+  \]
+</div>
+<div class="highlight">
+  <strong>Note:</strong> In VAEs, the proposal distribution \( q(z) \) is replaced by the encoder \( q_\phi(z|x) \).
+</div>
+
+<h2 id="elbo">Likelihood Estimator & ELBO Derivation</h2>
+<p>
+  The marginal likelihood of a single data point \( x \) (parameterized by \( \theta \)) is:
+</p>
+<div class="math">
+  \[
+  p(x; \theta) = \int p(x, z; \theta) dz
+  \]
+</div>
+<p>
+  For i.i.d. data \( X = \{x^{(1)}, \dots, x^{(m)}\} \), the total data likelihood is:
+</p>
+<div class="math">
+  \[
+  p(X; \theta) = \prod_{i=1}^{m} p(x^{(i)}; \theta)
+  \quad \Rightarrow \quad
+  \log p(X; \theta) = \sum_{i=1}^{m} \log p(x^{(i)}; \theta)
+  \]
+</div>
+
+<h3>Step-by-Step Derivation Using Jensen's Inequality</h3>
+<ol>
+  <li>
+    <strong>Rewrite the log-likelihood using importance sampling:</strong>
+    <div class="math">
+      \[
+      \log p(x; \theta) = \log \left( \int q_\phi(z|x) \cdot \frac{p(x, z)}{q_\phi(z|x)} dz \right)
+      = \log \mathbb{E}_{z \sim q_\phi(z|x)} \left[ \frac{p(x, z)}{q_\phi(z|x)} \right]
+      \]
+    </div>
+  </li>
+  <li>
+    <strong>Apply Jensen’s inequality (since log is concave):</strong>
+    <div class="math">
+      \[
+      \log \mathbb{E}_{z \sim q_\phi(z|x)} \left[ \frac{p(x, z)}{q_\phi(z|x)} \right]
+      \geq \mathbb{E}_{z \sim q_\phi(z|x)} \left[ \log \left( \frac{p(x, z)}{q_\phi(z|x)} \right) \right]
+      \]
+    </div>
+  </li>
+  <li>
+    <strong>Decompose the right-hand side (ELBO):</strong>
+    <div class="math">
+      \[
+      \mathcal{L}(x; \theta, \phi) = \mathbb{E}_{z \sim q_\phi(z|x)} \left[ \log p_\theta(x|z) \right] - D_{KL}(q_\phi(z|x) \| p(z))
+      \]
+    </div>
+  </li>
+  <li>
+    <strong>Condition for equality:</strong>
+    <div class="math">
+      \[
+      \log p(x) = \mathbb{E}_{z \sim p(z|x)} \left[ \log \left( \frac{p(x, z)}{p(z|x)} \right) \right] = \log p(x)
+      \]
+    </div>
+    <p>
+      The inequality becomes equality when \( q_\phi(z|x) = p(z|x) \), i.e., the approximate posterior equals the true posterior.
+    </p>
+  </li>
+</ol>
+
+<h3>Approximate Posterior via Neural Network</h3>
+<p>
+  To approximate \( p(z|x) \), we define \( q_\phi(z|x) \) as a neural network that outputs a Gaussian distribution with mean and variance conditioned on \( x \):
+</p>
+<div class="math">
+  \[
+  q_\phi(z|x) = \mathcal{N}(z; \mu_\phi(x), \sigma_\phi^2(x)I)
+  \]
+</div>
+<p>
+  We typically assume a standard normal prior:
+</p>
+<div class="math">
+  \[
+  p(z) = \mathcal{N}(0, I)
+  \]
+</div>
+<p>
+  The encoder (inference network) learns \( q_\phi(z|x) \), while the decoder models \( p_\theta(x|z) \).
+</p>
+
+<h3>Generation Process</h3>
+<p>
+  Once trained, we can generate new samples as follows:
+  <ol>
+    <li>Sample \( z \sim p(z) = \mathcal{N}(0, I) \)</li>
+    <li>Generate \( x \sim p_\theta(x|z) \) using the decoder</li>
+  </ol>
+</p>
+<p>
+  The joint distribution used during training is:
+</p>
+<div class="math">
+  \[
+  p(x, z) = p_\theta(x|z) \cdot p(z)
+  \]
+</div>
+
+<h2 id="final_loss">Final / Overall Loss Function (ELBO):</h2>
+<div class="math">
+  \[
+  \log p(x; \theta, \phi) \geq \mathbb{E}_{z \sim q_\phi(z|x)} \left[\log\left(\frac{p_\theta(x, z)}{q_\phi(z|x)}\right)\right]
+  \]
+  \[
+  = \mathbb{E}_{z \sim q_\phi(z|x)} \left[\log p_\theta(x|z) + \log\left(\frac{p(z)}{q_\phi(z|x)}\right)\right]
+  \]
+  \[
+  = \mathbb{E}_{z \sim q_\phi(z|x)}[\log p_\theta(x|z)] - D_{\text{KL}}(q_\phi(z|x) \| p(z))
+  \]
+</div>
+
+<h3>KL Divergence Loss:</h3>
+<p>
+Given:
+</p>
+<div class="math">
+\[
+q_\phi(z|x) = \mathcal{N}(z; \mu_\phi(x), \sigma_\phi^2(x)I), \quad p(z) = \mathcal{N}(z; 0, I)
+\]
+</div>
+<p>
+KL divergence:
+</p>
+<div class="math">
+\[
+D_{\text{KL}}(q_\phi(z|x) \| p(z)) = \int q_\phi(z|x) \log \left(\frac{q_\phi(z|x)}{p(z)}\right) dz = \mathbb{E}_{q_\phi(z|x)}[\log q_\phi(z|x) - \log p(z)]
+\]
+</div>
+<p>
+Using log-density of multivariate Gaussians:
+</p>
+<div class="math">
+\[
+\log \mathcal{N}(z; \mu, \Sigma) = -\frac{d}{2} \log(2\pi) - \frac{1}{2} \log|\Sigma| - \frac{1}{2}(z - \mu)^T \Sigma^{-1} (z - \mu)
+\]
+</div>
+<p>
+For \( q_\phi(z|x) = \mathcal{N}(\mu_\phi(x), \sigma_\phi^2(x)I) \), the closed-form KL divergence:
+</p>
+<div class="math">
+\[
+D_{\text{KL}}(q_\phi(z|x) \| p(z)) = \frac{1}{2} \sum_{j=1}^d \left( -\log \sigma_{\phi,j}^2(x) + \mu_{\phi,j}^2(x) + \sigma_{\phi,j}^2(x) - 1 \right)
+\]
+</div>
+<p>
+Rewriting to match the ELBO loss expression (with negative sign):
+</p>
+<div class="math">
+\[
+- D_{\text{KL}}(q_\phi(z|x) \| p(z)) = \frac{1}{2} \sum_{j=1}^d \left( 1 + \log \sigma_{\phi,j}^2(x) - \mu_{\phi,j}^2(x) - \sigma_{\phi,j}^2(x) \right)
+\]
+</div>
+
+<h3>Reconstruction Loss Gradient Derivation:</h3>
+<div class="math">
+\[
+\nabla_\phi \mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z)] = \nabla_\phi \int q_\phi(z|x) \log p_\theta(x|z) dz
+\]
+Assuming interchange of gradient and integral:
+\[
+= \int \log p_\theta(x|z) \nabla_\phi q_\phi(z|x) dz
+\]
+Use identity:
+\[
+\nabla_\phi q_\phi(z|x) = q_\phi(z|x) \nabla_\phi \log q_\phi(z|x)
+\]
+So,
+\[
+= \int \log p_\theta(x|z) q_\phi(z|x) \nabla_\phi \log q_\phi(z|x) dz
+= \mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z) \nabla_\phi \log q_\phi(z|x)]
+\]
+</div>
+
+<h2 id="reparameterization_trick">Reparameterization Trick:</h2>
+<p>
+The VAE is a high-variance model due to stochastic sampling, making it non-differentiable. To backpropagate through stochastic nodes, we use the reparameterization trick:
+</p>
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/vae_reparameterize.png"
+       alt="VAE architecture diagram"
+       style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: VAE using the reparameterization trick to enable backpropagation through the encoder.
+  </figcaption>
+</figure>
+
+      
+<div class="math">
+\[
+z = \mu_\phi(x) + \sigma_\phi(x) \cdot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)
+\]
+</div>
+
+<h2>For Image Datasets:</h2>
+<ul>
+  <li>The encoder is typically a stack of convolutional layers that maps the input image to latent variables (mean and variance).</li>
+  <li>The decoder consists of transposed convolutions (deconvolution layers) to reconstruct the image from the latent representation.</li>
+  <li>Each sample from the latent space (determined by predicted \(\mu_\phi(x)\) and \(\sigma_\phi(x)\)) results in a potentially different reconstructed image.</li>
+</ul>
+    </main>
+  </div>
+   <footer class="page__meta">
+                    <!-- Any additional metadata or footer information goes here -->
+                </footer>
+            </div>
+        </article>
+    </div>
+
+    <div class="page__footer">
+        <footer>
+            <!-- Your footer content goes here -->
+            <p>@2025 Margi Pandya</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,507 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Margi Pandya - Portfolio</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <div class="masthead__menu">
+        <nav id="site-nav" class="greedy-nav">
+          <button><div class="navicon"></div></button>
+          <ul class="visible-links">
+            <li class="masthead__menu-item masthead__menu-item--lg">
+              <a href="https://margipandya27.github.io/MargiPandya/">Margi Pandya</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/projects.html">Projects</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/notes.html">Blogs</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="https://margipandya27.github.io/MargiPandya/publications.html">Publications</a>
+            </li>
+          </ul>
+          <ul class="hidden-links hidden"></ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+<div class="page-content" style="display: flex; flex-direction: row; max-width: 1300px; margin: 0 auto; padding: 20px;">
+  <!-- Sidebar -->
+  <div class="sidebar sticky" style="width: 300px; padding: 20px;">
+    <div class="mainnotes-sidebar">
+     <h3>Contents</h3>
+      <ul>
+        <li><a href="#vanilla">Vanilla Generative Adversarial Network</a></li>
+        <li><a href="#training_strategy">Vanilla GAN-Training Strategy</a></li>
+        <li><a href="#dcgan">DCGAN</a></li>
+        <li><a href="#cgan">cGAN</a></li>
+        <li><a href="#cyclegan">CycleGAN</a></li>
+        <li><a href="#references">References</a></li>
+      </ul>
+    </div>
+  </div>
+
+
+  <!-- Main Content -->
+  <main style="flex: 1; padding: 20px; max-width: 1000px;">
+
+<p>Generative Adversarial Networks (GANs) started with vanilla GANs—uncontrolled models that generate data by competing generator and discriminator networks, but without specific output control. To enable targeted generation, conditional GANs (cGANs) were developed, which use extra information like class labels to guide both the generator and discriminator. This allows cGANs to produce data with desired attributes, supporting advanced applications such as image-to-image translation and controlled synthesis</p>
+
+<h2 id="vanilla">1. Vanilla Generative Adversarial Network</h2>
+<p>
+GANs (Generative Adversarial Networks) are implicit generative models: rather than explicitly computing or modeling likelihood functions, they aim to learn how to sample from the underlying data distribution. The objective is for the generator to produce samples that closely resemble the true data distribution, without ever directly estimating the probability density or likelihood.
+</p>
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/vanilla_gan.png"
+       alt="GAN architecture diagram"
+       style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Architecture of a Vanilla GAN. The generator learns to map noise to data samples, while the discriminator distinguishes real from generated samples. (Image Source: Internet)
+  </figcaption>
+</figure>
+
+<p>
+  A normally distributed random variable \( z \sim \mathcal{N}(0, I) \) is passed through the generator network to produce fake images with a similar distribution to the real dataset. To train the generator, GANs use a zero-sum loss function, encouraging the generator to produce images that the discriminator classifies as real.
+</p>
+
+<p>
+  Train the generator \( G \) such that the discriminator \( D \) misclassifies the generated sample \( \hat{x} \) into class 1 (real data and 0 for fake gernated sample), making it indistinguishable from real data \( x \sim p_{\text{data}} \).
+</p>
+
+<h3>Discriminator Objective \( O_1 \)</h3>
+<p>
+  Train discriminator \( D \) to maximize the log probability of correctly classifying real samples:
+</p>
+<div class="math">
+\[
+O_1 = \max_D \, \mathbb{E}_{x \sim p_{\text{data}}}[\log D(x)]
+\]
+</div>
+
+<h3>Generator Objective \( O_2 \)</h3>
+<p>
+  Train generator \( G \) to minimize the probability that the discriminator correctly classifies generated samples as fake:
+</p>
+<div class="math">
+\[
+O_2 = \min_G \, \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
+\]
+</div>
+
+
+
+
+
+<h2 id="training_strategy">Training Strategy</h2>
+<p>
+  If a pretrained discriminator is used initially, it might confidently classify all generated images as fake, resulting in \( \log(1 - D(G(z))) = \log(1 - 0) = 0 \), which leads to zero gradient for training the generator.
+</p>
+
+
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/gan _strategy.png" 
+       alt="GAN training strategy diagram" 
+       style="max-width: 20%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em;">
+    Figure: Training strategy of a GAN — the generator tries to fool the discriminator, which learns to distinguish real from generated samples. (Image Source: NPTEL Course)
+  </figcaption>
+</figure>
+    
+<p>
+  Therefore, it is essential to train both the generator and the discriminator alternately using different mini-batches. This avoids collapse and ensures both models improve progressively.
+</p>
+
+
+
+<p>
+  The minimax objective of a Generative Adversarial Network is:
+</p>
+<div style="border: 2px solid #ccc; padding: 15px; border-radius: 8px; background-color: #f9f9f9; margin: 20px 0;">
+  <div class="math">
+  \[
+  \min_G \max_D \left( \mathbb{E}_{x \sim p_{\text{data}}}[\log D(x)] + \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))] \right)
+  \]
+  </div>
+</div>
+
+<p>Expanding the expectations using the change of variables:</p>
+<div class="math">
+\[
+\min_G \max_D \int_x p_{\text{data}}(x) \log D(x) + p_G(x) \log(1 - D(x)) \, dx
+\]
+</div>
+
+<p>Now take the max inside the integral:</p>
+<div class="math">
+\[
+\min_G \int_x \max_D \left( p_{\text{data}}(x) \log D(x) + p_G(x) \log(1 - D(x)) \right) dx
+\]
+</div>
+
+<p>Let \( y = D(x), \quad a = p_{\text{data}}(x), \quad b = p_G(x) \). Define:</p>
+<div class="math">
+\[
+f(y) = a \log y + b \log(1 - y)
+\]
+</div>
+<p>To maximize \( f(y) \), take the derivative and set it to zero:</p>
+<div class="math">
+\[
+f'(y) = \frac{a}{y} - \frac{b}{1 - y} = 0 \quad \Rightarrow \quad y = \frac{a}{a + b}
+\]
+</div>
+
+<h3>Optimal Discriminator \( D^*_G(x) \)</h3>
+<p>
+  Substituting back:
+</p>
+
+<div style="border: 2px solid #ccc; padding: 15px; border-radius: 8px; background-color: #f9f9f9; margin: 20px 0;">
+<div class="math">
+\[
+D^*_G(x) = \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)}
+\]
+</div>
+</div>
+
+  
+<p>Now substitute this optimal discriminator into the original objective:</p>
+<div class="math">
+\[
+\min_G \int_x \left( p_{\text{data}}(x) \log \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)} + p_G(x) \log \frac{p_G(x)}{p_{\text{data}}(x) + p_G(x)} \right) dx
+\]
+</div>
+
+<p>Rewriting the expression using expectations:</p>
+<div class="math">
+\[
+\min_G \, \mathbb{E}_{x \sim p_{\text{data}}} \left[ \log \frac{p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)} \right] + \mathbb{E}_{x \sim p_G} \left[ \log \frac{p_G(x)}{p_{\text{data}}(x) + p_G(x)} \right]
+\]
+</div>
+
+<p>Multiply numerator and denominator by 2:</p>
+<div class="math">
+\[
+\min_G \, \mathbb{E}_{x \sim p_{\text{data}}} \left[ \log \frac{2 p_{\text{data}}(x)}{p_{\text{data}}(x) + p_G(x)} \right] + \mathbb{E}_{x \sim p_G} \left[ \log \frac{2 p_G(x)}{p_{\text{data}}(x) + p_G(x)} \right] - \log 4
+\]
+</div>
+
+<p>Which leads to the final expression involving KL divergence:</p>
+<div class="math">
+\[
+\min_G \left[ \text{KL} \left( p_{\text{data}} \,\|\, \frac{p_{\text{data}} + p_G}{2} \right) + \text{KL} \left( p_G \,\|\, \frac{p_{\text{data}} + p_G}{2} \right) - \log 4 \right]
+\]
+</div>
+
+<h3>Jensen–Shannon Divergence (JSD)</h3>
+<div class="math">
+\[
+\text{JSD}(p_{\text{data}} \,\|\, p_G) = \frac{1}{2} \text{KL} \left( p_{\text{data}} \,\|\, \frac{p_{\text{data}} + p_G}{2} \right) + \frac{1}{2} \text{KL} \left( p_G \,\|\, \frac{p_{\text{data}} + p_G}{2} \right)
+\]
+</div>
+
+<p>So the GAN objective simplifies to:</p>
+<div class="math">
+\[
+\min_G \left( 2 \cdot \text{JSD}(p_{\text{data}} \,\|\, p_G) - \log 4 \right) 
+\]
+</div>
+
+
+<p>This expression is minimized when </p>
+
+<div style="border: 2px solid #ccc; padding: 15px; border-radius: 8px; background-color: #f9f9f9; margin: 20px 0;">
+  <div class="math">
+    \[
+    p_G = p_{\text{data}}
+    \]
+  </div>
+</div>
+
+<p>since Jensen–Shannon divergence is non-negative and equals 0 only when the two distributions are identical.</p>
+
+
+
+<h2 id="dcgan">2. Deep Convolution Generative Adversarial Network (DCGAN)</h2>
+DCGAN bridge the gap between the unsupervised method and success of Convolutional Neural Networks stablize the training of Vanilla GANs.
+<p>Architectural Guidelines for Stable GAN Training:</p>
+
+<ul>
+  <li>
+    Replaces deterministic spatial pooling functions (e.g., max pooling) with <strong>strided convolutions</strong>  
+    <ul>
+      <li>Allows the network to learn spatial downsampling</li>
+    </ul>
+  </li>
+  
+  <li>
+    <strong>Removes fully connected hidden layers</strong>  
+    <ul>
+      <li>Supports deeper and more scalable architectures</li>
+    </ul>
+  </li>
+  
+  <li>
+    <strong>Batch Normalization</strong> in both Generator and Discriminator  
+    <ul>
+      <li>Prevents generator collapse</li>
+      <li>Enables stable gradient flow in deeper networks</li>
+      <li>Not applied at the output layer of the generator or input layer of the discriminator</li>
+    </ul>
+  </li>
+  
+  <li>
+    <strong>Non-linear Activations:</strong>
+    <ul>
+      <li><strong>Generator:</strong> ReLU activations in all layers except the output</li>
+      <li><strong>Discriminator:</strong> Leaky ReLU activations with slope 0.2</li>
+    </ul>
+  </li>
+  
+  <li>
+    <strong>Output Activations:</strong>
+    <ul>
+      <li><strong>Generator:</strong> tanh</li>
+      <li><strong>Discriminator:</strong> sigmoid</li>
+    </ul>
+  </li>
+</ul>
+
+<p>
+DCGAN demonstrates an interesting experiment with the latent space: when the latent vector of a man with glasses is subtracted from that of a man, and the result is added to the latent vector of a woman, the resulting vector generates images of women with glasses.
+</p>
+
+    
+  <figure style="text-align: center;">
+    <img src="https://margipandya27.github.io/MargiPandya/deep_gen/dcgan.png" 
+         alt="DCGAN architecture" 
+         style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
+    <figcaption style="font-style: italic; margin-top: 0.5em;">
+      Figure: DCGAN architecture — vector arthimetic in latent space. (Image Source: Radford, A., et al.)
+    </figcaption>
+  </figure>
+
+
+<section>
+  <h2 id="cgan">3. Conditional Generative Adversarial Network (cGAN)</h2>
+  
+  <figure style="text-align: center;">
+    <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cgan.png" 
+         alt="cGAN architecture" 
+         style="max-width: 40%; height: auto; display: block; margin: 0 auto;">
+    <figcaption style="font-style: italic; margin-top: 0.5em;">
+      Figure: Architecture of a conditional GAN (cGAN). The generator and discriminator are both conditioned on auxiliary information such as class labels or other modalities. (Image Source: Mirza, M., et al.)
+    </figcaption>
+  </figure>
+
+  <p>
+    So far, we have seen the impressive generation capabilities of GANs. However, a key limitation is the lack of control over what the GAN generates, for example, generating images of a specific class or outputs from other modalities like text.
+  </p>
+
+  <p>
+    <strong>(cGANs)</strong> address this limitation by introducing an additional conditioning variable <code>y</code>, which can be a class label, text embedding, or any other feature vector derived from a different modality. In this framework, both the generator and the discriminator are conditioned on <code>y</code>:
+  </p>
+
+  <ul>
+    <li><strong>Generator:</strong> The latent noise vector <code>z</code> is concatenated with <code>y</code>, enabling the model to learn the <em>conditional probability distribution</em> \( p(x|y) \).</li>
+    <li><strong>Discriminator:</strong> Both the generated/real sample <code>x</code> and the conditioning variable <code>y</code> are provided as input, allowing the model to evaluate whether <code>x</code> is a realistic sample <em>given</em> <code>y</code>.</li>
+  </ul>
+
+  <p>The objective function for a conditional GAN becomes:</p>
+
+  <div style="border: 2px solid #ccc; padding: 15px; border-radius: 8px; background-color: #f9f9f9; margin: 20px 0;">
+    <div class="math">
+  <p>
+    \[
+    \min_G \max_D V(D, G) = \mathbb{E}_{x \sim p_{\text{data}}(x)}[\log D(x|y)] + \mathbb{E}_{z \sim p_z(z)}[\log(1 - D(G(z|y)))]
+    \]
+  </p>
+      </div>
+    </div>
+
+  <div style="display: flex; justify-content: center; gap: 2em; flex-wrap: wrap;">
+  <figure style="text-align: center; flex: 1; min-width: 300px; max-width: 45%;">
+    <img src="https://margipandya27.github.io/MargiPandya/deep_gen/unimodal_cgan.png" 
+         alt="Unimodal cGAN" 
+         style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
+    <figcaption style="font-style: italic; margin-top: 0.5em;">
+      Figure: Unimodal cGAN — generating images conditioned on class labels.  (Image Source: Mirza, M., et al.)
+    </figcaption>
+  </figure>
+
+  <figure style="text-align: center; flex: 1; min-width: 300px; max-width: 45%;">
+    <img src="https://margipandya27.github.io/MargiPandya/deep_gen/multimodal_cgan.png" 
+         alt="Multimodal cGAN" 
+         style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
+    <figcaption style="font-style: italic; margin-top: 0.5em;">
+      Figure: Multimodal cGAN — generating semantic tags conditioned on image features. (Image Source: Mirza, M., et al.)
+    </figcaption>
+  </figure>
+</div>
+  
+  <p>
+    cGANs have been successfully used to generate both <strong>unimodal outputs</strong> (e.g., generating images from class labels) and <strong>multimodal outputs</strong> (e.g., generating descriptive tags from images). Here, the author tried to demonstrate automated tagging of images, with multi-label predictions, using conditional adversarial nets to generate a (possibly multi-modal) distribution of tag-vectors conditional on image features. They used the skip-model trained on the dictionary of size 247465 and the convolution networks to generate tags and images generation respectively.
+  </p>
+</section>
+    
+
+<section>
+  <h2 id="cyclegan">4. Cycle Generative Adversarial Network (CycleGAN)</h2>
+
+  <p>
+    <strong>CycleGAN</strong> enables image-to-image translation between two visual domains without requiring paired training examples. When trained on two unpaired image collections, CycleGAN learns to capture the domain-specific characteristics of each and translates between them. The model assumes that there is some underlying shared structure between domains — for example, both being different renderings or styles of the same scene — and seeks to learn a mapping between them.
+  </p>
+
+  
+<figure style="text-align: center;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cyclegan_result.png"
+       alt="CycleGAN results"
+       style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em; max-width: 70%; margin-left: auto; margin-right: auto;">
+    Figure: Sample results from CycleGAN — unpaired image-to-image translation across domains.  (Image Source: Zhu, J. Y., et al.)
+  </figcaption>
+</figure>
+
+
+  <p>
+    CycleGAN has become widely popular for tasks like <em>style transfer, object transfiguration, season conversion, and photo enhancement</em>. Its unique capability to perform translations without paired data makes it powerful for real-world applications where aligned datasets are unavailable.
+  </p>
+
+  <p>
+    A key insight from CycleGAN is that <strong>adversarial loss alone is insufficient</strong> to ensure meaningful translations. The model might map multiple inputs to the same output or introduce artifacts. To solve this, CycleGAN introduces the concept of <strong>cycle consistency</strong>, which enforces that translating from one domain to another and back again should yield the original image ideally. This is analogous to translating a sentence from English to French and then back to English — the result should closely resemble the original sentence.
+  </p>
+
+  <h3>Adversarial Loss</h3>
+
+  
+  <figure style="text-align: center; margin-top: 2em;">
+  <img src="https://margipandya27.github.io/MargiPandya/deep_gen/cyclegan.png"
+       alt="CycleGAN architecture"
+       style="max-width: 70%; height: auto; display: block; margin: 0 auto;">
+  <figcaption style="font-style: italic; margin-top: 0.5em; max-width: 70%; margin-left: auto; margin-right: auto;">
+    Figure: Architecture of CycleGAN — two generators and two discriminators trained with cycle consistency loss. (Image Source: Zhu, J. Y., et al.)
+  </figcaption>
+</figure>
+
+
+  <p>
+    The adversarial loss ensures that the generated images from one domain are indistinguishable from real images in the target domain.
+  </p>
+
+  <p>
+    \[
+    \mathcal{L}_{GAN}(G, D_Y, X, Y) = \mathbb{E}_{y \sim p_{data}(y)}[\log D_Y(y)] + \mathbb{E}_{x \sim p_{data}(x)}[\log(1 - D_Y(G(x)))]
+    \]
+  </p>
+
+  <p>
+    Similarly, for the reverse direction:
+  </p>
+
+  <p>
+    \[
+    \mathcal{L}_{GAN}(F, D_X, Y, X) = \mathbb{E}_{x \sim p_{data}(x)}[\log D_X(x)] + \mathbb{E}_{y \sim p_{data}(y)}[\log(1 - D_X(F(y)))]
+    \]
+  </p>
+
+  <h3>Cycle Consistency Loss</h3>
+  <p>
+    To preserve the content between translations, CycleGAN uses a cycle consistency loss. This ensures that:
+    \[
+    F(G(x)) \approx x \quad \text{and} \quad G(F(y)) \approx y
+    \]
+  </p>
+
+  <p>
+    The cycle consistency loss is defined as:
+  </p>
+
+  <p>
+    \[
+    \mathcal{L}_{cyc}(G, F) = \mathbb{E}_{x \sim p_{data}(x)}[\|F(G(x)) - x\|_1] + \mathbb{E}_{y \sim p_{data}(y)}[\|G(F(y)) - y\|_1]
+    \]
+  </p>
+
+  <p>
+     Notice that our model can be viewed as training two “autoencoders” [20]: we learn one autoencoder F o G : X -> X jointly with another G o F : Y -> Y. However, these autoencoders each have special internal structures: they map an image to itself via an intermediate representation that is a translation of the image into another domain. Such a setup can also be seen as a special case of “adversarial autoencoders”, which use an adversarial loss to train the bottleneck layer of an autoencoder to match an arbitrary tarm get distribution. In our case, the target distribution for the X-> Xautoencoderisthat of the domain Y.
+  </p>
+
+  <h3>Full Objective</h3>
+  <p>
+    The full objective combines both adversarial and cycle consistency losses:
+  </p>
+
+  <p>
+    \[
+    \mathcal{L}(G, F, D_X, D_Y) = \mathcal{L}_{GAN}(G, D_Y, X, Y) + \mathcal{L}_{GAN}(F, D_X, Y, X) + \lambda \cdot \mathcal{L}_{cyc}(G, F)
+    \]
+  </p>
+
+  <p>
+    The optimization problem becomes:
+  </p>
+
+  <p>
+    \[
+    G^*, F^* = \arg\min_{G, F} \max_{D_X, D_Y} \mathcal{L}(G, F, D_X, D_Y)
+    \]
+  </p>
+
+  <h3>Stabilizing Training with Least Squares Loss</h3>
+  <p>
+    To improve training stability and gradient flow, CycleGAN replaces the binary cross-entropy loss with a least squares loss. This change modifies the generator and discriminator objectives as follows:
+  </p>
+
+  <ul>
+    <li><strong>Generator loss:</strong> \( \mathbb{E}_{x \sim p_{data}(x)}[(D(G(x)) - 1)^2] \)</li>
+    <li><strong>Discriminator loss:</strong> \( \mathbb{E}_{y \sim p_{data}(y)}[(D(y) - 1)^2] + \mathbb{E}_{x \sim p_{data}(x)}[(D(G(x)))^2] \)</li>
+  </ul>
+
+  <p>
+    This formulation leads to smoother gradients, helping the model learn more effectively, and avoids issues like vanishing gradients often seen in vanilla GAN training.
+  </p>
+
+  <p>
+    In summary, CycleGAN elegantly solves the unpaired image-to-image translation problem by combining adversarial training with cycle consistency, enabling powerful and flexible cross-domain generation without requiring paired data.
+  </p>
+</section>
+
+
+    <h2 id="references">References</h2>
+      <ol>
+        <li>NPTEL Course, "Deep Learning for Computer Vision [Online].* Available: https://www.youtube.com/playlist?list=PLyqSpQzTE6M_PI-rIz4O1jEgffhJU9GgG"</li>
+        <li>Radford, A., et al. (2016). Unsupervised representation learning with deep convolutional generative adversarial networks. arXiv preprint arXiv:1511.06434.</li>
+        <li>Mirza, M., et al. (2014). Conditional generative adversarial nets. arXiv preprint arXiv:1411.1784.</li>
+        <li>Zhu, J. Y., et al. (2017). Unpaired image-to-image translation using cycle-consistent adversarial networks. In Proceedings of the IEEE International Conference on Computer Vision (ICCV) (pp. 2223–2232).</li>  
+        <li>Xie, Pengtao. (2025). ECE 285 Deep Generative Models. Electrical and Computer Engineering, UCSD.</li>
+      </ol>
+
+
+
+<footer class="page__meta">
+                    <!-- Any additional metadata or footer information goes here -->
+                </footer>
+            </div>
+        </article>
+    </div>
+
+    <div class="page__footer">
+        <footer>
+            <!-- Your footer content goes here -->
+            <p>@2025 Margi Pandya</p>
+        </footer>
+    </div>
+</body>
+</html>

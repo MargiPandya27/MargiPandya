@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAG System Methodology</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; max-width: 1000px; margin: auto; background-color: #fafafa; }
+    h2, h3, h4 { color: #2c3e50; margin-top: 40px; }
+    code, pre { background-color: #f4f4f4; padding: 10px; display: block; overflow-x: auto; }
+    blockquote { background-color: #eef; padding: 10px; border-left: 4px solid #88f; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    table, th, td { border: 1px solid #ccc; }
+    th, td { padding: 10px; text-align: left; }
+  </style>
+</head>
+<body>
+  <h2>Methodology</h2>
+
+  <h3>2.1 System Overview</h3>
+  <p>Our system combines dense vector retrieval with generative language modeling. Given a query <code>q</code> and corpus <code>D</code>, the model generates a summary <code>y</code> based on:</p>
+  <pre><code>y* = arg max_y P(y | q, R(q, D); θ)</code></pre>
+  <p>We support three processing paths: corpus-level summarization, document-specific summarization, and metadata extraction. All share the same base: preprocessing, semantic indexing, and response generation.</p>
+
+  <h3>2.2 Dataset and Knowledge Base</h3>
+  <p>We use the arXiv summarization dataset and support dynamic user-uploaded PDFs. Our semantic retrieval covers both sources using a vector database built on the fly.</p>
+
+  <h3>2.3 Semantic Routing</h3>
+  <p>We introduced a semantic routing layer to classify and redirect queries to appropriate modules:</p>
+  <ul>
+    <li><strong>Corpus Query Routing:</strong> For broad synthesis across multiple documents.</li>
+    <li><strong>Metadata Query Routing:</strong> Extracts structured fields from papers like authors and publication year.</li>
+    <li><strong>Document-Specific Query Routing:</strong> Answers using a restricted context from a specific document.</li>
+  </ul>
+  <pre><code>c* = arg max_c cos(z_q, z_c)</code></pre>
+
+  <h3>2.4 Corpus and Document Modules</h3>
+  <h4>2.4.1 Preprocessing and Chunking</h4>
+  <p>Each document is split into overlapping chunks <code>x_ij</code>, aligned with sentence boundaries and capped at <code>256</code> tokens.</p>
+
+  <h4>2.4.2 Embedding and Retrieval</h4>
+  <p>We use SciBERT to embed both chunks and queries. Top-k chunks are retrieved using cosine similarity via FAISS HNSW:</p>
+  <pre><code>R(q, D) = top-k { x in D : cos(z_q, z_x) }</code></pre>
+
+  <h3>2.5 Metadata Module</h3>
+  <h4>2.5.1 Preprocessing</h4>
+  <p>PDFs are parsed with layout-aware tools, cleaning LaTeX noise and isolating relevant text blocks.</p>
+
+  <h4>2.5.2 Metadata Formatting</h4>
+  <p>Each document's metadata record <code>M_i = {title, authors, venue, year}</code> is extracted using regex and formatting rules.</p>
+
+  <h4>2.5.3 Metadata Indexing and Query</h4>
+  <p>Metadata queries are semantically matched using sentence encoders and cosine similarity to return slot-mapped fields.</p>
+
+  <h3>2.6 Language Generation and Role Conditioning</h3>
+  <p>Top-k retrieved chunks and user instruction are merged into a prompt <code>c</code>. We use Gemini 2.0 Flash for generation.</p>
+  <pre><code>P(y | c; θ) = ∏ P(y_t | y_&lt;t, c; θ)</code></pre>
+  <p>Context <code>c</code> includes user instruction and retrieved segments:</p>
+  <pre><code>c = [INSTRUCTION: ...] + [RETRIEVED_CONTEXT]</code></pre>
+  <p>Examples of role-based prompts:</p>
+  <ul>
+    <li>"Explain interpretable ML to a policymaker."</li>
+    <li>"Summarize this for a product manager."</li>
+    <li>"Give a citation-style summary."</li>
+  </ul>
+
+  <h2>3. Experiments and Evaluation</h2>
+  <h3>3.1 Ablation Studies</h3>
+  <h4>3.1.1 With vs Without Semantic Routing</h4>
+  <p>Routing improved precision and reduced irrelevant content. Without routing, metadata or document-specific queries returned noisy corpus-level summaries. With routing, outputs were more accurate, focused, and aligned with user intent.</p>
+
+</body>
+</html>
