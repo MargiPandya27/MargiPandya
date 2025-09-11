@@ -1,0 +1,51 @@
+Does re-ranking help improve the performance of the RAG?
+
+When it comes to evaluation of RAG, it should be evaluated on quality of retrieved documents, since the quality of the retrieved document determines the quality of the generated response by the LLM. 
+For RAG with complex application, and also when the source of retireval is unknown webpages, then after performing only the first stage of retrieval would not be helpful.
+
+1. Classical RAG (Retriever → Generator)
+
+Retriever: dense retriever (e.g., FAISS, DPR, BM25) fetches top-k passages.
+
+Generator: LLM (like GPT-4) conditions on these k passages and produces an answer.
+
+Problem:
+
+Retriever may bring back many partially relevant or noisy passages.
+
+Generator has to process all of them, which:
+
+Increases token input length (higher cost).
+
+Makes the LLM’s reasoning harder → it may hallucinate or mix irrelevant content.
+
+2. With Re-ranking models
+After rough retrieval from the retrieval, the document chunks are passed through the re-ranking model, which are arranged decendingly based on the importance with the input query.
+
+Types of the Re-ranking models:
+1. Cross-Encoder based models: ColBERT, ColBERTv2
+2. LLM based re-ranking based models: RankerGPT
+3. API based models: CohereAPI
+
+Cross-Encoder based Models:
+
+1. ColBERT:
+ColBERT is based on BERT based encoder. The based concept behind the colbert is that of mask langauge modelling in Bert
+
+Masked Modelling:
+• Predict randomly masked tokens
+• Bidirectional (sees past and future tokens)
+• Strength: strong embeddings
+• Useful for retrieval and classification tasks
+• Limitation: not useful for generation
+
+
+Causal Modelling:
+• Predict next token in sequence
+• Unidirectional (only sees past tokens)
+• Strength: compatible with autoregressive LLMs
+• Useful for generation, instruction-following tasks
+• Limitation: harder to train (less parallelism)
+
+The colbert model have two encoder for query and documents which are pre-trained, and while being offline the similarity scored is computed for every token in query and all the documents. And then the max in tokens in query is taken for all the documents and then arranged based on descending order. 
+They make use of the powerful embedding of BERT model in Masked Modelling.
