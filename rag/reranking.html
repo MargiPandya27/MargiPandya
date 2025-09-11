@@ -17,7 +17,7 @@ Generator has to process all of them, which:
 
 Increases token input length (higher cost).
 
-Makes the LLM’s reasoning harder → it may hallucinate or mix irrelevant content.
+Makes the LLM’s reasoning harder → it may hallucinate or mix irrelevant content. 
 
 2. With Re-ranking models
 After rough retrieval from the retrieval, the document chunks are passed through the re-ranking model, which are arranged decendingly based on the importance with the input query.
@@ -48,4 +48,52 @@ Causal Modelling:
 • Limitation: harder to train (less parallelism)
 
 The colbert model have two encoder for query and documents which are pre-trained, and while being offline the similarity scored is computed for every token in query and all the documents. And then the max in tokens in query is taken for all the documents and then arranged based on descending order. 
-They make use of the powerful embedding of BERT model in Masked Modelling.
+They make use of the powerful embedding of BERT model in Masked Modelling. The Colbert have query embedding in which the q is tokenizend into a q1, q2,q3... tokens and converted to bag of words embedding.  \
+
+
+
+
+
+
+Approaxiamate Filtering:
+For each of the query's embeddings (Eq), a separate vector similarity search is performed on the FAISS index.
+
+The search finds the top-k' most similar document embeddings from the entire collection for each query embedding.
+
+The IVFPQ index is used to speed up this search. Instead of checking every document embedding, it only searches a few of the nearest partitions (p nearest cells) in the index.
+
+The results of these Nq searches (one for each query embedding) are combined, and the unique document IDs are collected into a set of K candidate documents. These K documents are the ones most likely to contain one or more embeddings that are highly similar to the query embeddings.
+
+
+Finally,
+
+ Eq := Normalize CNN BERT“Qq0q1 ql## #”
+ Ed := Filter Normalize CNN BERT“Dd0d1 dn”
+
+
+
+Re-ranking and Refinement:
+Once the smaller set of K candidate documents is identified, a more precise re-ranking is performed to find the final top-k results.
+
+Late Interaction:
+
+ Sqd :=
+ max
+ j 
+i 
+Eq 
+Ed 
+Eqi 
+ET
+ d
+
+The full ColBERT scoring process (MaxSim) is performed on this smaller set of K documents.
+
+The relevance score for each of the K candidates is calculated by taking the sum of the maximum similarity between each query embedding and all of the document's embeddings.
+
+The documents are then sorted by their scores, and the top-k documents are returned as the final result.
+
+
+
+ColBeRTV2
+Like ColBert is for optimized version for Bert for time and colbertv2 is optimized for space complexity, 
