@@ -1,272 +1,451 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Margi Pandya - Portfolio</title>
-  <link rel="stylesheet" href="../styles.css">
 
-  <!-- MathJax -->
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <meta charset="UTF-8">
 
-  <!-- Custom spacing fixes -->
-  <style>
-    /* Reset margins for headings, paragraphs, lists, figures */
-    h1, h2, h3, h4, h5, h6, p, ul, ol, figure, blockquote {
-      margin-top: 0.5em;
-      margin-bottom: 0.5em;
-    }
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    /* Headings: more space above, less below */
-    h1, h2, h3, h4, h5, h6 {
-      margin-top: 1.2em;
-      margin-bottom: 0.4em;
-    }
+  <title>Margi Pandya - Portfolio</title>
 
-    /* Paragraphs tighter */
-    article.container p {
-      margin-top: 0.4em;
-      margin-bottom: 0.6em;
-    }
+  <link rel="stylesheet" href="../styles.css">
 
-    /* Lists & figures balanced */
-    article.container ul,
-    article.container figure {
-      margin-top: 0.3em;
-      margin-bottom: 0.6em;
-    }
-  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
 </head>
+
 <body>
-  <!-- Top Navigation Bar -->
-  <div class="masthead">
-    <div class="masthead__inner-wrap">
-      <div class="masthead__menu">
-        <nav id="site-nav" class="greedy-nav">
-          <button><div class="navicon"></div></button>
-          <ul class="visible-links">
-            <li class="masthead__menu-item masthead__menu-item--lg">
-              <a href="https://margipandya27.github.io/MargiPandya/">Margi Pandya</a>
-            </li>
-            <li class="masthead__menu-item">
-              <a href="https://margipandya27.github.io/MargiPandya/projects.html">Projects</a>
-            </li>
-            <li class="masthead__menu-item">
-              <a href="https://margipandya27.github.io/MargiPandya/notes.html">Blogs</a>
-            </li>
-            <li class="masthead__menu-item">
-              <a href="https://margipandya27.github.io/MargiPandya/publications.html">Publications</a>
-            </li>
-          </ul>
-          <ul class="hidden-links hidden"></ul>
-        </nav>
-      </div>
-    </div>
-  </div>
 
-  <div class="page-content" style="display: flex; flex-direction: row; max-width: 1300px; margin: 0 auto; padding: 20px;">
-    <!-- Sidebar -->
-    <div class="sidebar sticky" style="width: 300px; padding: 20px;">
-      <div class="mainnotes-sidebar">
-        <h3>Main Notes</h3>
-        <ul>
-          <li><a href="https://margipandya27.github.io/MargiPandya/deep_gen/vae.html">Deep Generative Models</a></li>
-          <li><a href="agents.html">Agents</a></li>
-          <li><a href="https://margipandya27.github.io/MargiPandya/rag/naive_rag.html">RAGs</a></li>
-        </ul>
-      </div>
-    </div>
-      
+  <!-- Top Navigation Bar -->
 
-      
-    <main style="flex: 1; padding: 20px; max-width: 1000px;">
+  <div class="masthead">
+
+    <div class="masthead__inner-wrap">
+
+      <div class="masthead__menu">
+
+        <nav id="site-nav" class="greedy-nav">
+
+          <button><div class="navicon"></div></button>
+
+          <ul class="visible-links">
+
+            <li class="masthead__menu-item masthead__menu-item--lg">
+
+              <a href="https://margipandya27.github.io/MargiPandya/">Margi Pandya</a>
+
+            </li>
+
+            <li class="masthead__menu-item">
+
+              <a href="https://margipandya27.github.io/MargiPandya/projects.html">Projects</a>
+
+            </li>
+
+            <li class="masthead__menu-item">
+
+              <a href="https://margipandya27.github.io/MargiPandya/notes.html">Blogs</a>
+
+            </li>
+
+            <li class="masthead__menu-item">
+
+              <a href="https://margipandya27.github.io/MargiPandya/publications.html">Publications</a>
+
+            </li>
+
+          </ul>
+
+          <ul class="hidden-links hidden"></ul>
+
+        </nav>
+
+      </div>
+
+    </div>
+
+  </div>
+
+<div class="page-content" style="display: flex; flex-direction: row; max-width: 1300px; margin: 0 auto; padding: 20px;">
+
+  <!-- Sidebar -->
+
+  <div class="sidebar sticky" style="width: 300px; padding: 20px;">
+
+    <div class="mainnotes-sidebar">
+
+      <h3>Main Notes</h3>
+
+      <ul>
+
+          <li><a href="https://margipandya27.github.io/MargiPandya/deep_gen/vae.html">Deep Generative Models</a></li>
+
+          <li><a href="agents.html">Agents</a></li>
+
+          <li><a href="https://margipandya27.github.io/MargiPandya/rag/naive_rag.html">RAGs</a></li>
+
+          <!-- Add more links as needed -->
+
+      </ul>
+
+    </div>
+
+  </div>
+
+
+
+<!-- Main Content -->
+
+  <main style="flex: 1; padding: 20px; max-width: 1000px;">
+
      <body>
+
     <article class="container">
+
         <h1>Does Re-ranking Improve the Performance of RAG?</h1>
+
         <p>
+
             Yes, re-ranking is a crucial step that can significantly improve the performance of a Retrieval-Augmented Generation (RAG) system. While the initial retrieval stage fetches a broad set of documents, the re-ranking stage refines this set, ensuring that only the most relevant and highest-quality information is passed to the LLM.
+
         </p>
+
         <p>
+
             Let's look at the process in more detail.
+
         </p>
+
+
 
         <hr>
 
-        <h2 id="classical-rag">1. Classical RAG (Retriever → Generator)</h2>
+
+
+        <h2>1. Classical RAG (Retriever → Generator)</h2>
+
         <p>
+
             In a traditional RAG pipeline, the process is as follows:
+
         </p>
+
         <ul>
+
             <li><strong>Retriever:</strong> A dense retriever (e.g., FAISS, DPR) or a sparse retriever (e.g., BM25) fetches the top-k passages.</li>
+
             <li><strong>Generator:</strong> An LLM (like GPT-4) conditions its response on these k passages to produce an answer.</li>
+
         </ul>
+
         <p>
+
             <strong>Problem:</strong>
+
         </p>
+
         <p>
+
             This approach has limitations. The initial retriever may bring back many partially relevant or noisy passages. The LLM then has to process all of them, which can:
+
         </p>
+
         <ul>
+
             <li>Increase token input length, leading to higher cost.</li>
+
             <li>Make the LLM’s reasoning harder, potentially causing it to hallucinate or mix in irrelevant content.</li>
+
         </ul>
+
+
 
         <hr>
 
-        <h2 id="re-ranking-models">2. With Re-ranking Models</h2>
+
+
+        <h2>2. With Re-ranking Models</h2>
+
         <p>
+
             Re-ranking is a fine-grained retrieval step that analyzes the relationship between a query and documents more deeply. After the initial retrieval, the top document chunks are passed through a re-ranking model, which re-sorts them in descending order based on their importance to the input query.
+
         </p>
+
         
-        <h3 id="types-of-re-ranking-models">Types of Re-ranking Models:</h3>
+
+        <h3>Types of Re-ranking Models:</h3>
+
         <ol>
+
             <li><strong>Cross-Encoder based models:</strong> ColBERT, ColBERTv2</li>
+
             <li><strong>LLM-based re-ranking models:</strong> RankGPT</li>
+
             <li><strong>API-based models:</strong> CohereAPI</li>
+
         </ol>
 
-       <h3 id="colbert">Cross-Encoder based Models: ColBERT</h3>
 
-       <p>ColBERT uses a basic BERT model to encode tokens into embeddings, which is a good choice because: </p>
+
+       <h3>Cross-Encoder based Models:ColBERT</h3>
+
+
+
+       <p>ColBERT uses basic BERT model to encode the token into embedding, which is a good choice because: </p>
+
        <ul>
+
             <li><strong>Masked Language Modeling (BERT):</strong> ColBERT leverages the power of BERT's Masked Language Modeling, which predicts randomly masked tokens and uses a bidirectional approach (seeing both past and future tokens). This results in strong contextualized embeddings.</li>
+
             <li><strong>Causal Modeling (LLM):</strong> In contrast, Causal Modeling predicts the next token in a sequence and is unidirectional. While ideal for generation, the powerful bidirectional embeddings from BERT are more effective for retrieval tasks.</li>
+
         </ul>
 
-      <figure class="rag-figure">
-        <img src="Colbert_1.png" alt="Alternative text for the image">
-        <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
-      </figure>
-
         <p>
+
             The core concept behind <strong>ColBERT</strong> is that of late interaction. Unlike other models that create a single embedding for a document, ColBERT creates a powerful embedding for every token in the query and every token in the document using a pre-trained BERT-based encoder.
+
         </p>
 
        
+
         <p>
+
             During the re-ranking process, ColBERT efficiently calculates a similarity score for every token in the query against all tokens in the documents. It then takes the maximum similarity score for each query token and sums them up to determine the document's final relevance score.
-        </p>
-      
-        <h4>How ColBERT Works: A Two-Stage Process</h4>
-        <p>
-            The retrieval process in ColBERT is split into two stages:
-        </p>
-        <p>
-            <strong>Approximate Filtering:</strong>
-            For each of the query's embeddings, a separate vector similarity search is performed on the FAISS index. The search finds the top-k' most similar document embeddings from the entire collection for each query embedding. The IVFPQ index is used to speed up this search. Instead of checking every document embedding, it only searches a few of the nearest partitions (p nearest cells) in the index. The results of these Nq searches (one for each query embedding) are combined, and the unique document IDs are collected into a set of K candidate documents. These K documents are the ones most likely to contain one or more embeddings that are highly similar to the query embeddings.
-        </p>
-        
-        <p>
-            <strong>Re-ranking and Refinement:</strong>
-            Once the smaller set of K candidate documents is identified, a more precise re-ranking is performed to find the final top-k results. The full ColBERT scoring process (MaxSim) is performed on this smaller set of K documents. The relevance score for each of the K candidates is calculated by taking the sum of the maximum similarity between each query embedding and all of the document's embeddings. The documents are then sorted by their scores, and the top-k documents are returned as the final result.
+
         </p>
 
-       <figure class="rag-figure">
-        <img src="colbert_result.png" alt="Alternative text for the image">
-        <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
-      </figure>
+      
+
+        <p>
+
+            The retrieval process in ColBERT is split into two stages:
+
+        </p>
+
+        <p>
+
+            <strong>Approximate Filtering:</strong>
+
+            For each of the query's embeddings, a separate vector similarity search is performed on the FAISS index. The search finds the top-k' most similar document embeddings from the entire collection for each query embedding. The IVFPQ index is used to speed up this search. Instead of checking every document embedding, it only searches a few of the nearest partitions (p nearest cells) in the index. The results of these Nq searches (one for each query embedding) are combined, and the unique document IDs are collected into a set of K candidate documents. These K documents are the ones most likely to contain one or more embeddings that are highly similar to the query embeddings.
+
+        </p>
+
+        
+
+        <p>
+
+            <strong>Re-ranking and Refinement:</strong>
+
+            Once the smaller set of K candidate documents is identified, a more precise re-ranking is performed to find the final top-k results. The full ColBERT scoring process (MaxSim) is performed on this smaller set of K documents. The relevance score for each of the K candidates is calculated by taking the sum of the maximum similarity between each query embedding and all of the document's embeddings. The documents are then sorted by their scores, and the top-k documents are returned as the final result.
+
+        </p>
 
        
-        <h3 id="colbertv2">ColBERTv2</h3>
+
         <p>
-            <strong>ColBERTv2</strong> is an improvement over ColBERT on two key features: the training strategy and compressed indexing. An initial ColBERT model is used to index the training passages. For each training query, this model retrieves the top-k passages, which often include a mix of relevant documents and challenging, but irrelevant, documents (hard negatives) that are semantically similar to the query.
+
+            During the re-ranking process, ColBERT efficiently calculates a similarity score for every token in the query against all tokens in the documents. It then takes the maximum similarity score for each query token and sums them up to determine the document's final relevance score.
+
         </p>
-        
+
         <p>
+
+            The retrieval process in ColBERT is split into two stages:
+
+        </p>
+
+        <ol>
+
+            <li><strong>Approximate Filtering:</strong> For each of the query's token embeddings, a separate vector similarity search is performed on an index (like FAISS). This quickly finds the top-k' most similar document embeddings from the entire collection for each query embedding. The results are combined into a set of candidate documents.</li>
+
+            <li><strong>Re-ranking and Refinement:</strong> On this smaller set of candidate documents, the full ColBERT scoring process (MaxSim) is performed. The relevance score for each candidate is calculated by taking the sum of the maximum similarity between each query embedding and all of the document's embeddings. The documents are then sorted by their scores, and the final top-k are returned.</li>
+
+        </ol>
+
+
+
+        <h4>ColBERTv2</h4>
+
+        <h4>ColBERTv2</h4>
+
+        <p>
+
+            <strong>ColBERTv2</strong> is an improvement over ColBERT on two new key features: the training strategy and compressed indexing. Moreover, an initial ColBERT model is used to index the training passages. For each training query, this model retrieves the top-k passages. These passages often include a mix of relevant documents (positives) and challenging, but irrelevant, documents (hard negatives) that are semantically similar to the query.
+
+        </p>
+
+        
+
+        <p>
+
             <strong>1. Knowledge Distillation</strong><br>
-            For training, knowledge distillation of a powerful cross-encoder model like ms-macro-MiniLM-L-6-V2 is used as a teacher model. The scores from the cross-encoder are used to train the ColBERT student model. ColBERTv2 uses a KL-Divergence loss to distill the teacher's scores into its architecture, helping the student model mimic the teacher's ranking distribution. To further improve training, the process also uses in-batch negatives, where a cross-entropy loss is applied to the positive score of each query against all passages corresponding to other queries in the same batch.
+
+            For training, knowledge distillation of a powerful cross-encoder model like ms-macro-MiniLM-L-6-V2 is used as a teacher model for the already trained ColBERT model. The scores from the cross-encoder are used to train the ColBERT student model. ColBERTv2 uses a KL-Divergence loss to distill the teacher's scores into its architecture. This is a crucial step because the native scoring outputs of the ColBERT model (sum of cosine similarities) have a restricted scale and might not directly align with the cross-encoder's scores. The KL-Divergence loss helps the student model to mimic the teacher's ranking distribution. To further improve training, the process also uses in-batch negatives. A cross-entropy loss is applied to the positive score of each query against all passages corresponding to other queries in the same batch. This provides additional, diverse negative examples for the model to learn from.
+
         </p>
 
+
+
         <p>
+
             <strong>2. Indexing</strong><br>
+
             MaxSim is applied on a reduced inverted list in a two-stage retrieval process to improve efficiency. This two-step process allows for fast candidate generation using approximate scores, followed by a more accurate re-ranking of the top passages.
+
         </p>
+
         
+
         <p>
+
             <strong>Candidate Generation with the Reduced Inverted List</strong><br>
+
             This first stage is for speed and efficiency. The goal is to quickly identify a small set of promising documents without decompressing all the vectors.
+
         </p>
+
         <ul>
+
             <li><strong>Query Encoding:</strong> The query is encoded into a set of multi-vector representations, one for each token.</li>
+
             <li><strong>Centroid Lookup:</strong> For each query token vector, the system finds its nearest nprobe centroids. nprobe is a hyperparameter that controls how many clusters to search.</li>
+
             <li><strong>Inverted List Traversal:</strong> Using these centroid IDs, the system accesses the inverted list. This list maps each centroid to the compressed passage embeddings that are closest to it.</li>
+
             <li><strong>Approximate MaxSim:</strong> For each query vector, an approximate "MaxSim" operation is conducted. This involves calculating the similarity between the query vector and the decompressed passage embeddings from the inverted list. This computes a lower-bound on the true MaxSim score, which is a good proxy for relevance.</li>
+
             <li><strong>Candidate Selection:</strong> The lower-bound scores are summed across the query's tokens to get an overall score for each passage. The top ncandidate passages with the highest approximate scores are selected for the next stage.</li>
+
         </ul>
+
         
+
         <p>
+
             <strong>Decompression and Full MaxSim Calculation</strong><br>
+
             For each of the ncandidate passages, the system loads and fully decompresses all of its token embeddings by combining the centroid and the residual vector. The true MaxSim operation is then performed. This involves calculating the cosine similarity between each query token vector and all of the uncompressed passage token vectors, and then summing up the maximum similarities.
+
         </p>
 
-         <figure class="rag-figure">
-          <img src="colbert_v2.png" alt="Alternative text for the image">
-          <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
-        </figure>
 
 
-       <h3 id="rankgpt">LLM-based Re-ranking Models: RankGPT</h3>
+       <h3>LLM-based Re-ranking Models: RankGPT</h3>
+
         <p>
+
             Instead of the traditional supervised way of fine-tuning a LLM, RankGPT used a permutation knowledge distillation technique to train the model. They used two very interesting things like the sliding window technique for data generation and permutation distillation using RankNet loss.
+
         </p>
+
         
+
         <p>
+
             <strong>Sliding Window:</strong><br>
+
             The first step is to generate a large dataset of ranked lists. For a given query and a set of candidate passages, the large LLM (the teacher) uses the instructional permutation and sliding window methods to produce a high-quality, ranked list. This ranked list serves as the ground-truth data for the student model. To overcome the token limits of LLMs, which can't process hundreds of passages at once, the passages are re-ranked in a series of smaller batches using a sliding window. The window moves from the end of the list to the beginning, re-ranking a subset of passages at each step and "locking in" the relative order of the top documents as it proceeds.
+
         </p>
-      
-       <figure class="rag-figure">
-        <img src="rankgpt_data_generation.png" alt="Alternative text for the image">
-        <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
-      </figure>
+
 
 
         <p>
+
             <strong>Permutation Distillation:</strong><br>
+
             The core idea behind RankNet loss is to move beyond simple point-wise relevance scores and instead focus on the relative order of items. It is a type of pairwise loss function used in "learning to rank" algorithms.
+
         </p>
 
+
+
         <p>
+
             <strong>Pairwise Comparison:</strong>
+
             Instead of treating each passage's relevance score independently, RankNet works by considering pairs of passages. For a given query, the loss is calculated based on whether the model correctly ranks one passage higher than another, according to the ground-truth ranking provided by the teacher model (in this case, ChatGPT). The objective is to minimize the number of "inversions" in the final ranked list. An inversion occurs when a less-relevant passage is ranked above a more-relevant one.
+
         </p>
 
+
+
         <p>
+
             <strong>The Loss Function:</strong><br>
+
             The RankNet loss function, as described in the paper, is:
+
         </p>
+
         <blockquote>
+
             <p>
+
                 $L_{\text{RankNet}} = \sum_{i=1}^{M} \sum_{j=1}^{M} \mathbb{1}_{r_i < r_j} \log(1+\exp(s_j - s_i))$
+
             </p>
+
         </blockquote>
+
         <p>Let's break down this formula:</p>
+
         <ul>
+
             <li><strong>$M$</strong>: The total number of passages to be ranked for that query.</li>
+
             <li><strong>$(p_1, ..., p_M)$</strong>: The set of M passages.</li>
+
             <li><strong>$R=(r_1, ..., r_M)$</strong>: The ground-truth ranking generated by the teacher model (e.g., ChatGPT), where $r_i$ is the rank of passage $p_i$. A lower rank number indicates higher relevance (e.g., rank 1 is the most relevant).</li>
+
             <li><strong>$s_i = f_{\theta}(q, p_i)$</strong>: The relevance score predicted by the student model for the passage $p_i$ given the query $q$.</li>
+
             <li><strong>$\mathbb{1}_{r_i < r_j}$</strong>: This is an indicator function. It is equal to 1 if passage $p_i$ is more relevant than passage $p_j$ (i.e., its rank $r_i$ is lower than $r_j$), and 0 otherwise. This ensures the loss is only calculated for incorrectly ordered pairs.</li>
-            <li><strong>$\log(1+\exp(s_j - s_i))$</strong>: This is the core of the loss function. It's a logistic loss that penalizes the model when its predicted scores do not match the correct order. If passage $p_i$ is more relevant than $p_j$ (i.e., $r_i < r_j$), we want the student's score for $p_i$ ($s_i$) to be higher than the score for $p_j$ ($s_j$). The term ($s_j - s_i$) will be a positive value if the student model gets the ranking wrong ($s_j > s_i$) and a negative value if it gets it right ($s_i > s_j$). The $\log(1 + \exp(x))$ function is always positive. The loss increases as the difference in scores, ($s_j - s_i$), increases, heavily penalizing a wrong ranking. When the model gets the order right ($s_i > s_j$), the term ($s_j - s_i$) becomes a large negative number, causing the $\log(1 + \exp(x))$ term to approach zero, which results in a very small loss.</li>
+
+            <li><strong>$\log(1+\exp(s_j - s_i))$</strong>: This is the core of the loss function. It's a logistic loss that penalizes the model when its predicted scores don't match the correct order. If passage $p_i$ is more relevant than $p_j$ (i.e., $r_i < r_j$), we want the student's score for $p_i$ ($s_i$) to be higher than the score for $p_j$ ($s_j$). The term ($s_j - s_i$) will be a positive value if the student model gets the ranking wrong ($s_j > s_i$) and a negative value if it gets it right ($s_i > s_j$). The $\log(1 + \exp(x))$ function is always positive. The loss increases as the difference in scores, ($s_j - s_i$), increases, heavily penalizing a wrong ranking. When the model gets the order right ($s_i > s_j$), the term ($s_j - s_i$) becomes a large negative number, causing the $\log(1 + \exp(x))$ term to approach zero, which results in a very small loss.</li>
+
         </ul>
+
         <p>
+
             A smaller, specialized model (the student), such as a BERT-like cross-encoder, is then trained using this generated data. The training objective is not to predict the exact permutation but to produce relevance scores that result in a ranking that matches the teacher's. The training uses a pairwise loss function, like RankNet loss, which measures the correctness of the relative ordering of passages. The model is penalized if it scores a less-relevant passage higher than a more-relevant one, according to the teacher's permutation.
+
         </p>
+
     </article>
+
 </body>
+
 </main>
 
- 
+
+
+    
+
 <footer class="page__meta">
-  <!-- Any additional metadata or footer information goes here -->
+
+  <!-- Any additional metadata or footer information goes here -->
+
 </footer>
 
+
+
 <div class="page__footer">
-  <footer>
-    <!-- Your footer content goes here -->
-    <p>@2025 Margi Pandya</p>
-  </footer>
+
+  <footer>
+
+    <!-- Your footer content goes here -->
+
+    <p>@2025 Margi Pandya</p>
+
+  </footer>
+
 </div>
 
 </body>
