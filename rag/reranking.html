@@ -20,6 +20,7 @@ Increases token input length (higher cost).
 Makes the LLM’s reasoning harder → it may hallucinate or mix irrelevant content. 
 
 2. With Re-ranking models
+Re-ranking is a way of fine-grained retrieval results, that can search for individual words in query and documents at the same time and combinely.
 After rough retrieval from the retrieval, the document chunks are passed through the re-ranking model, which are arranged decendingly based on the importance with the input query.
 
 Types of the Re-ranking models:
@@ -96,4 +97,220 @@ The documents are then sorted by their scores, and the top-k documents are retur
 
 
 ColBeRTV2
-Like ColBert is for optimized version for Bert for time and colbertv2 is optimized for space complexity, 
+Cobertv2 is improvement of colbert on two new improvement 1. is the training strategy 2. compressed indexing. Moreover, an initial ColBERT model is used to index the training passages. For each training query, this model retrieves the top-k passages. These passages often include a mix of relevant documents (positives) and challenging, but irrelevant, documents (hard negatives) that are semantically similar to the query.
+
+
+
+1. Knowledge Distillation
+For training, knowledge distillation of ms-macro-miniLM-L-6-V2 is used as teacher model for the already trained colbert model The scores from the cross-encoder are used to train the ColBERT student model. ColBERTv2 uses a KL-Divergence loss to distill the teacher's scores into its architecture. This is a crucial step because the native scoring outputs of the ColBERT model (sum of cosine similarities) have a restricted scale and might not directly align with the cross-encoder's scores. The KL-Divergence loss helps the student model to mimic the teacher's ranking distribution.
+To further improve training, the process also uses in-batch negatives. A cross-entropy loss is applied to the positive score of each query against all passages corresponding to other queries in the same batch. This provides additional, diverse negative examples for the model to learn from.
+
+2. Indexing
+MaxSim is applied on a reduced inverted list in a two-stage retrieval process to improve efficiency. This two-step process allows for fast candidate generation using approximate scores, followed by a more accurate re-ranking of the top passages.
+
+1. Candidate Generation with the Reduced Inverted List
+This first stage is for speed and efficiency. The goal is to quickly identify a small set of promising documents without decompressing all the vectors.
+
+Query Encoding: The query is encoded into a set of multi-vector representations, one for each token.
+
+Centroid Lookup: For each query token vector, the system finds its nearest nprobe centroids. nprobe is a hyperparameter that controls how many clusters to search.
+
+Inverted List Traversal: Using these centroid IDs, the system accesses the inverted list. This list maps each centroid to the compressed passage embeddings that are closest to it.
+
+Approximate MaxSim: For each query vector, an approximate "MaxSim" operation is conducted. This involves calculating the similarity between the query vector and the decompressed passage embeddings from the inverted list. This computes a lower-bound on the true MaxSim score, which is a good proxy for relevance.
+
+Candidate Selection: The lower-bound scores are summed across the query's tokens to get an overall score for each passage. The top ncandidate passages with the highest approximate scores are selected for the next stage.
+
+
+Decompression: For each of the ncandidate passages, the system loads and fully decompresses all of its token embeddings by combining the centroid and the residual vector.
+
+Full MaxSim Calculation: The true MaxSim operation is performed. This involves calculating the cosine similarity between each query token vector and all of the uncompressed passage token vectors, and then summing up the maximum similarities.
+
+
+RankGPT:
+Instead of traditional supervised way of fine-tuning a LLM, rankGPT used permutation knowledge distillation technique to train the model. They used two very interesting things like sliding window techique for data generation and permutation distillaition using RankLoss.
+
+Sliding Window:
+ The first step is to generate a large dataset of ranked lists. For a given query and a set of candidate passages, the large LLM (the teacher) uses the instructional permutation and sliding window methods to produce a high-quality, ranked list. This ranked list serves as the ground-truth data for the student model. To overcome the token limits of LLMs, which can't process hundreds of passages at once, the passages are re-ranked in a series of smaller batches using a sliding window. The window moves from the end of the list to the beginning, re-ranking a subset of passages at each step and "locking in" the relative order of the top documents as it proceeds.
+
+Permutation Distillation:
+The core idea behind RankNet loss is to move beyond simple point-wise relevance scores and instead focus on the relative order of items. It is a type of pairwise loss function used in "learning to rank" algorithms.
+
+Here's a more detailed breakdown:
+
+Pairwise Comparison
+Instead of treating each passage's relevance score independently, RankNet works by considering pairs of passages. For a given query, the loss is calculated based on whether the model correctly ranks one passage higher than another, according to the ground-truth ranking provided by the teacher model (in this case, ChatGPT).
+
+The objective is to minimize the number of "inversions" in the final ranked list. An inversion occurs when a less-relevant passage is ranked above a more-relevant one.
+
+The Loss Function
+The RankNet loss function, as described in the paper you provided, is:
+
+L 
+RankNet
+​
+ =∑ 
+i=1
+M
+​
+ ∑ 
+j=1
+M
+​
+ 1 
+r 
+i
+​
+ <r 
+j
+​
+ 
+​
+ log(1+exp(s 
+j
+​
+ −s 
+i
+​
+ ))
+
+Let's break down this formula:
+
+q: The query.
+
+M: The total number of passages to be ranked for that query.
+
+(p 
+1
+​
+ ,…,p 
+M
+​
+ ): The set of M passages.
+
+R=(r 
+1
+​
+ ,…,r 
+M
+​
+ ): The ground-truth ranking generated by the teacher model (e.g., ChatGPT), where r 
+i
+​
+  is the rank of passage p 
+i
+​
+ . A lower rank number indicates higher relevance (e.g., rank 1 is the most relevant).
+
+s 
+i
+​
+ =f 
+θ
+​
+ (q,p 
+i
+​
+ ): The relevance score predicted by the student model for the passage p 
+i
+​
+  given the query q.
+
+1 
+r 
+i
+​
+ <r 
+j
+​
+ 
+​
+ : This is an indicator function. It is equal to 1 if passage p 
+i
+​
+  is more relevant than passage p 
+j
+​
+  (i.e., its rank r 
+i
+​
+  is lower than r 
+j
+​
+ ), and 0 otherwise. This ensures the loss is only calculated for incorrectly ordered pairs.
+
+log(1+exp(s 
+j
+​
+ −s 
+i
+​
+ )): This is the core of the loss function. It's a logistic loss that penalizes the model when its predicted scores don't match the correct order.
+
+If passage p 
+i
+​
+  is more relevant than p 
+j
+​
+  (i.e., r 
+i
+​
+ <r 
+j
+​
+ ), we want the student's score for p 
+i
+​
+  (s 
+i
+​
+ ) to be higher than the score for p 
+j
+​
+  (s 
+j
+​
+ ).
+
+The term (s 
+j
+​
+ −s 
+i
+​
+ ) will be a positive value if the student model gets the ranking wrong (s 
+j
+​
+ >s 
+i
+​
+ ) and a negative value if it gets it right (s 
+i
+​
+ >s 
+j
+​
+ ).
+
+The $\log(1 + \exp(x))$ function is always positive. The loss increases as the difference in scores, (s 
+j
+​
+ −s 
+i
+​
+ ), increases, heavily penalizing a wrong ranking. When the model gets the order right (s 
+i
+​
+ >s 
+j
+​
+ ), the term (s 
+j
+​
+ −s 
+i
+​
+ ) becomes a large negative number, causing the $\log(1 + \exp(x))$ term to approach zero, which results in a very small loss.
+
+  A smaller, specialized model (the student), such as a BERT-like cross-encoder, is then trained using this generated data. The training objective is not to predict the exact permutation but to produce relevance scores that result in a ranking that matches the teacher's. The training uses a pairwise loss function, like RankNet loss, which measures the correctness of the relative ordering of passages. The model is penalized if it scores a less-relevant passage higher than a more-relevant one, according to the teacher's permutation.
