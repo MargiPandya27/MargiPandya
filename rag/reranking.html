@@ -367,3 +367,28 @@ i
  ) becomes a large negative number, causing the $\log(1 + \exp(x))$ term to approach zero, which results in a very small loss.
 
   A smaller, specialized model (the student), such as a BERT-like cross-encoder, is then trained using this generated data. The training objective is not to predict the exact permutation but to produce relevance scores that result in a ranking that matches the teacher's. The training uses a pairwise loss function, like RankNet loss, which measures the correctness of the relative ordering of passages. The model is penalized if it scores a less-relevant passage higher than a more-relevant one, according to the teacher's permutation.
+
+
+   <h2>References</h2>
+      <ol>
+        <li>Cohan, Arman, et al. “A Discourse-Aware Attention Model for Abstractive Summarization of Long Documents.” NAACL HLT Short Papers (June 2018). Available at Hugging Face: ccdv/arxiv-summarization (accessed May 2025)</li>
+        <li>Beltagy, Iz, Kyle Lo, and Arman Cohan. "SciBERT: A pretrained language model for scientific text." arXiv preprint arXiv:1903.10676 (2019).</li>
+        <li>Malkov, Yu. A., and D. A. Yashunin. “Efficient and Robust Approximate Nearest Neighbor Search Using Hierarchical Navigable Small World Graphs.” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 42, no. 4, Apr. 2020, pp. 824–36. IEEE.</li>
+        <li>Johnson, Jeff, Matthijs Douze, and Hervé Jégou. “Billion-Scale Similarity Search with GPUs.” IEEE Transactions on Big Data, vol. 7, no. 3, July 2021, pp. 535–47. IEEE.</li>  
+      </ol>
+
+</main>
+
+<footer class="page__meta">
+  <!-- Any additional metadata or footer information goes here -->
+</footer>
+
+<div class="page__footer">
+  <footer>
+    <!-- Your footer content goes here -->
+    <p>@2025 Margi Pandya</p>
+  </footer>
+</div>
+
+</body>
+</html>
