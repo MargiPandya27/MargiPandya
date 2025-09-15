@@ -7,138 +7,68 @@
   <script id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
   </script>
-  <style>
-    body {
-      font-family: Georgia, serif;
-      margin: 0;
-      padding: 0;
-      background: #f9f9f9;
-      color: #333;
-    }
-    main {
-      display: flex;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    article {
-      flex: 3;
-      padding: 2rem;
-      background: white;
-    }
-    aside {
-      flex: 1;
-      background: #fafafa;
-      padding: 2rem;
-      border-left: 1px solid #ddd;
-    }
-    h1, h2, h3 {
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      color: #2c3e50;
-    }
-    h1 {
-      font-size: 2rem;
-      border-bottom: 2px solid #eee;
-      padding-bottom: 0.5rem;
-    }
-    figure {
-      margin: 2rem 0;
-    }
-    figcaption {
-      font-size: 0.9rem;
-      color: #555;
-      text-align: center;
-    }
-    .references {
-      font-size: 0.9rem;
-      margin-top: 2rem;
-    }
-    .references li {
-      margin-bottom: 0.5rem;
-    }
-    nav ul {
-      list-style: none;
-      padding: 0;
-    }
-    nav ul li {
-      margin-bottom: 0.8rem;
-    }
-    nav ul li a {
-      text-decoration: none;
-      color: #007acc;
-    }
-    nav ul li a:hover {
-      text-decoration: underline;
-    }
-  </style>
 </head>
 <body>
   <main>
     <article>
       <h1>Re-ranking in Retrieval-Augmented Generation (RAG) Systems</h1>
 
-      <section>
+      <section id="overview">
         <h2>Overview</h2>
         <p>
-          Retrieval-Augmented Generation (RAG) enhances large language models (LLMs) by grounding them in external knowledge.
-          A critical step in this process is the <em>retrieval stage</em>, where relevant documents or passages are selected to augment the model’s input.
-          However, simple retrieval pipelines (e.g., BM25 or dense retrievers like FAISS) often surface noisy or partially relevant documents,
-          reducing the overall performance of the system. Re-ranking methods aim to refine the retrieved set by re-scoring candidates
-          and prioritizing the most semantically aligned passages before they are passed to the generator.
+          Retrieval-Augmented Generation (RAG) strengthens large language models (LLMs) by grounding them in external knowledge.
+          A key challenge arises in the <em>retrieval stage</em>, where noisy or partially relevant documents can degrade performance.
+          Re-ranking addresses this issue by re-scoring retrieved documents and ensuring that only the most relevant ones are passed
+          to the generator.
         </p>
       </section>
 
-      <section>
+      <section id="cross-encoder">
         <h2>Cross-Encoder Based Re-ranking</h2>
         <p>
-          Cross-encoder architectures, such as <strong>ColBERT</strong> and <strong>ColBERTv2</strong>, represent one of the most effective approaches
-          for re-ranking. Unlike bi-encoders that embed queries and documents separately, cross-encoders jointly encode the query-document pair,
-          allowing for fine-grained token-level interactions. This leads to significantly improved relevance judgments, though at the cost of higher latency.
-        </p>
-        <p>
-          Recent studies have demonstrated that cross-encoder re-ranking can boost retrieval accuracy by up to 10–15% in open-domain QA benchmarks.
-          However, these methods are computationally expensive and often require infrastructure capable of handling large-scale inference.
+          Cross-encoder models such as <strong>ColBERT</strong> and <strong>ColBERTv2</strong> jointly encode query-document pairs,
+          allowing fine-grained token-level interactions. This significantly improves relevance scoring compared to bi-encoders,
+          which embed queries and documents separately. While effective, cross-encoders are computationally heavy and introduce
+          higher latency, making them less suitable for real-time or large-scale applications.
         </p>
       </section>
 
-      <section>
+      <section id="llm-based">
         <h2>LLM-based Re-ranking</h2>
         <p>
-          With the advent of instruction-tuned LLMs, re-ranking has also been explored using <em>zero-shot and few-shot prompting</em>.
-          For example, <strong>RankGPT</strong> leverages GPT-style models to evaluate the relevance of candidate passages by framing the task
-          as a ranking or classification prompt. While highly effective, the cost and latency of querying large models for every candidate pair
-          is a limiting factor. To mitigate this, <em>distillation strategies</em> have been proposed, where an LLM’s judgments are used to train
-          a smaller, more efficient cross-encoder.
+          Instruction-tuned LLMs can also serve as re-rankers. Approaches like <strong>RankGPT</strong> frame re-ranking as a ranking
+          or classification prompt, enabling zero-shot or few-shot usage. These methods are flexible and accurate, but querying an
+          LLM for every candidate passage is costly. To reduce expense, distillation techniques are used, where LLM outputs train
+          smaller cross-encoders for efficient deployment.
         </p>
       </section>
 
-      <section>
+      <section id="api-based">
         <h2>API-based Solutions</h2>
         <p>
-          Commercial APIs such as <strong>Cohere Rerank</strong> provide off-the-shelf re-ranking capabilities.
-          These services are optimized for speed and can be easily integrated into existing RAG pipelines.
-          While attractive for prototyping and production deployment, they introduce dependencies on external vendors
-          and recurring usage costs, which may be prohibitive for large-scale systems.
+          Services such as <strong>Cohere Rerank</strong> provide fast, production-ready re-ranking APIs. These tools simplify integration
+          into RAG pipelines and are optimized for speed. However, they introduce reliance on third-party providers and recurring costs,
+          which may limit scalability for large deployments.
         </p>
       </section>
 
-      <section>
+      <section id="discussion">
         <h2>Discussion</h2>
         <p>
-          Re-ranking substantially improves the quality of RAG pipelines by reducing noise in the retrieval stage
-          and ensuring that the most contextually relevant documents are passed to the LLM.
-          However, the choice of method involves a trade-off:
+          Re-ranking consistently enhances RAG pipelines by filtering out irrelevant results and ensuring the generator receives high-quality context.
+          Different methods involve trade-offs:
         </p>
         <ul>
-          <li><strong>Cross-encoders:</strong> High accuracy, high latency.</li>
-          <li><strong>LLM-based re-ranking:</strong> Flexible, but costly for large-scale usage.</li>
-          <li><strong>API-based solutions:</strong> Practical and fast, but reliant on third-party providers.</li>
+          <li><strong>Cross-encoders:</strong> Accurate but slow and resource-intensive.</li>
+          <li><strong>LLM-based re-ranking:</strong> Flexible and accurate, but costly at scale.</li>
+          <li><strong>API-based solutions:</strong> Easy to use and fast, but dependent on external vendors.</li>
         </ul>
         <p>
-          Ultimately, the best approach depends on the application’s scale, latency tolerance, and resource constraints.
+          The best strategy depends on an application’s accuracy needs, budget, and latency requirements.
         </p>
       </section>
 
-      <section class="references">
+      <section id="references">
         <h2>References</h2>
         <ul>
           <li>Khattab, O., & Zaharia, M. (2020). ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT. <em>SIGIR</em>.</li>
@@ -154,9 +84,9 @@
         <h2>Navigation</h2>
         <ul>
           <li><a href="#overview">Overview</a></li>
-          <li><a href="#cross-encoder-based-re-ranking">Cross-Encoder Re-ranking</a></li>
-          <li><a href="#llm-based-re-ranking">LLM-based Re-ranking</a></li>
-          <li><a href="#api-based-solutions">API-based Solutions</a></li>
+          <li><a href="#cross-encoder">Cross-Encoder Re-ranking</a></li>
+          <li><a href="#llm-based">LLM-based Re-ranking</a></li>
+          <li><a href="#api-based">API-based Solutions</a></li>
           <li><a href="#discussion">Discussion</a></li>
           <li><a href="#references">References</a></li>
         </ul>
