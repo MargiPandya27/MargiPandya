@@ -89,18 +89,34 @@
       </ol>
 
       <h3 id="colbert">Cross-Encoder based Models: ColBERT</h3>
-      <p>ColBERT uses a BERT model to encode tokens into embeddings, which is effective because:</p>
+  
+      <p>ColBERT uses a basic BERT model to encode tokens into embeddings, which is a good choice because:</p>
       <ul>
-        <li><strong>Masked Language Modeling (BERT):</strong> Creates bidirectional contextual embeddings.</li>
-        <li><strong>Causal Modeling (LLM):</strong> Unidirectional, better for generation, but not as strong for retrieval.</li>
+        <li><strong>Masked Language Modeling (BERT):</strong> ColBERT leverages BERT's Masked Language Modeling, predicting randomly masked tokens with a bidirectional approach (seeing both past and future tokens), resulting in strong contextualized embeddings.</li>
+        <li><strong>Causal Modeling (LLM):</strong> In contrast, Causal Modeling predicts the next token in a sequence and is unidirectional. While ideal for generation, the bidirectional embeddings from BERT are more effective for retrieval tasks.</li>
       </ul>
-
+      
       <figure class="rag-figure">
-        <img src="Colbert_1.png" alt="ColBERT architecture">
-        <figcaption><strong>Figure 1:</strong> ColBERT architecture and retrieval flow.</figcaption>
+        <img src="Colbert_1.png" alt="ColBERT pipeline illustration">
+        <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
       </figure>
-
-      <!-- ColBERT explanation continues here... -->
+      
+      <p>The core concept behind <strong>ColBERT</strong> is late interaction. Unlike other models that create a single embedding for a document, ColBERT creates an embedding for every token in the query and every token in the document using a pre-trained BERT-based encoder.</p>
+      
+      <p>During the re-ranking process, ColBERT calculates a similarity score for every token in the query against all tokens in the documents. It then takes the maximum similarity score for each query token and sums them to determine the document's final relevance score.</p>
+      
+      <h4>How ColBERT Works: A Two-Stage Process</h4>
+      
+      <p>The retrieval process in ColBERT is split into two stages:</p>
+      
+      <p><strong>Approximate Filtering:</strong> For each query embedding, a separate vector similarity search is performed on the FAISS index. The search finds the top-k' most similar document embeddings from the entire collection. The IVFPQ index speeds up this search by searching only a few nearest partitions (p nearest cells). The results of these Nq searches (one for each query embedding) are combined, and the unique document IDs are collected into a set of K candidate documents. These K documents are likely to contain embeddings highly similar to the query embeddings.</p>
+      
+      <p><strong>Re-ranking and Refinement:</strong> Once the smaller set of K candidate documents is identified, a precise re-ranking finds the final top-k results. The full ColBERT scoring process (MaxSim) is applied to these K documents. The relevance score for each candidate is calculated by summing the maximum similarity between each query embedding and all document embeddings. The documents are then sorted by score, and the top-k are returned as the final result.</p>
+      
+      <figure class="rag-figure">
+        <img src="colbert_result.png" alt="ColBERT re-ranking result">
+        <figcaption><strong>Figure 2:</strong> Re-ranking and scoring in the ColBERT system.</figcaption>
+      </figure>
 
     
       <h3 id="colbertv2">ColBERTv2</h3>
