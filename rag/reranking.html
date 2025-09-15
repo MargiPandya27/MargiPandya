@@ -105,8 +105,6 @@
       
       <p>During the re-ranking process, ColBERT calculates a similarity score for every token in the query against all tokens in the documents. It then takes the maximum similarity score for each query token and sums them to determine the document's final relevance score.</p>
       
-      <h4>How ColBERT Works: A Two-Stage Process</h4>
-      
       <p>The retrieval process in ColBERT is split into two stages:</p>
       
       <p><strong>Approximate Filtering:</strong> For each query embedding, a separate vector similarity search is performed on the FAISS index. The search finds the top-k' most similar document embeddings from the entire collection. The IVFPQ index speeds up this search by searching only a few nearest partitions (p nearest cells). The results of these Nq searches (one for each query embedding) are combined, and the unique document IDs are collected into a set of K candidate documents. These K documents are likely to contain embeddings highly similar to the query embeddings.</p>
