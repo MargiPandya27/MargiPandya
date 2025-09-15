@@ -49,148 +49,142 @@
   </div>
 
 <!-- Main Content -->
-<main style="flex: 1; padding: 20px; max-width: 1000px;">
+  <main style="flex: 1; padding: 20px; max-width: 1000px;">
+      <h1>Does Re-ranking Help Improve the Performance of RAG?</h1>
 
-  <h1>Does Re-ranking Help Improve the Performance of RAG?</h1>
+      <section id="overview">
+        <h2>Overview</h2>
+        <p>
+          When it comes to evaluation of RAG, it should be evaluated on the quality of retrieved documents,
+          since the quality of the retrieved documents determines the quality of the generated response by the LLM.
+          For RAG with complex applications, and also when the source of retrieval is unknown webpages,
+          then after performing only the first stage of retrieval would not be helpful.
+        </p>
+      </section>
 
-  <p>
-    When evaluating Retrieval-Augmented Generation (RAG), performance should be assessed not only on the quality of generated answers,
-    but also on the <strong>quality of retrieved documents</strong>, since retrieved evidence directly shapes the LLM’s outputs.
-    In complex applications—especially when the retrieval source is unstructured or noisy (e.g., the open web)—relying only on a
-    first-stage retriever is insufficient. This is where <strong>re-ranking</strong> improves performance by refining retrieved passages.
-  </p>
+      <section id="classical-rag">
+        <h2>1. Classical RAG (Retriever → Generator)</h2>
+        <p><strong>Retriever:</strong> dense retriever (e.g., FAISS, DPR, BM25) fetches top-k passages.</p>
+        <p><strong>Generator:</strong> LLM (like GPT-4) conditions on these k passages and produces an answer.</p>
+        <p><strong>Problem:</strong> Retriever may bring back many partially relevant or noisy passages. Generator has to process all of them, which:</p>
+        <ul>
+          <li>Increases token input length (higher cost).</li>
+          <li>Makes the LLM’s reasoning harder → it may hallucinate or mix irrelevant content.</li>
+        </ul>
+      </section>
 
-  <section>
-    <h2>1. Classical RAG (Retriever → Generator)</h2>
-    <p>
-      In the standard setup:
-    </p>
-    <ul>
-      <li><strong>Retriever:</strong> A dense retriever (e.g., FAISS, DPR, BM25) fetches the top-<em>k</em> passages.</li>
-      <li><strong>Generator:</strong> An LLM (such as GPT-4) conditions on these <em>k</em> passages to produce an answer.</li>
-    </ul>
-    <p>
-      <strong>Problem:</strong> The retriever may return many partially relevant or noisy passages. The generator then faces challenges:
-    </p>
-    <ul>
-      <li>Increased input length → higher cost and slower inference.</li>
-      <li>Reasoning over noise → higher risk of hallucination or irrelevant mixing.</li>
-    </ul>
-  </section>
+      <section id="with-reranking">
+        <h2>2. With Re-ranking Models</h2>
+        <p>
+          Re-ranking is a way of fine-grained retrieval results, that can search for individual words
+          in query and documents at the same time and jointly. After rough retrieval,
+          the document chunks are passed through the re-ranking model, which are arranged
+          descendingly based on the importance with the input query.
+        </p>
+        <p><strong>Types of Re-ranking Models:</strong></p>
+        <ol>
+          <li>Cross-Encoder based models: ColBERT, ColBERTv2</li>
+          <li>LLM based re-ranking models: RankGPT</li>
+          <li>API based models: Cohere API</li>
+        </ol>
+      </section>
 
-  <section>
-    <h2>2. RAG with Re-ranking</h2>
-    <p>
-      Re-ranking provides a second filtering stage that <em>refines</em> retrieval outputs. After initial retrieval,
-      candidate passages are passed through a re-ranking model, which reorders them based on fine-grained similarity to the query.
-      This ensures that the generator receives only the <strong>most relevant</strong> evidence.
-    </p>
-    <p><strong>Types of re-ranking models:</strong></p>
-    <ol>
-      <li>Cross-encoder based models: <em>ColBERT, ColBERTv2</em></li>
-      <li>LLM-based re-ranking: <em>RankGPT</em></li>
-      <li>API-based models: <em>Cohere Rerank</em></li>
-    </ol>
-  </section>
+      <section id="cross-encoder">
+        <h2>Cross-Encoder Based Models</h2>
+        <h3>ColBERT</h3>
+        <p>
+          ColBERT is based on a BERT encoder. The main concept behind ColBERT is that of masked language modelling in BERT.
+        </p>
+        <p><strong>Masked Modelling:</strong></p>
+        <ul>
+          <li>Predict randomly masked tokens</li>
+          <li>Bidirectional (sees past and future tokens)</li>
+          <li>Strength: strong embeddings</li>
+          <li>Useful for retrieval and classification tasks</li>
+          <li>Limitation: not useful for generation</li>
+        </ul>
+        <p><strong>Causal Modelling:</strong></p>
+        <ul>
+          <li>Predict next token in sequence</li>
+          <li>Unidirectional (only sees past tokens)</li>
+          <li>Strength: compatible with autoregressive LLMs</li>
+          <li>Useful for generation, instruction-following tasks</li>
+          <li>Limitation: harder to train (less parallelism)</li>
+        </ul>
+        <p>
+          The ColBERT model has two encoders for queries and documents which are pre-trained.
+          Offline, the similarity score is computed for every token in query and all the documents.
+          The max similarity across tokens is taken for each document, then arranged in descending order.
+        </p>
+        <p>
+          They make use of the powerful embeddings of the BERT model in masked modelling.
+          Query embeddings are tokenized into <code>q1, q2, q3, ...</code> and converted to bag-of-words embeddings.
+        </p>
 
-  <section>
-    <h2>Cross-Encoder Based Models</h2>
-    <h3>ColBERT</h3>
-    <p>
-      ColBERT is based on BERT encoders. It exploits <strong>masked language modeling</strong> representations,
-      which are bidirectional and yield strong embeddings for retrieval and classification.
-      Unlike causal models, masked models excel in semantic similarity tasks but are not designed for text generation.
-    </p>
-    <p>
-      ColBERT uses two encoders (for queries and documents). Query tokens are embedded individually,
-      and similarity is computed between each query token embedding and document token embeddings.
-      For each query token, the maximum similarity across document tokens is taken (<em>MaxSim</em>), and results are summed to form a final score.
-      This token-level matching enables fine-grained relevance scoring.
-    </p>
+        <h4>Approximate Filtering</h4>
+        <p>
+          For each of the query’s embeddings (\(E_q\)), a separate vector similarity search is performed on the FAISS index.
+          The search finds the top-k′ most similar document embeddings. The IVFPQ index is used to speed this up.
+        </p>
 
-    <h4>Approximate Filtering</h4>
-    <p>
-      To scale, ColBERT uses approximate filtering with FAISS:
-    </p>
-    <ul>
-      <li>Each query embedding runs a similarity search against FAISS indexes (e.g., IVFPQ).</li>
-      <li>Nearest partitions are searched, reducing computational cost.</li>
-      <li>Results from all query embeddings are merged into <em>K</em> candidate documents.</li>
-    </ul>
+        <h4>Re-ranking and Refinement</h4>
+        <p>
+          Once the smaller set of K candidate documents is identified, ColBERT performs precise re-ranking.
+          Using late interaction, the relevance score is calculated as:
+        </p>
+        <p>
+          \[
+          S_{qd} = \sum_i \max_j (E_{q_i}^\top E_{d_j})
+          \]
+        </p>
+        <p>
+          Documents are sorted by these scores, and the top-k are returned as final results.
+        </p>
 
-    <h4>Re-ranking and Refinement</h4>
-    <p>
-      Once candidates are collected, ColBERT applies the full <em>MaxSim</em> scoring:
-    </p>
-    <p>
-      \[
-      \text{Score}(q, d) = \sum_{i} \max_{j} \langle E_{q_i}, E_{d_j} \rangle
-      \]
-    </p>
-    <p>
-      Documents are then sorted by these scores, ensuring that top-<em>k</em> passages are the most relevant.
-    </p>
+        <h3>ColBERTv2</h3>
+        <p>
+          ColBERTv2 improves ColBERT with new training strategies and compressed indexing.
+          It uses knowledge distillation and efficient candidate generation with reduced inverted lists.
+        </p>
+      </section>
 
-    <h3>ColBERTv2</h3>
-    <p>
-      ColBERTv2 introduces two key improvements:
-    </p>
-    <ol>
-      <li><strong>Training Strategy:</strong> Uses knowledge distillation from a cross-encoder teacher (e.g., ms-macro-MiniLM-L-6-v2).
-        KL-divergence loss aligns ColBERT’s scores with teacher distributions, combined with in-batch negatives for robustness.</li>
-      <li><strong>Compressed Indexing:</strong> Employs a two-stage retrieval process:
-        fast approximate candidate generation with reduced inverted lists, followed by precise <em>MaxSim</em> re-ranking.
-      </li>
-    </ol>
-  </section>
+      <section id="llm-rerank">
+        <h2>LLM-Based Re-ranking</h2>
+        <h3>RankGPT</h3>
+        <p>
+          Instead of traditional supervised fine-tuning, RankGPT uses <strong>permutation knowledge distillation</strong>
+          with two innovations: sliding window data generation and permutation distillation with RankLoss.
+        </p>
 
-  <section>
-    <h2>LLM-Based Re-ranking</h2>
-    <h3>RankGPT</h3>
-    <p>
-      Instead of traditional supervised fine-tuning, RankGPT introduces <strong>permutation knowledge distillation</strong> with two innovations:
-    </p>
-    <ul>
-      <li><strong>Sliding Window:</strong> Handles long candidate lists by re-ranking subsets iteratively, locking in the relative order of top passages.</li>
-      <li><strong>Permutation Distillation:</strong> Uses RankNet loss to train a smaller student model (e.g., BERT cross-encoder) from teacher rankings.
-    </ul>
-    <p>
-      The RankNet loss is defined as:
-    </p>
-    <p>
-      \[
-      L_{\text{RankNet}} = \sum_{i=1}^M \sum_{j=1}^M \mathbf{1}_{r_i < r_j} \cdot \log(1 + \exp(s_j - s_i))
-      \]
-    </p>
-    <p>
-      where \(s_i\) and \(s_j\) are the student model’s scores, and \(r_i, r_j\) are teacher-provided ranks.
-      This penalizes inversions (cases where less relevant passages are scored above more relevant ones).
-    </p>
-  </section>
+        <h4>Sliding Window</h4>
+        <p>
+          To overcome token limits of LLMs, passages are re-ranked in batches using a sliding window.
+          The window moves backwards through the list, locking in the relative order of top documents.
+        </p>
 
-  <section>
-    <h2>API-Based Models</h2>
-    <p>
-      Commercial APIs like <strong>Cohere Rerank</strong> provide ready-to-use re-ranking functionality optimized for speed and scalability.
-      These are useful in production pipelines but introduce dependencies and recurring costs.
-    </p>
-  </section>
+        <h4>Permutation Distillation</h4>
+        <p>
+          RankNet loss focuses on relative ordering of passages.
+          For a query \(q\), passages \(p_1,\dots,p_M\), and ground-truth ranking \(R\), the loss is:
+        </p>
+        <p>
+          \[
+          L_{\text{RankNet}} = \sum_{i=1}^M \sum_{j=1}^M \mathbf{1}_{r_i < r_j} \log(1 + \exp(s_j - s_i))
+          \]
+        </p>
+        <p>
+          Here, \(s_i = f_\theta(q, p_i)\) is the predicted score.  
+          The loss penalizes incorrect orderings (inversions), ensuring the student model matches the teacher’s ranking.
+        </p>
+      </section>
 
-  <section>
-    <h2>Discussion</h2>
-    <p>
-      Re-ranking consistently enhances RAG by reducing noise and ensuring that LLMs receive higher-quality evidence.
-      However, the choice of method involves trade-offs:
-    </p>
-    <ul>
-      <li><strong>Cross-encoders:</strong> Accurate, but computationally heavy.</li>
-      <li><strong>LLM-based:</strong> Flexible and high-quality, but costly for large-scale use.</li>
-      <li><strong>API-based:</strong> Easy to integrate, but dependent on third-party services.</li>
-    </ul>
-    <p>
-      Ultimately, the optimal re-ranking strategy depends on scale, latency requirements, and resource availability.
-    </p>
-  </section>
+      <section id="api-rerank">
+        <h2>API-Based Models</h2>
+        <p>
+          API services such as <strong>Cohere Rerank</strong> provide easy-to-integrate, production-ready solutions.
+          They are optimized for speed and reliability but add third-party dependency and recurring cost.
+        </p>
+      </section>
 </main>
 
 
