@@ -95,15 +95,34 @@
             <li><strong>API-based models:</strong> CohereAPI</li>
         </ol>
 
-        <h3>Cross-Encoder based Models:</h3>
-        <h4>ColBERT</h4>
-        <p>
-            The core concept behind <strong>ColBERT</strong> is that of late interaction. Unlike other models that create a single embedding for a document, ColBERT creates a powerful embedding for every token in the query and every token in the document using a pre-trained BERT-based encoder.
-        </p>
-        <ul>
+       <h3>Cross-Encoder based Models:ColBERT</h3>
+
+       <p>ColBERT uses basic BERT model to encode the token into embedding, which is a good choice because: </p>
+       <ul>
             <li><strong>Masked Language Modeling (BERT):</strong> ColBERT leverages the power of BERT's Masked Language Modeling, which predicts randomly masked tokens and uses a bidirectional approach (seeing both past and future tokens). This results in strong contextualized embeddings.</li>
             <li><strong>Causal Modeling (LLM):</strong> In contrast, Causal Modeling predicts the next token in a sequence and is unidirectional. While ideal for generation, the powerful bidirectional embeddings from BERT are more effective for retrieval tasks.</li>
         </ul>
+        <p>
+            The core concept behind <strong>ColBERT</strong> is that of late interaction. Unlike other models that create a single embedding for a document, ColBERT creates a powerful embedding for every token in the query and every token in the document using a pre-trained BERT-based encoder.
+        </p>
+       
+        <p>
+            During the re-ranking process, ColBERT efficiently calculates a similarity score for every token in the query against all tokens in the documents. It then takes the maximum similarity score for each query token and sums them up to determine the document's final relevance score.
+        </p>
+      
+        <p>
+            The retrieval process in ColBERT is split into two stages:
+        </p>
+        <p>
+            <strong>Approximate Filtering:</strong>
+            For each of the query's embeddings, a separate vector similarity search is performed on the FAISS index. The search finds the top-k' most similar document embeddings from the entire collection for each query embedding. The IVFPQ index is used to speed up this search. Instead of checking every document embedding, it only searches a few of the nearest partitions (p nearest cells) in the index. The results of these Nq searches (one for each query embedding) are combined, and the unique document IDs are collected into a set of K candidate documents. These K documents are the ones most likely to contain one or more embeddings that are highly similar to the query embeddings.
+        </p>
+        
+        <p>
+            <strong>Re-ranking and Refinement:</strong>
+            Once the smaller set of K candidate documents is identified, a more precise re-ranking is performed to find the final top-k results. The full ColBERT scoring process (MaxSim) is performed on this smaller set of K documents. The relevance score for each of the K candidates is calculated by taking the sum of the maximum similarity between each query embedding and all of the document's embeddings. The documents are then sorted by their scores, and the top-k documents are returned as the final result.
+        </p>
+       
         <p>
             During the re-ranking process, ColBERT efficiently calculates a similarity score for every token in the query against all tokens in the documents. It then takes the maximum similarity score for each query token and sums them up to determine the document's final relevance score.
         </p>
@@ -116,13 +135,37 @@
         </ol>
 
         <h4>ColBERTv2</h4>
+        <h4>ColBERTv2</h4>
         <p>
-            <strong>ColBERTv2</strong> is an improvement over ColBERT with two new key features: a new training strategy and compressed indexing. An initial ColBERT model is used to index the training passages, and for each query, it retrieves a mix of relevant and challenging irrelevant documents.
+            <strong>ColBERTv2</strong> is an improvement over ColBERT on two new key features: the training strategy and compressed indexing. Moreover, an initial ColBERT model is used to index the training passages. For each training query, this model retrieves the top-k passages. These passages often include a mix of relevant documents (positives) and challenging, but irrelevant, documents (hard negatives) that are semantically similar to the query.
         </p>
-        <ol>
-            <li><strong>Knowledge Distillation:</strong> For training, an already trained ColBERT model acts as a "student," and its scores are compared to a more powerful "teacher" model (a cross-encoder). ColBERTv2 uses a KL-Divergence loss to distill the teacher's ranking distribution into its architecture. This helps the student model mimic the teacher's ranking behavior.</li>
-            <li><strong>Compressed Indexing:</strong> ColBERTv2 applies its MaxSim scoring on a reduced inverted list to improve efficiency. This two-step process allows for fast candidate generation using approximate scores, followed by a more accurate re-ranking of the top passages, which are then fully decompressed for a precise MaxSim calculation.</li>
-        </ol>
+        
+        <p>
+            <strong>1. Knowledge Distillation</strong><br>
+            For training, knowledge distillation of a powerful cross-encoder model like ms-macro-MiniLM-L-6-V2 is used as a teacher model for the already trained ColBERT model. The scores from the cross-encoder are used to train the ColBERT student model. ColBERTv2 uses a KL-Divergence loss to distill the teacher's scores into its architecture. This is a crucial step because the native scoring outputs of the ColBERT model (sum of cosine similarities) have a restricted scale and might not directly align with the cross-encoder's scores. The KL-Divergence loss helps the student model to mimic the teacher's ranking distribution. To further improve training, the process also uses in-batch negatives. A cross-entropy loss is applied to the positive score of each query against all passages corresponding to other queries in the same batch. This provides additional, diverse negative examples for the model to learn from.
+        </p>
+
+        <p>
+            <strong>2. Indexing</strong><br>
+            MaxSim is applied on a reduced inverted list in a two-stage retrieval process to improve efficiency. This two-step process allows for fast candidate generation using approximate scores, followed by a more accurate re-ranking of the top passages.
+        </p>
+        
+        <p>
+            <strong>Candidate Generation with the Reduced Inverted List</strong><br>
+            This first stage is for speed and efficiency. The goal is to quickly identify a small set of promising documents without decompressing all the vectors.
+        </p>
+        <ul>
+            <li><strong>Query Encoding:</strong> The query is encoded into a set of multi-vector representations, one for each token.</li>
+            <li><strong>Centroid Lookup:</strong> For each query token vector, the system finds its nearest nprobe centroids. nprobe is a hyperparameter that controls how many clusters to search.</li>
+            <li><strong>Inverted List Traversal:</strong> Using these centroid IDs, the system accesses the inverted list. This list maps each centroid to the compressed passage embeddings that are closest to it.</li>
+            <li><strong>Approximate MaxSim:</strong> For each query vector, an approximate "MaxSim" operation is conducted. This involves calculating the similarity between the query vector and the decompressed passage embeddings from the inverted list. This computes a lower-bound on the true MaxSim score, which is a good proxy for relevance.</li>
+            <li><strong>Candidate Selection:</strong> The lower-bound scores are summed across the query's tokens to get an overall score for each passage. The top ncandidate passages with the highest approximate scores are selected for the next stage.</li>
+        </ul>
+        
+        <p>
+            <strong>Decompression and Full MaxSim Calculation</strong><br>
+            For each of the ncandidate passages, the system loads and fully decompresses all of its token embeddings by combining the centroid and the residual vector. The true MaxSim operation is then performed. This involves calculating the cosine similarity between each query token vector and all of the uncompressed passage token vectors, and then summing up the maximum similarities.
+        </p>
 
         <h3>LLM-based Re-ranking Models: RankGPT</h3>
         <p>
