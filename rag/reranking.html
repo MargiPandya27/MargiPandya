@@ -54,131 +54,93 @@
     
     <!-- Main Content -->
     <main style="flex: 1; padding: 20px; max-width: 1000px;">
-     
-        <h1>Does Re-ranking Improve the Performance of RAG?</h1>
-        <p>
-            Yes, re-ranking is a crucial step that can significantly improve the performance of a Retrieval-Augmented Generation (RAG) system. While the initial retrieval stage fetches a broad set of documents, the re-ranking stage refines this set, ensuring that only the most relevant and highest-quality information is passed to the LLM.
-        </p>
-        <p>
-            Let's look at the process in more detail.
-        </p>
+      <h1>Does Re-ranking Improve the Performance of RAG?</h1>
+      <p>
+        Yes, re-ranking is a crucial step that can significantly improve the performance of a Retrieval-Augmented Generation (RAG) system. While the initial retrieval stage fetches a broad set of documents, the re-ranking stage refines this set, ensuring that only the most relevant and highest-quality information is passed to the LLM.
+      </p>
+      <p>Let's look at the process in more detail.</p>
 
-        <hr>
+      <hr>
 
-        <h2 id="classical-rag">1. Classical RAG </h2>
-        <p>
-            In a traditional RAG pipeline, the process is as follows:
-        </p>
-        <ul>
-            <li><strong>Retriever:</strong> A dense retriever (e.g., FAISS, DPR) or a sparse retriever (e.g., BM25) fetches the top-k passages.</li>
-            <li><strong>Generator:</strong> An LLM (like GPT-4) conditions its response on these k passages to produce an answer.</li>
-        </ul>
-        <p>
-            <strong>Problem:</strong>
-        </p>
-        <p>
-            This approach has limitations. The initial retriever may bring back many partially relevant or noisy passages. The LLM then has to process all of them, which can:
-        </p>
-        <ul>
-            <li>Increase token input length, leading to higher cost.</li>
-            <li>Make the LLM’s reasoning harder, potentially causing it to hallucinate or mix in irrelevant content.</li>
-        </ul>
+      <h2 id="classical-rag">1. Classical RAG</h2>
+      <p>In a traditional RAG pipeline, the process is as follows:</p>
+      <ul>
+        <li><strong>Retriever:</strong> A dense retriever (e.g., FAISS, DPR) or a sparse retriever (e.g., BM25) fetches the top-k passages.</li>
+        <li><strong>Generator:</strong> An LLM (like GPT-4) conditions its response on these k passages to produce an answer.</li>
+      </ul>
+      <p><strong>Problem:</strong></p>
+      <ul>
+        <li>Increase token input length, leading to higher cost.</li>
+        <li>Make the LLM’s reasoning harder, potentially causing hallucinations or irrelevant content.</li>
+      </ul>
 
-        <hr>
+      <hr>
 
-        <h2 id="re-ranking-models">2. With Re-ranking Models</h2>
-        <p>
-            Re-ranking is a fine-grained retrieval step that analyzes the relationship between a query and documents more deeply. After the initial retrieval, the top document chunks are passed through a re-ranking model, which re-sorts them in descending order based on their importance to the input query.
-        </p>
-        
-        <h3 id="types-of-re-ranking-models">Types of Re-ranking Models:</h3>
-        <ol>
-            <li><strong>Cross-Encoder based models:</strong> ColBERT, ColBERTv2</li>
-            <li><strong>LLM-based re-ranking models:</strong> RankGPT</li>
-            <li><strong>API-based models:</strong> CohereAPI</li>
-        </ol>
+      <h2 id="re-ranking-models">2. With Re-ranking Models</h2>
+      <p>
+        Re-ranking is a fine-grained retrieval step that analyzes the relationship between a query and documents more deeply. After the initial retrieval, the top document chunks are passed through a re-ranking model, which re-sorts them in descending order based on their importance to the input query.
+      </p>
 
-       <h3 id="colbert">Cross-Encoder based Models: ColBERT</h3>
+      <h3 id="types-of-re-ranking-models">Types of Re-ranking Models:</h3>
+      <ol>
+        <li><strong>Cross-Encoder based models:</strong> ColBERT, ColBERTv2</li>
+        <li><strong>LLM-based re-ranking models:</strong> RankGPT</li>
+        <li><strong>API-based models:</strong> CohereAPI</li>
+      </ol>
 
-       <p>ColBERT uses a basic BERT model to encode tokens into embeddings, which is a good choice because: </p>
-       <ul>
-            <li><strong>Masked Language Modeling (BERT):</strong> ColBERT leverages the power of BERT's Masked Language Modeling, which predicts randomly masked tokens and uses a bidirectional approach (seeing both past and future tokens). This results in strong contextualized embeddings.</li>
-            <li><strong>Causal Modeling (LLM):</strong> In contrast, Causal Modeling predicts the next token in a sequence and is unidirectional. While ideal for generation, the powerful bidirectional embeddings from BERT are more effective for retrieval tasks.</li>
-        </ul>
+      <h3 id="colbert">Cross-Encoder based Models: ColBERT</h3>
+      <p>ColBERT uses a BERT model to encode tokens into embeddings, which is effective because:</p>
+      <ul>
+        <li><strong>Masked Language Modeling (BERT):</strong> Creates bidirectional contextual embeddings.</li>
+        <li><strong>Causal Modeling (LLM):</strong> Unidirectional, better for generation, but not as strong for retrieval.</li>
+      </ul>
 
       <figure class="rag-figure">
-        <img src="Colbert_1.png" alt="Alternative text for the image">
-        <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
+        <img src="Colbert_1.png" alt="ColBERT architecture">
+        <figcaption><strong>Figure 1:</strong> ColBERT architecture and retrieval flow.</figcaption>
       </figure>
 
-        <p>
-            The core concept behind <strong>ColBERT</strong> is that of late interaction. Unlike other models that create a single embedding for a document, ColBERT creates a powerful embedding for every token in the query and every token in the document using a pre-trained BERT-based encoder.
-        </p>
+      <!-- ColBERT explanation continues here... -->
 
-       
-        <p>
-            During the re-ranking process, ColBERT efficiently calculates a similarity score for every token in the query against all tokens in the documents. It then takes the maximum similarity score for each query token and sums them up to determine the document's final relevance score.
-        </p>
-      
-        <h4>How ColBERT Works: A Two-Stage Process</h4>
-        <p>
-            The retrieval process in ColBERT is split into two stages:
-        </p>
-        <p>
-            <strong>Approximate Filtering:</strong>
-            For each of the query's embeddings, a separate vector similarity search is performed on the FAISS index. The search finds the top-k' most similar document embeddings from the entire collection for each query embedding. The IVFPQ index is used to speed up this search. Instead of checking every document embedding, it only searches a few of the nearest partitions (p nearest cells) in the index. The results of these Nq searches (one for each query embedding) are combined, and the unique document IDs are collected into a set of K candidate documents. These K documents are the ones most likely to contain one or more embeddings that are highly similar to the query embeddings.
-        </p>
-        
-        <p>
-            <strong>Re-ranking and Refinement:</strong>
-            Once the smaller set of K candidate documents is identified, a more precise re-ranking is performed to find the final top-k results. The full ColBERT scoring process (MaxSim) is performed on this smaller set of K documents. The relevance score for each of the K candidates is calculated by taking the sum of the maximum similarity between each query embedding and all of the document's embeddings. The documents are then sorted by their scores, and the top-k documents are returned as the final result.
-        </p>
+    
+      <h3 id="colbertv2">ColBERTv2</h3>
+      <p>
+          <strong>ColBERTv2</strong> is an improvement over ColBERT on two key features: the training strategy and compressed indexing. An initial ColBERT model is used to index the training passages. For each training query, this model retrieves the top-k passages, which often include a mix of relevant documents and challenging, but irrelevant, documents (hard negatives) that are semantically similar to the query.
+      </p>
+      
+      <p>
+          <strong>1. Knowledge Distillation</strong><br>
+          For training, knowledge distillation of a powerful cross-encoder model like ms-macro-MiniLM-L-6-V2 is used as a teacher model. The scores from the cross-encoder are used to train the ColBERT student model. ColBERTv2 uses a KL-Divergence loss to distill the teacher's scores into its architecture, helping the student model mimic the teacher's ranking distribution. To further improve training, the process also uses in-batch negatives, where a cross-entropy loss is applied to the positive score of each query against all passages corresponding to other queries in the same batch.
+      </p>
+
+      <p>
+          <strong>2. Indexing</strong><br>
+          MaxSim is applied on a reduced inverted list in a two-stage retrieval process to improve efficiency. This two-step process allows for fast candidate generation using approximate scores, followed by a more accurate re-ranking of the top passages.
+      </p>
+      
+      <p>
+          <strong>Candidate Generation with the Reduced Inverted List</strong><br>
+          This first stage is for speed and efficiency. The goal is to quickly identify a small set of promising documents without decompressing all the vectors.
+      </p>
+      <ul>
+          <li><strong>Query Encoding:</strong> The query is encoded into a set of multi-vector representations, one for each token.</li>
+          <li><strong>Centroid Lookup:</strong> For each query token vector, the system finds its nearest nprobe centroids. nprobe is a hyperparameter that controls how many clusters to search.</li>
+          <li><strong>Inverted List Traversal:</strong> Using these centroid IDs, the system accesses the inverted list. This list maps each centroid to the compressed passage embeddings that are closest to it.</li>
+          <li><strong>Approximate MaxSim:</strong> For each query vector, an approximate "MaxSim" operation is conducted. This involves calculating the similarity between the query vector and the decompressed passage embeddings from the inverted list. This computes a lower-bound on the true MaxSim score, which is a good proxy for relevance.</li>
+          <li><strong>Candidate Selection:</strong> The lower-bound scores are summed across the query's tokens to get an overall score for each passage. The top ncandidate passages with the highest approximate scores are selected for the next stage.</li>
+      </ul>
+      
+      <p>
+          <strong>Decompression and Full MaxSim Calculation</strong><br>
+          For each of the ncandidate passages, the system loads and fully decompresses all of its token embeddings by combining the centroid and the residual vector. The true MaxSim operation is then performed. This involves calculating the cosine similarity between each query token vector and all of the uncompressed passage token vectors, and then summing up the maximum similarities.
+      </p>
 
        <figure class="rag-figure">
-        <img src="colbert_result.png" alt="Alternative text for the image">
+        <img src="colbert_v2.png" alt="Alternative text for the image">
         <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
       </figure>
 
-       
-        <h3 id="colbertv2">ColBERTv2</h3>
-        <p>
-            <strong>ColBERTv2</strong> is an improvement over ColBERT on two key features: the training strategy and compressed indexing. An initial ColBERT model is used to index the training passages. For each training query, this model retrieves the top-k passages, which often include a mix of relevant documents and challenging, but irrelevant, documents (hard negatives) that are semantically similar to the query.
-        </p>
-        
-        <p>
-            <strong>1. Knowledge Distillation</strong><br>
-            For training, knowledge distillation of a powerful cross-encoder model like ms-macro-MiniLM-L-6-V2 is used as a teacher model. The scores from the cross-encoder are used to train the ColBERT student model. ColBERTv2 uses a KL-Divergence loss to distill the teacher's scores into its architecture, helping the student model mimic the teacher's ranking distribution. To further improve training, the process also uses in-batch negatives, where a cross-entropy loss is applied to the positive score of each query against all passages corresponding to other queries in the same batch.
-        </p>
-
-        <p>
-            <strong>2. Indexing</strong><br>
-            MaxSim is applied on a reduced inverted list in a two-stage retrieval process to improve efficiency. This two-step process allows for fast candidate generation using approximate scores, followed by a more accurate re-ranking of the top passages.
-        </p>
-        
-        <p>
-            <strong>Candidate Generation with the Reduced Inverted List</strong><br>
-            This first stage is for speed and efficiency. The goal is to quickly identify a small set of promising documents without decompressing all the vectors.
-        </p>
-        <ul>
-            <li><strong>Query Encoding:</strong> The query is encoded into a set of multi-vector representations, one for each token.</li>
-            <li><strong>Centroid Lookup:</strong> For each query token vector, the system finds its nearest nprobe centroids. nprobe is a hyperparameter that controls how many clusters to search.</li>
-            <li><strong>Inverted List Traversal:</strong> Using these centroid IDs, the system accesses the inverted list. This list maps each centroid to the compressed passage embeddings that are closest to it.</li>
-            <li><strong>Approximate MaxSim:</strong> For each query vector, an approximate "MaxSim" operation is conducted. This involves calculating the similarity between the query vector and the decompressed passage embeddings from the inverted list. This computes a lower-bound on the true MaxSim score, which is a good proxy for relevance.</li>
-            <li><strong>Candidate Selection:</strong> The lower-bound scores are summed across the query's tokens to get an overall score for each passage. The top ncandidate passages with the highest approximate scores are selected for the next stage.</li>
-        </ul>
-        
-        <p>
-            <strong>Decompression and Full MaxSim Calculation</strong><br>
-            For each of the ncandidate passages, the system loads and fully decompresses all of its token embeddings by combining the centroid and the residual vector. The true MaxSim operation is then performed. This involves calculating the cosine similarity between each query token vector and all of the uncompressed passage token vectors, and then summing up the maximum similarities.
-        </p>
-
-         <figure class="rag-figure">
-          <img src="colbert_v2.png" alt="Alternative text for the image">
-          <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
-        </figure>
-
-
-       <h3 id="rankgpt">LLM-based Re-ranking Models: RankGPT</h3>
+      <h3 id="rankgpt">LLM-based Re-ranking Models: RankGPT</h3>
         <p>
             Instead of the traditional supervised way of fine-tuning a LLM, RankGPT used a permutation knowledge distillation technique to train the model. They used two very interesting things like the sliding window technique for data generation and permutation distillation using RankNet loss.
         </p>
@@ -226,7 +188,7 @@
             A smaller, specialized model (the student), such as a BERT-like cross-encoder, is then trained using this generated data. The training objective is not to predict the exact permutation but to produce relevance scores that result in a ranking that matches the teacher's. The training uses a pairwise loss function, like RankNet loss, which measures the correctness of the relative ordering of passages. The model is penalized if it scores a less-relevant passage higher than a more-relevant one, according to the teacher's permutation.
         </p>
 
-        <section class="references">
+      <section class="references">
         <h2>References</h2>
         <ul>
           <li>Khattab, O., & Zaharia, M. (2020). ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT. <em>SIGIR</em>.</li>
@@ -236,7 +198,7 @@
         </ul>
       </section>
     </main>
-
+  </div>
 
   <footer class="page__meta"></footer>
   <div class="page__footer">
