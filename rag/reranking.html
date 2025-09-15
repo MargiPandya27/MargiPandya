@@ -5,8 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Margi Pandya - Portfolio</title>
   <link rel="stylesheet" href="../styles.css">
+
+  <!-- MathJax -->
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Custom spacing fixes -->
+  <style>
+    /* Reset margins for headings, paragraphs, lists, figures */
+    h1, h2, h3, h4, h5, h6, p, ul, ol, figure, blockquote {
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+    }
+
+    /* Headings: more space above, less below */
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.2em;
+      margin-bottom: 0.4em;
+    }
+
+    /* Paragraphs tighter */
+    article.container p {
+      margin-top: 0.4em;
+      margin-bottom: 0.6em;
+    }
+
+    /* Lists & figures balanced */
+    article.container ul,
+    article.container figure {
+      margin-top: 0.3em;
+      margin-bottom: 0.6em;
+    }
+  </style>
 </head>
 <body>
   <!-- Top Navigation Bar -->
@@ -34,19 +64,21 @@
       </div>
     </div>
   </div>
-<div class="page-content" style="display: flex; flex-direction: row; max-width: 1300px; margin: 0 auto; padding: 20px;">
-  <!-- Sidebar -->
-  <div class="sidebar sticky" style="width: 300px; padding: 20px;">
-    <div class="mainnotes-sidebar">
-      <h3>Main Notes</h3>
-      <ul>
+
+  <div class="page-content" style="display: flex; flex-direction: row; max-width: 1300px; margin: 0 auto; padding: 20px;">
+    <!-- Sidebar -->
+    <div class="sidebar sticky" style="width: 300px; padding: 20px;">
+      <div class="mainnotes-sidebar">
+        <h3>Main Notes</h3>
+        <ul>
           <li><a href="https://margipandya27.github.io/MargiPandya/deep_gen/vae.html">Deep Generative Models</a></li>
           <li><a href="agents.html">Agents</a></li>
           <li><a href="https://margipandya27.github.io/MargiPandya/rag/naive_rag.html">RAGs</a></li>
-          <!-- Add more links as needed -->
-      </ul>
+        </ul>
+      </div>
     </div>
-  </div>
+      
+
       
     <main style="flex: 1; padding: 20px; max-width: 1000px;">
      <body>
