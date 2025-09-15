@@ -9,7 +9,7 @@
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <style>
-    /* 🔥 Fix paragraph spacing */
+
     p {
       margin-top: 0;
       margin-bottom: 12px; /* adjust this as you like */
@@ -47,11 +47,14 @@
     <!-- Sidebar -->
     <div class="sidebar sticky" style="width: 300px; padding: 20px;">
       <div class="mainnotes-sidebar">
-        <h3>Main Notes</h3>
+        <h3>Content</h3>
         <ul>
-          <li><a href="">Deep Generative Models</a></li>
-          <li><a href="agents.html">Agents</a></li>
-          <li><a href="https://margipandya27.github.io/MargiPandya/rag/naive_rag.html">RAGs</a></li>
+          <li><a href="#classical-rag">Classical RAG</a></li>
+          <li><a href="#re-ranking-models"> With Re-ranking Models</a></li>
+          <li><a href="#types-of-re-ranking-models"> Types of Re-ranking Models</a></li>
+          <li><a href="#colbert">ColBERT</a></li>
+          <li><a href="#colbertv2"> ColBERTv2</a></li>
+          <li><a href="#rankgpt">RankGPT</a></li>
         </ul>
       </div>
     </div>
@@ -69,7 +72,7 @@
 
         <hr>
 
-        <h2 id="classical-rag">1. Classical RAG (Retriever → Generator)</h2>
+        <h2 id="classical-rag">1. Classical RAG </h2>
         <p>
             In a traditional RAG pipeline, the process is as follows:
         </p>
