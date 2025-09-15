@@ -58,6 +58,10 @@
       <p>
         Yes, re-ranking is a crucial step that can significantly improve the performance of a Retrieval-Augmented Generation (RAG) system. While the initial retrieval stage fetches a broad set of documents, the re-ranking stage refines this set, ensuring that only the most relevant and highest-quality information is passed to the LLM.
       </p>
+       <figure class="rag-figure">
+        <img src="reranking_scaled.jpg" alt="ColBERT pipeline illustration">
+        <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
+      </figure>
       <p>Let's look at the process in more detail.</p>
 
       <hr>
@@ -68,6 +72,10 @@
         <li><strong>Retriever:</strong> A dense retriever (e.g., FAISS, DPR) or a sparse retriever (e.g., BM25) fetches the top-k passages.</li>
         <li><strong>Generator:</strong> An LLM (like GPT-4) conditions its response on these k passages to produce an answer.</li>
       </ul>
+      <figure class="rag-figure">
+        <img src="rag_basic.png" alt="ColBERT pipeline illustration">
+        <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
+      </figure>
       <p><strong>Problem:</strong></p>
       <ul>
         <li>Increase token input length, leading to higher cost.</li>
