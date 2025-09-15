@@ -48,327 +48,46 @@
     </div>
   </div>
 
+<main style="flex: 1; padding: 20px; max-width: 1000px;"> <article> <h1>Does re-ranking help improve the performance of RAG?</h1>
+<p>When evaluating Retrieval-Augmented Generation (RAG), the primary criterion should be the quality of retrieved documents because the relevance and accuracy of those documents directly determine the quality of the response produced by the large language model (LLM). For complex applications, and especially when the retrieval source is heterogeneous or consists of unknown webpages, a single-stage retrieval is often insufficient: after the first retrieval stage the returned passages can still contain noisy or only partially relevant information. Passing all of these passages directly to the generator degrades generation quality, increases the risk of hallucination, and raises token and inference costs. In these settings, re-ranking is a crucial refinement step that improves downstream generation.</p>
 
+<h2>Classical RAG (Retriever → Generator)</h2>
+<p>In the classical RAG pipeline the retriever—using methods such as FAISS, DPR, or BM25—fetches the top-k passages and the generator (for example, GPT-4) conditions on these passages to produce an answer. The problem in this design is that the retriever may return many partially relevant or noisy passages. The generator must then process all returned passages, which increases the input token length (and cost) and complicates reasoning. Large and noisy contexts make it easier for the LLM to hallucinate or to mix in irrelevant content, producing lower-quality output.</p>
 
+<h2>RAG with Re-ranking Models</h2>
+<p>Re-ranking provides a fine-grained reordering of the rough candidate set returned by the first-stage retriever. After the initial retrieval, document chunks are passed through a re-ranking model that scores and arranges candidates in descending order of relevance to the input query. Re-ranking can inspect richer query–document interactions than the first-stage dense retrieval, and therefore it typically yields a smaller, cleaner set of passages to condition the generator on. Common families of re-ranking solutions include cross-encoder based models (e.g., ColBERT, ColBERTv2), LLM-based re-rankers (e.g., RankGPT), and API-based re-rankers (e.g., Cohere’s Rerank API).</p>
 
-Does re-ranking help improve the performance of the RAG?
+<h2>Cross-Encoder Based Re-rankers: ColBERT and ColBERTv2</h2>
+<p>Cross-encoder re-rankers rely on contextualized embeddings. ColBERT is built on BERT encoders and leverages masked language modeling to produce strong token-level contextual embeddings. Masked language modeling predicts randomly masked tokens and is bidirectional (it sees both left and right context), which makes BERT embeddings particularly effective for retrieval and classification tasks, though not primarily designed for generation. By contrast, causal modeling (used in autoregressive LLMs) predicts the next token and is unidirectional; causal models are well suited for generation but are less convenient for the dense retrieval setting.</p>
 
-When it comes to evaluation of RAG, it should be evaluated on quality of retrieved documents, since the quality of the retrieved document determines the quality of the generated response by the LLM. 
-For RAG with complex application, and also when the source of retireval is unknown webpages, then after performing only the first stage of retrieval would not be helpful.
+<p>ColBERT encodes queries and documents into token embeddings. For a tokenized query q = (q₁, q₂, q₃, …) and a document token sequence d = (d₁, d₂, …), ColBERT computes similarity between each query token embedding and the document token embeddings, then applies a late interaction step (often referred to as MaxSim) that takes the maximum similarity for each query token across the document tokens and sums those maxima to obtain a document relevance score. To scale this process, ColBERT uses an approximate filtering stage: for each query token embedding, a separate FAISS search (often over an IVFPQ index) retrieves the top-k′ most similar document token embeddings; results across query tokens are merged into a candidate set of size K, and the MaxSim scoring is computed exactly on that reduced set. This two-step approach (approximate candidate generation followed by precise late interaction) balances efficiency and accuracy.</p>
 
-1. Classical RAG (Retriever → Generator)
+<p>ColBERTv2 refines this pipeline in two important ways: by improving training and by compressing indexing. Training improvements include knowledge distillation from stronger cross-encoders (teacher models such as ms-marco-MiniLM) where ColBERTv2 uses a KL-divergence loss to align its score distribution with the teacher’s ranking distribution, and in-batch negatives and cross-entropy components to provide more diverse contrastive signals. For indexing, ColBERTv2 applies MaxSim on a reduced inverted list in a two-stage retrieval process: an initial, fast approximate MaxSim over compressed representations to generate candidates, followed by decompression and exact MaxSim scoring on the top candidates. This design yields both high precision and competitive retrieval latency.</p>
 
-Retriever: dense retriever (e.g., FAISS, DPR, BM25) fetches top-k passages.
+<h2>LLM-based Re-ranking: RankGPT and Permutation Distillation</h2>
+<p>LLM-based re-rankers follow a different philosophy: they use large language models as high-quality teachers to produce ranked lists, and then distill those permutations into smaller student models that are practical to deploy. RankGPT is an example of this strategy. Because large LLMs cannot process hundreds of passages at once due to token limits, RankGPT uses a sliding window technique: candidate passages are re-ranked in overlapping batches, the relative order of top passages is locked in progressively as the window moves, and the teacher produces a full ranked list across all candidates. This teacher-generated permutation becomes the ground truth for training.</p>
 
-Generator: LLM (like GPT-4) conditions on these k passages and produces an answer.
+<p>Permutation distillation uses pairwise ranking objectives (e.g., RankNet loss) rather than pointwise regression. The RankNet loss focuses on pairs (p_i, p_j) and penalizes the student model when a less relevant passage is scored higher than a more relevant one. Formally, for a query with M candidate passages and teacher ranks r_i (lower rank indicates higher relevance) and student scores s_i = f_θ(q, p_i), RankNet loss is</p>
 
-Problem:
+<pre style="background:#f7f7f7;padding:12px;border-radius:6px;overflow:auto;">
 
-Retriever may bring back many partially relevant or noisy passages.
 
-Generator has to process all of them, which:
+L_RankNet = ∑<sub>i=1</sub><sup>M</sup> ∑<sub>j=1</sub><sup>M</sup> 1_{r_i < r_j} log(1 + exp(s_j - s_i))
+</pre>
 
-Increases token input length (higher cost).
+<p>Intuitively, when p_i is more relevant than p_j (r_i &lt; r_j), we want s_i &gt; s_j; the logistic term log(1 + exp(s_j - s_i)) is large when the student gets the pair ordering wrong and approaches zero when the ordering is correct. Training a compact cross-encoder student on many such teacher-generated permutations enables high-quality rankings at deployment cost comparable to classical cross-encoders.</p>
 
-Makes the LLM’s reasoning harder → it may hallucinate or mix irrelevant content. 
+<h2>API-based Re-ranking</h2>
+<p>For production scenarios where training and maintaining custom re-rankers is impractical, API-based services (for example, Cohere’s Rerank API) provide a straightforward alternative: pass the query and candidate list to the service and receive an ordered list with relevance scores. These managed solutions are useful when engineering resources are constrained or when rapid iteration is required.</p>
 
-2. With Re-ranking models
-Re-ranking is a way of fine-grained retrieval results, that can search for individual words in query and documents at the same time and combinely.
-After rough retrieval from the retrieval, the document chunks are passed through the re-ranking model, which are arranged decendingly based on the importance with the input query.
+<h2>Why Re-ranking Improves RAG</h2>
+<p>Re-ranking improves RAG by increasing precision in the retrieval stage, which reduces noise in the context passed to the generator. Cleaner context lowers token costs and reduces the chance that the generator will hallucinate or blend irrelevant information. Although re-ranking imposes additional compute overhead, the quality gains—especially for complex tasks and noisy corpora—typically justify the cost. Across approaches (cross-encoder token-level interaction like ColBERT/ColBERTv2, LLM-teacher distillation like RankGPT, or managed API re-rankers), re-ranking consistently improves the reliability and factuality of retrieval-augmented generation.</p>
 
-Types of the Re-ranking models:
-1. Cross-Encoder based models: ColBERT, ColBERTv2
-2. LLM based re-ranking based models: RankerGPT
-3. API based models: CohereAPI
+<h2>Summary</h2>
+<p>In short, yes—re-ranking significantly helps RAG systems. It refines first-stage retrieval, prioritizes the most relevant evidence, reduces input noise for the generator, and therefore improves the factual accuracy and overall quality of generated answers. The best choice of re-ranking method depends on constraints such as latency, available training data, and engineering resources, but the value of adding a re-ranking stage is clear for complex and noisy retrieval problems.</p>
 
-Cross-Encoder based Models:
-
-1. ColBERT:
-ColBERT is based on BERT based encoder. The based concept behind the colbert is that of mask langauge modelling in Bert
-
-Masked Modelling:
-• Predict randomly masked tokens
-• Bidirectional (sees past and future tokens)
-• Strength: strong embeddings
-• Useful for retrieval and classification tasks
-• Limitation: not useful for generation
-
-
-Causal Modelling:
-• Predict next token in sequence
-• Unidirectional (only sees past tokens)
-• Strength: compatible with autoregressive LLMs
-• Useful for generation, instruction-following tasks
-• Limitation: harder to train (less parallelism)
-
-The colbert model have two encoder for query and documents which are pre-trained, and while being offline the similarity scored is computed for every token in query and all the documents. And then the max in tokens in query is taken for all the documents and then arranged based on descending order. 
-They make use of the powerful embedding of BERT model in Masked Modelling. The Colbert have query embedding in which the q is tokenizend into a q1, q2,q3... tokens and converted to bag of words embedding.  \
-
-
-
-
-
-
-Approaxiamate Filtering:
-For each of the query's embeddings (Eq), a separate vector similarity search is performed on the FAISS index.
-
-The search finds the top-k' most similar document embeddings from the entire collection for each query embedding.
-
-The IVFPQ index is used to speed up this search. Instead of checking every document embedding, it only searches a few of the nearest partitions (p nearest cells) in the index.
-
-The results of these Nq searches (one for each query embedding) are combined, and the unique document IDs are collected into a set of K candidate documents. These K documents are the ones most likely to contain one or more embeddings that are highly similar to the query embeddings.
-
-
-Finally,
-
- Eq := Normalize CNN BERT“Qq0q1 ql## #”
- Ed := Filter Normalize CNN BERT“Dd0d1 dn”
-
-
-
-Re-ranking and Refinement:
-Once the smaller set of K candidate documents is identified, a more precise re-ranking is performed to find the final top-k results.
-
-Late Interaction:
-
- Sqd :=
- max
- j 
-i 
-Eq 
-Ed 
-Eqi 
-ET
- d
-
-The full ColBERT scoring process (MaxSim) is performed on this smaller set of K documents.
-
-The relevance score for each of the K candidates is calculated by taking the sum of the maximum similarity between each query embedding and all of the document's embeddings.
-
-The documents are then sorted by their scores, and the top-k documents are returned as the final result.
-
-
-
-ColBeRTV2
-Cobertv2 is improvement of colbert on two new improvement 1. is the training strategy 2. compressed indexing. Moreover, an initial ColBERT model is used to index the training passages. For each training query, this model retrieves the top-k passages. These passages often include a mix of relevant documents (positives) and challenging, but irrelevant, documents (hard negatives) that are semantically similar to the query.
-
-
-
-1. Knowledge Distillation
-For training, knowledge distillation of ms-macro-miniLM-L-6-V2 is used as teacher model for the already trained colbert model The scores from the cross-encoder are used to train the ColBERT student model. ColBERTv2 uses a KL-Divergence loss to distill the teacher's scores into its architecture. This is a crucial step because the native scoring outputs of the ColBERT model (sum of cosine similarities) have a restricted scale and might not directly align with the cross-encoder's scores. The KL-Divergence loss helps the student model to mimic the teacher's ranking distribution.
-To further improve training, the process also uses in-batch negatives. A cross-entropy loss is applied to the positive score of each query against all passages corresponding to other queries in the same batch. This provides additional, diverse negative examples for the model to learn from.
-
-2. Indexing
-MaxSim is applied on a reduced inverted list in a two-stage retrieval process to improve efficiency. This two-step process allows for fast candidate generation using approximate scores, followed by a more accurate re-ranking of the top passages.
-
-1. Candidate Generation with the Reduced Inverted List
-This first stage is for speed and efficiency. The goal is to quickly identify a small set of promising documents without decompressing all the vectors.
-
-Query Encoding: The query is encoded into a set of multi-vector representations, one for each token.
-
-Centroid Lookup: For each query token vector, the system finds its nearest nprobe centroids. nprobe is a hyperparameter that controls how many clusters to search.
-
-Inverted List Traversal: Using these centroid IDs, the system accesses the inverted list. This list maps each centroid to the compressed passage embeddings that are closest to it.
-
-Approximate MaxSim: For each query vector, an approximate "MaxSim" operation is conducted. This involves calculating the similarity between the query vector and the decompressed passage embeddings from the inverted list. This computes a lower-bound on the true MaxSim score, which is a good proxy for relevance.
-
-Candidate Selection: The lower-bound scores are summed across the query's tokens to get an overall score for each passage. The top ncandidate passages with the highest approximate scores are selected for the next stage.
-
-
-Decompression: For each of the ncandidate passages, the system loads and fully decompresses all of its token embeddings by combining the centroid and the residual vector.
-
-Full MaxSim Calculation: The true MaxSim operation is performed. This involves calculating the cosine similarity between each query token vector and all of the uncompressed passage token vectors, and then summing up the maximum similarities.
-
-
-RankGPT:
-Instead of traditional supervised way of fine-tuning a LLM, rankGPT used permutation knowledge distillation technique to train the model. They used two very interesting things like sliding window techique for data generation and permutation distillaition using RankLoss.
-
-Sliding Window:
- The first step is to generate a large dataset of ranked lists. For a given query and a set of candidate passages, the large LLM (the teacher) uses the instructional permutation and sliding window methods to produce a high-quality, ranked list. This ranked list serves as the ground-truth data for the student model. To overcome the token limits of LLMs, which can't process hundreds of passages at once, the passages are re-ranked in a series of smaller batches using a sliding window. The window moves from the end of the list to the beginning, re-ranking a subset of passages at each step and "locking in" the relative order of the top documents as it proceeds.
-
-Permutation Distillation:
-The core idea behind RankNet loss is to move beyond simple point-wise relevance scores and instead focus on the relative order of items. It is a type of pairwise loss function used in "learning to rank" algorithms.
-
-Here's a more detailed breakdown:
-
-Pairwise Comparison
-Instead of treating each passage's relevance score independently, RankNet works by considering pairs of passages. For a given query, the loss is calculated based on whether the model correctly ranks one passage higher than another, according to the ground-truth ranking provided by the teacher model (in this case, ChatGPT).
-
-The objective is to minimize the number of "inversions" in the final ranked list. An inversion occurs when a less-relevant passage is ranked above a more-relevant one.
-
-The Loss Function
-The RankNet loss function, as described in the paper you provided, is:
-
-L 
-RankNet
-​
- =∑ 
-i=1
-M
-​
- ∑ 
-j=1
-M
-​
- 1 
-r 
-i
-​
- <r 
-j
-​
- 
-​
- log(1+exp(s 
-j
-​
- −s 
-i
-​
- ))
-
-Let's break down this formula:
-
-q: The query.
-
-M: The total number of passages to be ranked for that query.
-
-(p 
-1
-​
- ,…,p 
-M
-​
- ): The set of M passages.
-
-R=(r 
-1
-​
- ,…,r 
-M
-​
- ): The ground-truth ranking generated by the teacher model (e.g., ChatGPT), where r 
-i
-​
-  is the rank of passage p 
-i
-​
- . A lower rank number indicates higher relevance (e.g., rank 1 is the most relevant).
-
-s 
-i
-​
- =f 
-θ
-​
- (q,p 
-i
-​
- ): The relevance score predicted by the student model for the passage p 
-i
-​
-  given the query q.
-
-1 
-r 
-i
-​
- <r 
-j
-​
- 
-​
- : This is an indicator function. It is equal to 1 if passage p 
-i
-​
-  is more relevant than passage p 
-j
-​
-  (i.e., its rank r 
-i
-​
-  is lower than r 
-j
-​
- ), and 0 otherwise. This ensures the loss is only calculated for incorrectly ordered pairs.
-
-log(1+exp(s 
-j
-​
- −s 
-i
-​
- )): This is the core of the loss function. It's a logistic loss that penalizes the model when its predicted scores don't match the correct order.
-
-If passage p 
-i
-​
-  is more relevant than p 
-j
-​
-  (i.e., r 
-i
-​
- <r 
-j
-​
- ), we want the student's score for p 
-i
-​
-  (s 
-i
-​
- ) to be higher than the score for p 
-j
-​
-  (s 
-j
-​
- ).
-
-The term (s 
-j
-​
- −s 
-i
-​
- ) will be a positive value if the student model gets the ranking wrong (s 
-j
-​
- >s 
-i
-​
- ) and a negative value if it gets it right (s 
-i
-​
- >s 
-j
-​
- ).
-
-The $\log(1 + \exp(x))$ function is always positive. The loss increases as the difference in scores, (s 
-j
-​
- −s 
-i
-​
- ), increases, heavily penalizing a wrong ranking. When the model gets the order right (s 
-i
-​
- >s 
-j
-​
- ), the term (s 
-j
-​
- −s 
-i
-​
- ) becomes a large negative number, causing the $\log(1 + \exp(x))$ term to approach zero, which results in a very small loss.
-
-  A smaller, specialized model (the student), such as a BERT-like cross-encoder, is then trained using this generated data. The training objective is not to predict the exact permutation but to produce relevance scores that result in a ranking that matches the teacher's. The training uses a pairwise loss function, like RankNet loss, which measures the correctness of the relative ordering of passages. The model is penalized if it scores a less-relevant passage higher than a more-relevant one, according to the teacher's permutation.
-
-
+</article> </main>
+  
    <h2>References</h2>
       <ol>
         <li>Cohan, Arman, et al. “A Discourse-Aware Attention Model for Abstractive Summarization of Long Documents.” NAACL HLT Short Papers (June 2018). Available at Hugging Face: ccdv/arxiv-summarization (accessed May 2025)</li>
