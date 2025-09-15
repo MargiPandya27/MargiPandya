@@ -2,112 +2,166 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Margi Pandya - Portfolio</title>
-  <link rel="stylesheet" href="../styles.css">
+  <title>Re-ranking in Retrieval-Augmented Generation (RAG)</title>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+  <style>
+    body {
+      font-family: Georgia, serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+      color: #333;
+    }
+    main {
+      display: flex;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    article {
+      flex: 3;
+      padding: 2rem;
+      background: white;
+    }
+    aside {
+      flex: 1;
+      background: #fafafa;
+      padding: 2rem;
+      border-left: 1px solid #ddd;
+    }
+    h1, h2, h3 {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: #2c3e50;
+    }
+    h1 {
+      font-size: 2rem;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    figure {
+      margin: 2rem 0;
+    }
+    figcaption {
+      font-size: 0.9rem;
+      color: #555;
+      text-align: center;
+    }
+    .references {
+      font-size: 0.9rem;
+      margin-top: 2rem;
+    }
+    .references li {
+      margin-bottom: 0.5rem;
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+    }
+    nav ul li {
+      margin-bottom: 0.8rem;
+    }
+    nav ul li a {
+      text-decoration: none;
+      color: #007acc;
+    }
+    nav ul li a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-  <!-- Top Navigation Bar -->
-  <div class="masthead">
-    <div class="masthead__inner-wrap">
-      <div class="masthead__menu">
-        <nav id="site-nav" class="greedy-nav">
-          <button><div class="navicon"></div></button>
-          <ul class="visible-links">
-            <li class="masthead__menu-item masthead__menu-item--lg">
-              <a href="https://margipandya27.github.io/MargiPandya/">Margi Pandya</a>
-            </li>
-            <li class="masthead__menu-item">
-              <a href="https://margipandya27.github.io/MargiPandya/projects.html">Projects</a>
-            </li>
-            <li class="masthead__menu-item">
-              <a href="https://margipandya27.github.io/MargiPandya/notes.html">Blogs</a>
-            </li>
-            <li class="masthead__menu-item">
-              <a href="https://margipandya27.github.io/MargiPandya/publications.html">Publications</a>
-            </li>
-          </ul>
-          <ul class="hidden-links hidden"></ul>
-        </nav>
-      </div>
-    </div>
-  </div>
-<div class="page-content" style="display: flex; flex-direction: row; max-width: 1300px; margin: 0 auto; padding: 20px;">
-  <!-- Sidebar -->
-  <div class="sidebar sticky" style="width: 300px; padding: 20px;">
-    <div class="mainnotes-sidebar">
-      <h3>Main Notes</h3>
-      <ul>
-          <li><a href="https://margipandya27.github.io/MargiPandya/deep_gen/vae.html">Deep Generative Models</a></li>
-          <li><a href="agents.html">Agents</a></li>
-          <li><a href="https://margipandya27.github.io/MargiPandya/rag/naive_rag.html">RAGs</a></li>
-          <!-- Add more links as needed -->
-      </ul>
-    </div>
-  </div>
+  <main>
+    <article>
+      <h1>Re-ranking in Retrieval-Augmented Generation (RAG) Systems</h1>
 
-<main style="flex: 1; padding: 20px; max-width: 1000px;"> <article> <h1>Does re-ranking help improve the performance of RAG?</h1>
-<p>When evaluating Retrieval-Augmented Generation (RAG), the primary criterion should be the quality of retrieved documents because the relevance and accuracy of those documents directly determine the quality of the response produced by the large language model (LLM). For complex applications, and especially when the retrieval source is heterogeneous or consists of unknown webpages, a single-stage retrieval is often insufficient: after the first retrieval stage the returned passages can still contain noisy or only partially relevant information. Passing all of these passages directly to the generator degrades generation quality, increases the risk of hallucination, and raises token and inference costs. In these settings, re-ranking is a crucial refinement step that improves downstream generation.</p>
+      <section>
+        <h2>Overview</h2>
+        <p>
+          Retrieval-Augmented Generation (RAG) enhances large language models (LLMs) by grounding them in external knowledge.
+          A critical step in this process is the <em>retrieval stage</em>, where relevant documents or passages are selected to augment the model’s input.
+          However, simple retrieval pipelines (e.g., BM25 or dense retrievers like FAISS) often surface noisy or partially relevant documents,
+          reducing the overall performance of the system. Re-ranking methods aim to refine the retrieved set by re-scoring candidates
+          and prioritizing the most semantically aligned passages before they are passed to the generator.
+        </p>
+      </section>
 
-<h2>Classical RAG (Retriever → Generator)</h2>
-<p>In the classical RAG pipeline the retriever—using methods such as FAISS, DPR, or BM25—fetches the top-k passages and the generator (for example, GPT-4) conditions on these passages to produce an answer. The problem in this design is that the retriever may return many partially relevant or noisy passages. The generator must then process all returned passages, which increases the input token length (and cost) and complicates reasoning. Large and noisy contexts make it easier for the LLM to hallucinate or to mix in irrelevant content, producing lower-quality output.</p>
+      <section>
+        <h2>Cross-Encoder Based Re-ranking</h2>
+        <p>
+          Cross-encoder architectures, such as <strong>ColBERT</strong> and <strong>ColBERTv2</strong>, represent one of the most effective approaches
+          for re-ranking. Unlike bi-encoders that embed queries and documents separately, cross-encoders jointly encode the query-document pair,
+          allowing for fine-grained token-level interactions. This leads to significantly improved relevance judgments, though at the cost of higher latency.
+        </p>
+        <p>
+          Recent studies have demonstrated that cross-encoder re-ranking can boost retrieval accuracy by up to 10–15% in open-domain QA benchmarks.
+          However, these methods are computationally expensive and often require infrastructure capable of handling large-scale inference.
+        </p>
+      </section>
 
-<h2>RAG with Re-ranking Models</h2>
-<p>Re-ranking provides a fine-grained reordering of the rough candidate set returned by the first-stage retriever. After the initial retrieval, document chunks are passed through a re-ranking model that scores and arranges candidates in descending order of relevance to the input query. Re-ranking can inspect richer query–document interactions than the first-stage dense retrieval, and therefore it typically yields a smaller, cleaner set of passages to condition the generator on. Common families of re-ranking solutions include cross-encoder based models (e.g., ColBERT, ColBERTv2), LLM-based re-rankers (e.g., RankGPT), and API-based re-rankers (e.g., Cohere’s Rerank API).</p>
+      <section>
+        <h2>LLM-based Re-ranking</h2>
+        <p>
+          With the advent of instruction-tuned LLMs, re-ranking has also been explored using <em>zero-shot and few-shot prompting</em>.
+          For example, <strong>RankGPT</strong> leverages GPT-style models to evaluate the relevance of candidate passages by framing the task
+          as a ranking or classification prompt. While highly effective, the cost and latency of querying large models for every candidate pair
+          is a limiting factor. To mitigate this, <em>distillation strategies</em> have been proposed, where an LLM’s judgments are used to train
+          a smaller, more efficient cross-encoder.
+        </p>
+      </section>
 
-<h2>Cross-Encoder Based Re-rankers: ColBERT and ColBERTv2</h2>
-<p>Cross-encoder re-rankers rely on contextualized embeddings. ColBERT is built on BERT encoders and leverages masked language modeling to produce strong token-level contextual embeddings. Masked language modeling predicts randomly masked tokens and is bidirectional (it sees both left and right context), which makes BERT embeddings particularly effective for retrieval and classification tasks, though not primarily designed for generation. By contrast, causal modeling (used in autoregressive LLMs) predicts the next token and is unidirectional; causal models are well suited for generation but are less convenient for the dense retrieval setting.</p>
+      <section>
+        <h2>API-based Solutions</h2>
+        <p>
+          Commercial APIs such as <strong>Cohere Rerank</strong> provide off-the-shelf re-ranking capabilities.
+          These services are optimized for speed and can be easily integrated into existing RAG pipelines.
+          While attractive for prototyping and production deployment, they introduce dependencies on external vendors
+          and recurring usage costs, which may be prohibitive for large-scale systems.
+        </p>
+      </section>
 
-<p>ColBERT encodes queries and documents into token embeddings. For a tokenized query q = (q₁, q₂, q₃, …) and a document token sequence d = (d₁, d₂, …), ColBERT computes similarity between each query token embedding and the document token embeddings, then applies a late interaction step (often referred to as MaxSim) that takes the maximum similarity for each query token across the document tokens and sums those maxima to obtain a document relevance score. To scale this process, ColBERT uses an approximate filtering stage: for each query token embedding, a separate FAISS search (often over an IVFPQ index) retrieves the top-k′ most similar document token embeddings; results across query tokens are merged into a candidate set of size K, and the MaxSim scoring is computed exactly on that reduced set. This two-step approach (approximate candidate generation followed by precise late interaction) balances efficiency and accuracy.</p>
+      <section>
+        <h2>Discussion</h2>
+        <p>
+          Re-ranking substantially improves the quality of RAG pipelines by reducing noise in the retrieval stage
+          and ensuring that the most contextually relevant documents are passed to the LLM.
+          However, the choice of method involves a trade-off:
+        </p>
+        <ul>
+          <li><strong>Cross-encoders:</strong> High accuracy, high latency.</li>
+          <li><strong>LLM-based re-ranking:</strong> Flexible, but costly for large-scale usage.</li>
+          <li><strong>API-based solutions:</strong> Practical and fast, but reliant on third-party providers.</li>
+        </ul>
+        <p>
+          Ultimately, the best approach depends on the application’s scale, latency tolerance, and resource constraints.
+        </p>
+      </section>
 
-<p>ColBERTv2 refines this pipeline in two important ways: by improving training and by compressing indexing. Training improvements include knowledge distillation from stronger cross-encoders (teacher models such as ms-marco-MiniLM) where ColBERTv2 uses a KL-divergence loss to align its score distribution with the teacher’s ranking distribution, and in-batch negatives and cross-entropy components to provide more diverse contrastive signals. For indexing, ColBERTv2 applies MaxSim on a reduced inverted list in a two-stage retrieval process: an initial, fast approximate MaxSim over compressed representations to generate candidates, followed by decompression and exact MaxSim scoring on the top candidates. This design yields both high precision and competitive retrieval latency.</p>
+      <section class="references">
+        <h2>References</h2>
+        <ul>
+          <li>Khattab, O., & Zaharia, M. (2020). ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT. <em>SIGIR</em>.</li>
+          <li>Santhanam, K., et al. (2022). ColBERTv2: Effective and Efficient Retrieval via Lightweight Late Interaction. <em>arXiv:2112.01488</em>.</li>
+          <li>Sun, S., et al. (2023). RankGPT: Instruction Tuning for Generative Ranking. <em>arXiv:2304.09569</em>.</li>
+          <li>Cohere AI. (2023). Cohere Rerank API Documentation. Retrieved from <a href="https://docs.cohere.com">https://docs.cohere.com</a>.</li>
+        </ul>
+      </section>
+    </article>
 
-<h2>LLM-based Re-ranking: RankGPT and Permutation Distillation</h2>
-<p>LLM-based re-rankers follow a different philosophy: they use large language models as high-quality teachers to produce ranked lists, and then distill those permutations into smaller student models that are practical to deploy. RankGPT is an example of this strategy. Because large LLMs cannot process hundreds of passages at once due to token limits, RankGPT uses a sliding window technique: candidate passages are re-ranked in overlapping batches, the relative order of top passages is locked in progressively as the window moves, and the teacher produces a full ranked list across all candidates. This teacher-generated permutation becomes the ground truth for training.</p>
-
-<p>Permutation distillation uses pairwise ranking objectives (e.g., RankNet loss) rather than pointwise regression. The RankNet loss focuses on pairs (p_i, p_j) and penalizes the student model when a less relevant passage is scored higher than a more relevant one. Formally, for a query with M candidate passages and teacher ranks r_i (lower rank indicates higher relevance) and student scores s_i = f_θ(q, p_i), RankNet loss is</p>
-
-<pre style="background:#f7f7f7;padding:12px;border-radius:6px;overflow:auto;">
-
-
-L_RankNet = ∑<sub>i=1</sub><sup>M</sup> ∑<sub>j=1</sub><sup>M</sup> 1_{r_i < r_j} log(1 + exp(s_j - s_i))
-</pre>
-
-<p>Intuitively, when p_i is more relevant than p_j (r_i &lt; r_j), we want s_i &gt; s_j; the logistic term log(1 + exp(s_j - s_i)) is large when the student gets the pair ordering wrong and approaches zero when the ordering is correct. Training a compact cross-encoder student on many such teacher-generated permutations enables high-quality rankings at deployment cost comparable to classical cross-encoders.</p>
-
-<h2>API-based Re-ranking</h2>
-<p>For production scenarios where training and maintaining custom re-rankers is impractical, API-based services (for example, Cohere’s Rerank API) provide a straightforward alternative: pass the query and candidate list to the service and receive an ordered list with relevance scores. These managed solutions are useful when engineering resources are constrained or when rapid iteration is required.</p>
-
-<h2>Why Re-ranking Improves RAG</h2>
-<p>Re-ranking improves RAG by increasing precision in the retrieval stage, which reduces noise in the context passed to the generator. Cleaner context lowers token costs and reduces the chance that the generator will hallucinate or blend irrelevant information. Although re-ranking imposes additional compute overhead, the quality gains—especially for complex tasks and noisy corpora—typically justify the cost. Across approaches (cross-encoder token-level interaction like ColBERT/ColBERTv2, LLM-teacher distillation like RankGPT, or managed API re-rankers), re-ranking consistently improves the reliability and factuality of retrieval-augmented generation.</p>
-
-<h2>Summary</h2>
-<p>In short, yes—re-ranking significantly helps RAG systems. It refines first-stage retrieval, prioritizes the most relevant evidence, reduces input noise for the generator, and therefore improves the factual accuracy and overall quality of generated answers. The best choice of re-ranking method depends on constraints such as latency, available training data, and engineering resources, but the value of adding a re-ranking stage is clear for complex and noisy retrieval problems.</p>
-
-</article> </main>
-  
-   <h2>References</h2>
-      <ol>
-        <li>Cohan, Arman, et al. “A Discourse-Aware Attention Model for Abstractive Summarization of Long Documents.” NAACL HLT Short Papers (June 2018). Available at Hugging Face: ccdv/arxiv-summarization (accessed May 2025)</li>
-        <li>Beltagy, Iz, Kyle Lo, and Arman Cohan. "SciBERT: A pretrained language model for scientific text." arXiv preprint arXiv:1903.10676 (2019).</li>
-        <li>Malkov, Yu. A., and D. A. Yashunin. “Efficient and Robust Approximate Nearest Neighbor Search Using Hierarchical Navigable Small World Graphs.” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 42, no. 4, Apr. 2020, pp. 824–36. IEEE.</li>
-        <li>Johnson, Jeff, Matthijs Douze, and Hervé Jégou. “Billion-Scale Similarity Search with GPUs.” IEEE Transactions on Big Data, vol. 7, no. 3, July 2021, pp. 535–47. IEEE.</li>  
-      </ol>
-
-</main>
-
-<footer class="page__meta">
-  <!-- Any additional metadata or footer information goes here -->
-</footer>
-
-<div class="page__footer">
-  <footer>
-    <!-- Your footer content goes here -->
-    <p>@2025 Margi Pandya</p>
-  </footer>
-</div>
-
+    <aside>
+      <nav>
+        <h2>Navigation</h2>
+        <ul>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#cross-encoder-based-re-ranking">Cross-Encoder Re-ranking</a></li>
+          <li><a href="#llm-based-re-ranking">LLM-based Re-ranking</a></li>
+          <li><a href="#api-based-solutions">API-based Solutions</a></li>
+          <li><a href="#discussion">Discussion</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+    </aside>
+  </main>
 </body>
 </html>
