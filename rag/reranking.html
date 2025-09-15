@@ -167,19 +167,30 @@
             For each of the ncandidate passages, the system loads and fully decompresses all of its token embeddings by combining the centroid and the residual vector. The true MaxSim operation is then performed. This involves calculating the cosine similarity between each query token vector and all of the uncompressed passage token vectors, and then summing up the maximum similarities.
         </p>
 
-        <h3>LLM-based Re-ranking Models: RankGPT</h3>
+       <h3>LLM-based Re-ranking Models: RankGPT</h3>
         <p>
-            Instead of traditional supervised fine-tuning, <strong>RankGPT</strong> uses a permutation knowledge distillation technique to train a model. It uses a large LLM as a "teacher" to generate a dataset of ranked lists, which are then used to train a smaller "student" model.
+            Instead of the traditional supervised way of fine-tuning a LLM, RankGPT used a permutation knowledge distillation technique to train the model. They used two very interesting things like the sliding window technique for data generation and permutation distillation using RankNet loss.
         </p>
+        
         <p>
-            This is done using two interesting techniques:
+            <strong>Sliding Window:</strong><br>
+            The first step is to generate a large dataset of ranked lists. For a given query and a set of candidate passages, the large LLM (the teacher) uses the instructional permutation and sliding window methods to produce a high-quality, ranked list. This ranked list serves as the ground-truth data for the student model. To overcome the token limits of LLMs, which can't process hundreds of passages at once, the passages are re-ranked in a series of smaller batches using a sliding window. The window moves from the end of the list to the beginning, re-ranking a subset of passages at each step and "locking in" the relative order of the top documents as it proceeds.
         </p>
-        <ol>
-            <li><strong>Sliding Window:</strong> To overcome the token limits of large LLMs, which cannot process hundreds of passages at once, the passages are re-ranked in a series of smaller batches using a sliding window. The window moves from the end of the list to the beginning, re-ranking a subset of passages at each step and "locking in" the relative order of the top documents as it proceeds.</li>
-            <li><strong>Permutation Distillation:</strong> The core idea is to train the smaller model to get the relative order of documents correct, rather than their exact relevance score. It uses a pairwise loss function known as <strong>RankNet loss</strong>, which measures the correctness of the relative ordering.</li>
-        </ol>
 
-        <p>The RankNet loss function is defined as:</p>
+        <p>
+            <strong>Permutation Distillation:</strong><br>
+            The core idea behind RankNet loss is to move beyond simple point-wise relevance scores and instead focus on the relative order of items. It is a type of pairwise loss function used in "learning to rank" algorithms.
+        </p>
+
+        <p>
+            <strong>Pairwise Comparison:</strong>
+            Instead of treating each passage's relevance score independently, RankNet works by considering pairs of passages. For a given query, the loss is calculated based on whether the model correctly ranks one passage higher than another, according to the ground-truth ranking provided by the teacher model (in this case, ChatGPT). The objective is to minimize the number of "inversions" in the final ranked list. An inversion occurs when a less-relevant passage is ranked above a more-relevant one.
+        </p>
+
+        <p>
+            <strong>The Loss Function:</strong><br>
+            The RankNet loss function, as described in the paper, is:
+        </p>
         <blockquote>
             <p>
                 $L_{\text{RankNet}} = \sum_{i=1}^{M} \sum_{j=1}^{M} \mathbb{1}_{r_i < r_j} \log(1+\exp(s_j - s_i))$
@@ -187,12 +198,15 @@
         </blockquote>
         <p>Let's break down this formula:</p>
         <ul>
-            <li><strong>$r_i < r_j$</strong>: An indicator function that is 1 if passage $i$ is more relevant than passage $j$ (i.e., its rank $r_i$ is lower than $r_j$), and 0 otherwise.</li>
-            <li><strong>$s_i$ and $s_j$</strong>: The relevance scores predicted by the student model for passages $p_i$ and $p_j$.</li>
-            <li><strong>$\log(1+\exp(s_j - s_i))$</strong>: The logistic loss that penalizes the model when its predicted scores do not match the correct order. If the student model incorrectly scores a less-relevant passage ($s_j$) higher than a more-relevant one ($s_i$), the term $(s_j - s_i)$ will be a positive value, leading to a high loss. When the model gets the order right ($s_i > s_j$), the term is a large negative number, and the loss approaches zero.</li>
+            <li><strong>$M$</strong>: The total number of passages to be ranked for that query.</li>
+            <li><strong>$(p_1, ..., p_M)$</strong>: The set of M passages.</li>
+            <li><strong>$R=(r_1, ..., r_M)$</strong>: The ground-truth ranking generated by the teacher model (e.g., ChatGPT), where $r_i$ is the rank of passage $p_i$. A lower rank number indicates higher relevance (e.g., rank 1 is the most relevant).</li>
+            <li><strong>$s_i = f_{\theta}(q, p_i)$</strong>: The relevance score predicted by the student model for the passage $p_i$ given the query $q$.</li>
+            <li><strong>$\mathbb{1}_{r_i < r_j}$</strong>: This is an indicator function. It is equal to 1 if passage $p_i$ is more relevant than passage $p_j$ (i.e., its rank $r_i$ is lower than $r_j$), and 0 otherwise. This ensures the loss is only calculated for incorrectly ordered pairs.</li>
+            <li><strong>$\log(1+\exp(s_j - s_i))$</strong>: This is the core of the loss function. It's a logistic loss that penalizes the model when its predicted scores don't match the correct order. If passage $p_i$ is more relevant than $p_j$ (i.e., $r_i < r_j$), we want the student's score for $p_i$ ($s_i$) to be higher than the score for $p_j$ ($s_j$). The term ($s_j - s_i$) will be a positive value if the student model gets the ranking wrong ($s_j > s_i$) and a negative value if it gets it right ($s_i > s_j$). The $\log(1 + \exp(x))$ function is always positive. The loss increases as the difference in scores, ($s_j - s_i$), increases, heavily penalizing a wrong ranking. When the model gets the order right ($s_i > s_j$), the term ($s_j - s_i$) becomes a large negative number, causing the $\log(1 + \exp(x))$ term to approach zero, which results in a very small loss.</li>
         </ul>
         <p>
-            This method allows a smaller, specialized model to be trained to match the ranking quality of a much larger, more expensive LLM.
+            A smaller, specialized model (the student), such as a BERT-like cross-encoder, is then trained using this generated data. The training objective is not to predict the exact permutation but to produce relevance scores that result in a ranking that matches the teacher's. The training uses a pairwise loss function, like RankNet loss, which measures the correctness of the relative ordering of passages. The model is penalized if it scores a less-relevant passage higher than a more-relevant one, according to the teacher's permutation.
         </p>
     </article>
 </body>
