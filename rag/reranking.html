@@ -87,9 +87,16 @@
             <li><strong>Masked Language Modeling (BERT):</strong> ColBERT leverages the power of BERT's Masked Language Modeling, which predicts randomly masked tokens and uses a bidirectional approach (seeing both past and future tokens). This results in strong contextualized embeddings.</li>
             <li><strong>Causal Modeling (LLM):</strong> In contrast, Causal Modeling predicts the next token in a sequence and is unidirectional. While ideal for generation, the powerful bidirectional embeddings from BERT are more effective for retrieval tasks.</li>
         </ul>
+
+      <figure class="rag-figure">
+        <img src="Colbert_1.png" alt="Alternative text for the image">
+        <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
+      </figure>
+
         <p>
             The core concept behind <strong>ColBERT</strong> is that of late interaction. Unlike other models that create a single embedding for a document, ColBERT creates a powerful embedding for every token in the query and every token in the document using a pre-trained BERT-based encoder.
         </p>
+
        
         <p>
             During the re-ranking process, ColBERT efficiently calculates a similarity score for every token in the query against all tokens in the documents. It then takes the maximum similarity score for each query token and sums them up to determine the document's final relevance score.
@@ -108,6 +115,12 @@
             <strong>Re-ranking and Refinement:</strong>
             Once the smaller set of K candidate documents is identified, a more precise re-ranking is performed to find the final top-k results. The full ColBERT scoring process (MaxSim) is performed on this smaller set of K documents. The relevance score for each of the K candidates is calculated by taking the sum of the maximum similarity between each query embedding and all of the document's embeddings. The documents are then sorted by their scores, and the top-k documents are returned as the final result.
         </p>
+
+       <figure class="rag-figure">
+        <img src="colbert_result.png" alt="Alternative text for the image">
+        <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
+      </figure>
+
        
         <h3 id="colbertv2">ColBERTv2</h3>
         <p>
@@ -141,6 +154,12 @@
             For each of the ncandidate passages, the system loads and fully decompresses all of its token embeddings by combining the centroid and the residual vector. The true MaxSim operation is then performed. This involves calculating the cosine similarity between each query token vector and all of the uncompressed passage token vectors, and then summing up the maximum similarities.
         </p>
 
+         <figure class="rag-figure">
+          <img src="colbert_v2.png" alt="Alternative text for the image">
+          <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
+        </figure>
+
+
        <h3 id="rankgpt">LLM-based Re-ranking Models: RankGPT</h3>
         <p>
             Instead of the traditional supervised way of fine-tuning a LLM, RankGPT used a permutation knowledge distillation technique to train the model. They used two very interesting things like the sliding window technique for data generation and permutation distillation using RankNet loss.
@@ -150,6 +169,12 @@
             <strong>Sliding Window:</strong><br>
             The first step is to generate a large dataset of ranked lists. For a given query and a set of candidate passages, the large LLM (the teacher) uses the instructional permutation and sliding window methods to produce a high-quality, ranked list. This ranked list serves as the ground-truth data for the student model. To overcome the token limits of LLMs, which can't process hundreds of passages at once, the passages are re-ranked in a series of smaller batches using a sliding window. The window moves from the end of the list to the beginning, re-ranking a subset of passages at each step and "locking in" the relative order of the top documents as it proceeds.
         </p>
+      
+       <figure class="rag-figure">
+        <img src="rankgpt_data_generation.png" alt="Alternative text for the image">
+        <figcaption><strong>Figure 1:</strong> End-to-end pipeline of the implemented RAG system.</figcaption>
+      </figure>
+
 
         <p>
             <strong>Permutation Distillation:</strong><br>
