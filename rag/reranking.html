@@ -35,9 +35,10 @@
     </div>
   </div>
   
-  <div class="page-content">
+  <div class="page-content" style="display: flex; flex-direction: row; max-width: 1300px; margin: 0 auto; padding: 20px;">
+  <div class="sidebar sticky" style="width: 300px; padding: 20px;">
     <!-- Sidebar -->
-    <aside class="sidebar sticky">
+<!--     <aside class="sidebar sticky"> -->
       <div class="mainnotes-sidebar">
         <h3>Content</h3>
         <ul>
@@ -52,7 +53,7 @@
     </aside>
     
     <!-- Main Content -->
-    <main class="content">
+    <main style="flex: 1; padding: 20px; max-width: 1000px;">
       <h1>Does Re-ranking Improve the Performance of RAG?</h1>
       <p>
         Yes, re-ranking is a crucial step that can significantly improve the performance of a Retrieval-Augmented Generation (RAG) system. While the initial retrieval stage fetches a broad set of documents, the re-ranking stage refines this set, ensuring that only the most relevant and highest-quality information is passed to the LLM.
