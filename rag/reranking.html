@@ -52,8 +52,7 @@
     </div>
     
     <main style="flex: 1; padding: 20px; max-width: 1000px;">
-     <body>
-    <article class="container">
+   
         <h1>Does Re-ranking Improve the Performance of RAG?</h1>
         <p>
             Yes, re-ranking is a crucial step that can significantly improve the performance of a Retrieval-Augmented Generation (RAG) system. While the initial retrieval stage fetches a broad set of documents, the re-ranking stage refines this set, ensuring that only the most relevant and highest-quality information is passed to the LLM.
@@ -224,8 +223,16 @@
         <p>
             A smaller, specialized model (the student), such as a BERT-like cross-encoder, is then trained using this generated data. The training objective is not to predict the exact permutation but to produce relevance scores that result in a ranking that matches the teacher's. The training uses a pairwise loss function, like RankNet loss, which measures the correctness of the relative ordering of passages. The model is penalized if it scores a less-relevant passage higher than a more-relevant one, according to the teacher's permutation.
         </p>
-    </article>
-</body>
+
+        <section class="references">
+        <h2>References</h2>
+        <ul>
+          <li>Khattab, O., & Zaharia, M. (2020). ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT. <em>SIGIR</em>.</li>
+          <li>Santhanam, K., et al. (2022). ColBERTv2: Effective and Efficient Retrieval via Lightweight Late Interaction. <em>arXiv:2112.01488</em>.</li>
+          <li>Sun, S., et al. (2023). RankGPT: Instruction Tuning for Generative Ranking. <em>arXiv:2304.09569</em>.</li>
+          <li>Cohere AI. (2023). Cohere Rerank API Documentation. Retrieved from <a href="https://docs.cohere.com">https://docs.cohere.com</a>.</li>
+        </ul>
+      </section>
 </main>
 
  
